@@ -231,6 +231,8 @@ contract MarkoutFeeHook is ForgeFeeHook, PoolConfigurable {
         int256 continuation = mark.zeroForOne ? -moved : moved;
         if (continuation <= 0) return 0; // The price came back: the swap was noise, and noise scores zero.
 
+        // Casting to 'uint256' is safe because the line above returned unless `continuation > 0`.
+        // forge-lint: disable-next-line(unsafe-typecast)
         uint256 magnitude = uint256(continuation);
         return magnitude >= saturationTicks ? WAD : (magnitude * WAD) / saturationTicks;
     }

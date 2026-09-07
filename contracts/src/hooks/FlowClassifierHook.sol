@@ -146,6 +146,9 @@ contract FlowClassifierHook is ForgeHook, IFlowStats {
 
         Pending memory pending = _pending[id];
         int256 moved = int256(tickAfter) - int256(pending.tickBefore);
+        // Both casts are safe: `moved` is the difference of two int24 ticks, so it is far inside int256 and the
+        // branch fixes its sign before each conversion.
+        // forge-lint: disable-next-line(unsafe-typecast)
         uint256 ticks = moved < 0 ? uint256(-moved) : uint256(moved);
 
         Stats memory stats = _stats[id];
@@ -156,6 +159,8 @@ contract FlowClassifierHook is ForgeHook, IFlowStats {
         } else {
             stats.followTicks = stats.followTicks.add64(ticks);
         }
+        // Casting to 'uint64' is safe because no chain will reach block 18 quintillion.
+        // forge-lint: disable-next-line(unsafe-typecast)
         stats.lastBlock = uint64(block.number);
         _stats[id] = stats;
 

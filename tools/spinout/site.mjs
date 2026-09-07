@@ -25,141 +25,195 @@ function write(root, path, contents) {
 }
 
 const SCENE = `/**
- * The Uniswap v4 callback pipeline, with this hook's callbacks lit.
+ * The pool, in three dimensions.
  *
- * A swap runs left to right through the gates the protocol offers. The ones this hook implements glow and pulse as
- * the swap passes; the ones it does not are dark and inert. That is the whole contract between a hook and the
- * protocol, and reading it off a picture is faster than reading it off fourteen booleans.
+ * A Uniswap v4 pool is a curve with fourteen doors around it, and this draws exactly that: the torus is the pool, the
+ * fourteen pillars are the callbacks the protocol offers, and the ones this hook claims stand tall and lit while the
+ * rest stay dark and low. Order flow orbits the curve as particles and slows where a lit pillar governs it, which is
+ * the picture of a hook pricing a swap on its way through.
  *
- * The scene is decoration over content that is already complete. Without WebGL, or with JavaScript off, the page
- * reads exactly the same.
+ * Drag to orbit. It rotates on its own when left alone, pauses when scrolled out of view, and renders one still frame
+ * when the visitor has asked for reduced motion. Without WebGL the page loses the picture and nothing else: every fact
+ * it shows is also written in the text beneath it.
  */
 import {
-  AdditiveBlending, CanvasTexture, Color, Group, Mesh, MeshBasicMaterial, OrthographicCamera, PlaneGeometry,
-  Scene, SphereGeometry, Sprite, SpriteMaterial, TorusGeometry, WebGLRenderer,
+  AdditiveBlending, BufferAttribute, BufferGeometry, CanvasTexture, Color, CylinderGeometry, Fog, Group, Mesh,
+  MeshBasicMaterial, PerspectiveCamera, Points, PointsMaterial, Scene, SphereGeometry, Sprite, SpriteMaterial,
+  TorusGeometry, WebGLRenderer,
 } from "three";
 
-const STAGES = [
-  ["beforeInitialize", "beforeInitialize"],
-  ["afterInitialize", "afterInitialize"],
-  ["beforeAddLiquidity", "beforeAddLiq"],
-  ["afterAddLiquidity", "afterAddLiq"],
-  ["beforeSwap", "beforeSwap"],
-  ["afterSwap", "afterSwap"],
-  ["beforeRemoveLiquidity", "beforeRemoveLiq"],
-  ["afterRemoveLiquidity", "afterRemoveLiq"],
-  ["beforeDonate", "beforeDonate"],
-  ["afterDonate", "afterDonate"],
+/** The fourteen callbacks, grouped so a phase reads as a contiguous arc of the ring. */
+const DOORS = [
+  ["beforeInitialize", "init"], ["afterInitialize", "init"],
+  ["beforeAddLiquidity", "liquidity"], ["afterAddLiquidity", "liquidity"],
+  ["afterAddLiquidityReturnsDelta", "liquidity"],
+  ["beforeRemoveLiquidity", "liquidity"], ["afterRemoveLiquidity", "liquidity"],
+  ["afterRemoveLiquidityReturnsDelta", "liquidity"],
+  ["beforeSwap", "swap"], ["afterSwap", "swap"],
+  ["beforeSwapReturnsDelta", "swap"], ["afterSwapReturnsDelta", "swap"],
+  ["beforeDonate", "donate"], ["afterDonate", "donate"],
 ];
 
-const ON = new Color("#ff6a2b");
-const OFF = new Color("#232a35");
-
-function labelSprite(text, active) {
-  const canvas = document.createElement("canvas");
-  const scale = 3;
-  canvas.width = 300 * scale;
-  canvas.height = 56 * scale;
-
-  const ctx = canvas.getContext("2d");
-  ctx.scale(scale, scale);
-  ctx.font = "500 19px ui-monospace, SFMono-Regular, Menlo, monospace";
-  ctx.fillStyle = active ? "#e8eaef" : "#5a6373";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(text, 150, 28);
-
-  const sprite = new Sprite(new SpriteMaterial({map: new CanvasTexture(canvas), transparent: true, depthTest: false}));
-  sprite.scale.set(2.6, 0.49, 1);
-  return sprite;
-}
+const PHASE = {init: 0x8ab4ff, liquidity: 0x4ecdc4, swap: 0xff6a2b, donate: 0xb58cff};
 
 const canvas = document.querySelector("canvas[data-permissions]");
 if (canvas) mount(canvas, JSON.parse(canvas.dataset.permissions));
 
+function label(text, active) {
+  const c = document.createElement("canvas");
+  const scale = 3;
+  c.width = 340 * scale;
+  c.height = 52 * scale;
+  const ctx = c.getContext("2d");
+  ctx.scale(scale, scale);
+  ctx.font = "500 17px ui-monospace, SFMono-Regular, Menlo, monospace";
+  ctx.fillStyle = active ? "#e8eaef" : "#4b5563";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, 170, 26);
+  const sprite = new Sprite(new SpriteMaterial({map: new CanvasTexture(c), transparent: true, depthTest: false}));
+  sprite.scale.set(2.5, 0.38, 1);
+  return sprite;
+}
+
 function mount(canvas, permissions) {
   let renderer;
   try {
-    renderer = new WebGLRenderer({canvas, antialias: true, alpha: true, powerPreference: "low-power"});
+    renderer = new WebGLRenderer({canvas, antialias: true, alpha: true, powerPreference: "high-performance"});
   } catch {
     return;
   }
 
   const fallback = canvas.parentElement?.querySelector(".scene__fallback");
-  if (fallback) fallback.remove();
+  if (fallback) fallback.classList.add("scene__fallback--quiet");
 
   const scene = new Scene();
-  const camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
-  camera.position.z = 10;
+  scene.fog = new Fog(0x07080b, 12, 30);
 
+  const camera = new PerspectiveCamera(42, 1, 0.1, 120);
   const root = new Group();
   scene.add(root);
 
-  const spacing = 1.6;
-  const span = (STAGES.length - 1) * spacing;
-  const gates = [];
+  const RADIUS = 3.2;
 
-  root.add(new Mesh(new PlaneGeometry(span + spacing, 0.012), new MeshBasicMaterial({color: OFF, transparent: true, opacity: 0.7})));
+  // The pool: the curve every swap moves along.
+  const ring = new Mesh(
+    new TorusGeometry(RADIUS, 0.045, 14, 260),
+    new MeshBasicMaterial({color: 0x1d6f74, transparent: true, opacity: 0.9}),
+  );
+  ring.rotation.x = Math.PI / 2;
+  root.add(ring);
 
-  STAGES.forEach(([key, label], index) => {
-    const active = Boolean(permissions[key]);
-    const x = index * spacing - span / 2;
+  const halo = new Mesh(
+    new TorusGeometry(RADIUS, 0.24, 12, 200),
+    new MeshBasicMaterial({color: 0x1d6f74, transparent: true, opacity: 0.06, blending: AdditiveBlending}),
+  );
+  halo.rotation.x = Math.PI / 2;
+  root.add(halo);
 
-    const ring = new Mesh(
-      new TorusGeometry(0.34, active ? 0.035 : 0.018, 10, 56),
-      new MeshBasicMaterial({color: active ? ON : OFF, transparent: true, opacity: active ? 0.95 : 0.55}),
+  // A faint floor ring, purely to give the eye a horizon and make the ring read as a solid in space.
+  const floor = new Mesh(
+    new TorusGeometry(RADIUS * 1.9, 0.006, 6, 160),
+    new MeshBasicMaterial({color: 0x1b1f28, transparent: true, opacity: 0.7}),
+  );
+  floor.rotation.x = Math.PI / 2;
+  floor.position.y = -1.5;
+  root.add(floor);
+
+  const doors = DOORS.map(([key, phase], index) => {
+    const active = permissions[key] === true;
+    const angle = (index / DOORS.length) * Math.PI * 2;
+    const height = active ? 1.5 : 0.34;
+    const colour = new Color(active ? PHASE[phase] : 0x252c38);
+
+    const pillar = new Mesh(
+      new CylinderGeometry(active ? 0.075 : 0.05, active ? 0.075 : 0.05, height, 14),
+      new MeshBasicMaterial({color: colour, transparent: true, opacity: active ? 0.95 : 0.5}),
     );
-    ring.position.set(x, 0, 0);
-    root.add(ring);
+    pillar.position.set(Math.cos(angle) * RADIUS, height / 2, Math.sin(angle) * RADIUS);
+    root.add(pillar);
 
     let glow = null;
     if (active) {
       glow = new Mesh(
-        new TorusGeometry(0.34, 0.13, 10, 56),
-        new MeshBasicMaterial({color: ON, transparent: true, opacity: 0.1, blending: AdditiveBlending}),
+        new SphereGeometry(0.2, 18, 14),
+        new MeshBasicMaterial({color: colour, transparent: true, opacity: 0.25, blending: AdditiveBlending}),
       );
-      glow.position.copy(ring.position);
+      glow.position.set(pillar.position.x, height, pillar.position.z);
       root.add(glow);
     }
 
-    const sprite = labelSprite(label, active);
-    sprite.position.set(x, -0.78, 0);
-    root.add(sprite);
+    const text = label(key, active);
+    text.position.set(Math.cos(angle) * (RADIUS + 1.55), height + 0.34, Math.sin(angle) * (RADIUS + 1.55));
+    root.add(text);
 
-    gates.push({x, active, ring, glow});
+    return {angle, active, pillar, glow, height};
   });
 
-  const swap = new Mesh(new SphereGeometry(0.085, 16, 16), new MeshBasicMaterial({color: new Color("#4ecdc4")}));
-  root.add(swap);
+  // Order flow, orbiting the curve. It slows in the arc a claimed callback governs, which is what a hook taxing a
+  // swap on its way through actually looks like.
+  const COUNT = 1400;
+  const positions = new Float32Array(COUNT * 3);
+  const phase = new Float32Array(COUNT);
+  const lift = new Float32Array(COUNT);
+  for (let i = 0; i < COUNT; i++) {
+    phase[i] = Math.random() * Math.PI * 2;
+    lift[i] = (Math.random() - 0.5) * 0.3;
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute("position", new BufferAttribute(positions, 3));
+  const flow = new Points(
+    geometry,
+    new PointsMaterial({color: 0x7fe9d8, size: 0.05, transparent: true, opacity: 0.8, blending: AdditiveBlending}),
+  );
+  root.add(flow);
+
+  // Camera, orbited by dragging and drifting on its own otherwise.
+  let yaw = 0.6;
+  let pitch = 0.52;
+  let targetYaw = yaw;
+  let targetPitch = pitch;
+  let distance = 11.5;
+  let dragging = false;
+  let lastPointer = null;
+  let idleSince = performance.now();
+
+  canvas.style.touchAction = "pan-y";
+  canvas.addEventListener("pointerdown", (event) => {
+    dragging = true;
+    lastPointer = {x: event.clientX, y: event.clientY};
+    canvas.setPointerCapture(event.pointerId);
+    canvas.style.cursor = "grabbing";
+  });
+  canvas.addEventListener("pointermove", (event) => {
+    if (!dragging || !lastPointer) return;
+    targetYaw -= (event.clientX - lastPointer.x) * 0.006;
+    targetPitch = Math.max(0.12, Math.min(1.3, targetPitch + (event.clientY - lastPointer.y) * 0.004));
+    lastPointer = {x: event.clientX, y: event.clientY};
+    idleSince = performance.now();
+  });
+  const release = (event) => {
+    dragging = false;
+    lastPointer = null;
+    canvas.style.cursor = "grab";
+    idleSince = performance.now();
+    if (event?.pointerId !== undefined && canvas.hasPointerCapture(event.pointerId)) {
+      canvas.releasePointerCapture(event.pointerId);
+    }
+  };
+  canvas.addEventListener("pointerup", release);
+  canvas.addEventListener("pointercancel", release);
+  canvas.style.cursor = "grab";
 
   function resize() {
     const {clientWidth, clientHeight} = canvas;
     if (clientWidth === 0 || clientHeight === 0) return;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(clientWidth, clientHeight, false);
-
-    const worldWidth = span + spacing * 1.4;
-    const halfHeight = (worldWidth * clientHeight) / clientWidth / 2;
-    camera.left = -worldWidth / 2;
-    camera.right = worldWidth / 2;
-    camera.top = halfHeight;
-    camera.bottom = -halfHeight;
+    camera.aspect = clientWidth / clientHeight;
+    // Pull back on narrow screens so the ring and its labels still fit.
+    distance = clientWidth < 720 ? 15.5 : 11.5;
     camera.updateProjectionMatrix();
-  }
-
-  const startX = -span / 2 - spacing * 0.7;
-  const endX = span / 2 + spacing * 0.7;
-
-  function step(elapsed) {
-    const x = startX + (endX - startX) * ((elapsed % 7) / 7);
-    swap.position.set(x, 0, 0.2);
-    for (const gate of gates) {
-      if (!gate.active) continue;
-      const excitement = Math.max(0, 1 - Math.abs(x - gate.x) / 0.75);
-      gate.ring.material.opacity = 0.72 + excitement * 0.28;
-      gate.ring.scale.setScalar(1 + excitement * 0.16);
-      if (gate.glow) gate.glow.material.opacity = 0.07 + excitement * 0.3;
-    }
   }
 
   const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
@@ -167,10 +221,50 @@ function mount(canvas, permissions) {
   let last = performance.now();
   let visible = true;
 
+  function step(delta, now) {
+    elapsed += delta;
+
+    // Drift back into motion once the visitor has stopped dragging.
+    if (!dragging && now - idleSince > 2500) targetYaw += delta * 0.12;
+    yaw += (targetYaw - yaw) * 0.08;
+    pitch += (targetPitch - pitch) * 0.08;
+
+    camera.position.set(
+      Math.sin(yaw) * Math.cos(pitch) * distance,
+      Math.sin(pitch) * distance,
+      Math.cos(yaw) * Math.cos(pitch) * distance,
+    );
+    camera.lookAt(0, 0.4, 0);
+
+    for (const door of doors) {
+      if (!door.active) continue;
+      const pulse = 0.5 + 0.5 * Math.sin(elapsed * 1.6 + door.angle * 2.4);
+      door.pillar.scale.y = 1 + pulse * 0.06;
+      if (door.glow) {
+        door.glow.material.opacity = 0.16 + pulse * 0.24;
+        door.glow.scale.setScalar(1 + pulse * 0.22);
+      }
+    }
+
+    for (let i = 0; i < COUNT; i++) {
+      let drag = 0;
+      for (const door of doors) {
+        if (!door.active) continue;
+        const gap = Math.abs(((phase[i] - door.angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+        if (gap > Math.PI - 0.5) drag += 1;
+      }
+      phase[i] += delta * 0.34 / (1 + drag * 2.2);
+      const r = RADIUS + Math.sin(phase[i] * 4 + i) * 0.06;
+      positions[i * 3] = Math.cos(phase[i]) * r;
+      positions[i * 3 + 1] = lift[i] + Math.sin(elapsed * 0.7 + i) * 0.03;
+      positions[i * 3 + 2] = Math.sin(phase[i]) * r;
+    }
+    flow.geometry.attributes.position.needsUpdate = true;
+  }
+
   resize();
   if (reduced) {
-    const first = gates.find((gate) => gate.active);
-    step(first ? ((first.x - startX) / (endX - startX)) * 7 : 0);
+    step(0, performance.now());
     renderer.render(scene, camera);
   } else {
     const frame = (now) => {
@@ -178,8 +272,7 @@ function mount(canvas, permissions) {
       const delta = Math.min((now - last) / 1000, 0.05);
       last = now;
       if (!visible) return;
-      elapsed += delta;
-      step(elapsed);
+      step(delta, now);
       renderer.render(scene, camera);
     };
     requestAnimationFrame(frame);
@@ -247,9 +340,17 @@ pre code { white-space: pre; background: none; border: 0; padding: 0; }
 .btn:hover { transform: translateY(-1px); border-color: var(--forge); color: var(--text); }
 .btn--primary { background: var(--forge); border-color: var(--forge); color: #14060a; font-weight: 600; }
 .btn--primary:hover { background: var(--forge-soft); border-color: var(--forge-soft); color: #14060a; }
-.scene { position: relative; margin: 2.5rem 0 1rem; aspect-ratio: 16 / 5; min-height: 190px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--ink-raised); overflow: hidden; }
+/* The scene is the page's backdrop, not a figure inside it: it fills the viewport and the hero copy sits over it. */
+.stage { position: relative; min-height: min(88vh, 820px); display: grid; align-items: end; overflow: hidden; border-bottom: 1px solid var(--line); }
+.scene { position: absolute; inset: 0; z-index: 0; }
 .scene canvas { display: block; width: 100%; height: 100%; }
-.scene__fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 1.5rem; margin: 0; text-align: center; color: var(--text-dim); font-size: .92rem; }
+.scene__fallback { position: absolute; inset: auto 0 1rem; display: grid; place-items: center; padding: 1.5rem; margin: 0; text-align: center; color: var(--text-dim); font-size: .92rem; }
+.scene__fallback--quiet { display: none; }
+.scene__hint { position: absolute; right: 1rem; bottom: 1rem; z-index: 2; font-family: var(--mono); font-size: .72rem; color: var(--text-faint); pointer-events: none; }
+/* A vignette so type over the scene stays readable wherever the camera happens to be. */
+.stage::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to top, var(--ink) 2%, rgba(7,8,11,.72) 34%, rgba(7,8,11,.15) 62%, rgba(7,8,11,.55) 100%); }
+.stage .hero { position: relative; z-index: 2; padding-bottom: clamp(2.5rem, 6vw, 4.5rem); }
+@media (max-width: 720px) { .stage { min-height: min(78vh, 640px); } }
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; margin: 2rem 0 0; }
 .stat { background: var(--ink-raised); padding: 1.05rem 1.2rem; }
 .stat dt { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); margin-bottom: .25rem; }
@@ -476,6 +577,15 @@ poolManager.initialize(key, startingSqrtPriceX96);`
 </header>
 
 <main id="main">
+  <div class="stage">
+    <div class="scene">
+      <canvas data-permissions="${esc(JSON.stringify(hook.permissions ?? {}))}" aria-hidden="true"></canvas>
+      <p class="scene__fallback">${esc(hook.name)} implements ${claimed.length} of the fourteen Uniswap v4 callbacks: ${
+    claimed.join(", ") || "none"
+  }.</p>
+    </div>
+    <p class="scene__hint">drag to orbit</p>
+
   <section class="shell hero">
     <p class="eyebrow">Uniswap v4 hook &middot; ${esc(hook.family)}</p>
     <h1>${esc(hook.name)}</h1>
@@ -486,13 +596,6 @@ poolManager.initialize(key, startingSqrtPriceX96);`
       <a class="btn" href="/hook.json">Manifest JSON</a>
     </div>
 
-    <div class="scene">
-      <canvas data-permissions="${esc(JSON.stringify(hook.permissions ?? {}))}" aria-hidden="true"></canvas>
-      <p class="scene__fallback">${esc(hook.name)} implements ${claimed.length} of the fourteen Uniswap v4 callbacks: ${
-    claimed.join(", ") || "none"
-  }.</p>
-    </div>
-
     <dl class="stats">
       <div class="stat"><dt>Family</dt><dd>${esc(hook.family)}</dd></div>
       <div class="stat"><dt>Callbacks</dt><dd>${claimed.length} of 14</dd></div>
@@ -501,6 +604,7 @@ poolManager.initialize(key, startingSqrtPriceX96);`
       <div class="stat"><dt>Licence</dt><dd>MIT</dd></div>
     </dl>
   </section>
+  </div>
 
   <section class="shell">
     <h2 id="how">How it works</h2>

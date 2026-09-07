@@ -49,3 +49,9 @@ line_length = 120
 tab_width = 4
 bracket_spacing = false
 int_types = 'long'
+
+[lint]
+# The linter runs on `forge build`, and its unsafe-cast rule fires on every `int256(x)` in a test where `x` came from
+# `bound()` and cannot truncate. Annotating each one buries the signal, so tests are excluded and `src` is held to a
+# zero-warning standard where a truncating cast would actually matter.
+ignore = ["test/**/*.sol", "test/*.sol"]
