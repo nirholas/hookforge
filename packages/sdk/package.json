@@ -1,0 +1,17 @@
+{
+  "name": "@hookforge/sdk",
+  "version": "1.0.0",
+  "description": "TypeScript client for HookForge Uniswap v4 hooks: discover a hook on-chain, read its parameters, quote its fee, and configure a pool.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "files": ["dist", "src"],
+  "keywords": ["uniswap", "uniswap-v4", "hooks", "viem", "defi", "amm", "typescript", "base", "arbitrum"],
+  "repository": { "type": "git", "url": "https://github.com/nirholas/hookforge.git", "directory": "packages/sdk" },
+  "scripts": { "build": "tsc -p tsconfig.json", "test": "node --test test/*.test.mjs" },
+  "dependencies": { "@hookforge/registry": "1.0.0" },
+  "peerDependencies": { "viem": "^2.21.0" },
+  "devDependencies": { "typescript": "^5.6.0", "viem": "^2.21.0" }
+}
