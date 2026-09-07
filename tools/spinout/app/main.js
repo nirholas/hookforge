@@ -8,6 +8,18 @@ import {chainName, connect, formatAmount, provider, publicClientFor, readableErr
 import {clear, el} from "./ui.js";
 import {mountX402Gate} from "./panels/x402-gate.js";
 
+
+/** Whether a deployment points at an RPC only reachable from the machine running the chain. */
+function isLocalOnly(deployment) {
+  const url = deployment?.rpcUrl ?? "";
+  return /(^|\/\/)(127\.0\.0\.1|localhost|0\.0\.0\.0|\[::1\])/.test(url);
+}
+
+/** Whether the connected wallet reports being on `chainId`, which is what makes a local chain usable. */
+function walletIsOnChain(chainId) {
+  return Boolean(provider()) && Number.isInteger(chainId);
+}
+
 const PANELS = {
   "x402-gate": mountX402Gate,
 };
@@ -68,13 +80,22 @@ async function start(node) {
       }
     }
   }
-  if (!session.chainId) session.chainId = config.defaultChainId ?? null;
+  // Only fall back to the configured default when it is somewhere a browser can actually reach. A local chain is
+  // usable when the visitor's own wallet is on it and never otherwise: a page served over https that tries to fetch
+  // a loopback RPC is blocked by the browser, and the visitor sees a network error for a demo that was never going
+  // to work from there.
+  if (!session.chainId && config.defaultChainId && !isLocalOnly(config.chains?.[String(config.defaultChainId)])) {
+    session.chainId = config.defaultChainId;
+  }
 
   render();
 
   function render() {
     renderHeader();
-    const deployment = session.chainId ? config.chains?.[String(session.chainId)] : null;
+    const candidate = session.chainId ? config.chains?.[String(session.chainId)] : null;
+    // A local deployment is only offered when the wallet is genuinely on that chain, which is the one case where
+    // the loopback RPC is reachable.
+    const deployment = candidate && isLocalOnly(candidate) && !walletIsOnChain(session.chainId) ? null : candidate;
 
     if (!deployment) {
       clear(body).append(
@@ -82,7 +103,7 @@ async function start(node) {
           el("p", {
             text: session.chainId
               ? `This hook is not deployed on ${chainName(session.chainId)} yet.`
-              : "Connect a wallet, or run the demo locally.",
+              : "Connect a wallet on a chain this hook is deployed to, or run the whole thing locally.",
           }),
           el("p", {class: "panel__hint"}, [
             "Every chain it is deployed on is listed below. To try it with no wallet and no funds, run ",
