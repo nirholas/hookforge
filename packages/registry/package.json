@@ -7,17 +7,45 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "./hooks/*": "./hooks/*",
-    "./index.json": "./index.json"
+    "./index.json": "./index.json",
+    "./chains.json": "./chains.json",
+    "./schema/*": "./schema/*",
+    "./package.json": "./package.json"
   },
-  "files": ["dist", "hooks", "index.json", "chains.json", "schema"],
-  "keywords": ["uniswap", "uniswap-v4", "hooks", "defi", "amm", "registry", "ethereum", "base", "arbitrum"],
-  "repository": { "type": "git", "url": "https://github.com/nirholas/hookforge.git", "directory": "packages/registry" },
+  "files": [
+    "dist",
+    "hooks",
+    "index.json",
+    "chains.json",
+    "schema"
+  ],
+  "keywords": [
+    "uniswap",
+    "uniswap-v4",
+    "hooks",
+    "defi",
+    "amm",
+    "registry",
+    "ethereum",
+    "base",
+    "arbitrum"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nirholas/hookforge.git",
+    "directory": "packages/registry"
+  },
   "scripts": {
     "generate": "node scripts/build.mjs",
     "build": "node scripts/build.mjs && tsc -p tsconfig.json",
     "test": "node --test test/*.test.mjs"
   },
-  "devDependencies": { "typescript": "^5.6.0" }
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
 }

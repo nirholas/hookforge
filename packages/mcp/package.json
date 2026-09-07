@@ -1,0 +1,19 @@
+{
+  "name": "@hookforge/mcp",
+  "version": "1.0.0",
+  "description": "MCP server for the HookForge Uniswap v4 hook catalogue: let a coding agent search hooks by problem, read a hook's parameters and prior art, and decode what any hook address will actually do.",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "hookforge-mcp": "./dist/server.js" },
+  "main": "./dist/server.js",
+  "files": ["dist", "src"],
+  "keywords": ["mcp", "model-context-protocol", "uniswap", "uniswap-v4", "hooks", "defi", "ai-agent", "claude"],
+  "repository": { "type": "git", "url": "https://github.com/nirholas/hookforge.git", "directory": "packages/mcp" },
+  "scripts": { "build": "tsc -p tsconfig.json && chmod +x dist/server.js", "start": "node dist/server.js", "test": "node --test test/*.test.mjs" },
+  "dependencies": {
+    "@hookforge/registry": "1.0.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": { "typescript": "^5.6.0", "@types/node": "^22.0.0" }
+}

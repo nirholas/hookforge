@@ -29,7 +29,12 @@ import {AntiSnipeRampHook} from "src/hooks/AntiSnipeRampHook.sol";
  * Usage:
  *
  *   forge script script/DeployHooks.s.sol --rpc-url base --broadcast --verify
- *   forge script script/DeployHooks.s.sol --rpc-url robinhood --broadcast
+ *   forge script script/DeployHooks.s.sol --rpc-url robinhood --broadcast --gas-limit 30000000000
+ *
+ * Salt mining is a loop, and how long it runs depends on the chain (the `PoolManager` address is part of the init
+ * code, so each chain searches a different space). Some chains need more headroom than the default script gas limit
+ * allows and fail with `EvmError: OutOfGas` in the miner rather than anywhere interesting; `--gas-limit` fixes it and
+ * costs nothing, since mining is a view loop that never reaches the chain.
  *
  * Requires `PRIVATE_KEY` in the environment (or `--account` / `--ledger`). The addresses are written to
  * `deployments/<chainId>.json`, which `packages/registry` reads when it builds the published address book.

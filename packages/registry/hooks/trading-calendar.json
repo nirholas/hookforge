@@ -1,23 +1,32 @@
 {
   "$schema": "https://hookforge.dev/schema/hook-manifest.json",
-  "slug": "tradingcalendarhook",
+  "slug": "trading-calendar",
   "name": "TradingCalendar",
   "contract": "TradingCalendarHook",
   "version": "1.0.0",
-  "family": "Uncategorised",
+  "family": "Time",
   "summary": "Gives a pool a trading session, and closes it by raising the price of immediacy rather than by reverting.",
   "description": "Some assets should not be quoted around the clock at the same spread. A pool whose reference market is open for part of the day is being priced blind the rest of the time, and the liquidity sitting in it overnight is providing a free option to anyone with better information about where the asset will open. The obvious hook for this reverts outside session hours, and several published ones do exactly that. Reverting is the wrong instrument. A pool that reverts is a pool that every router, aggregator and quoting service must special case; it fails after the user has signed; it strands liquidity providers who wanted to exit; and it converts a pricing problem into a liveness problem. Worse, it does not stop informed flow at all, it just moves it to the first second after the open, where it hits the same liquidity at the same stale price. This hook keeps the pool open and quotable at every instant and expresses the session in the fee instead:   - Inside the session, swaps pay `sessionFee`.   - Outside it, swaps pay `closedFee`, which is meant to be punitive rather than prohibitive.   - Across `rampSeconds` on either side of each boundary the fee moves linearly between the two, so the open and     the close are gradients rather than cliffs and there is no single block worth racing to. The ramp is the part that matters. A cliff at the open creates a race: the first swap after the boundary captures the whole overnight gap at the session spread. A ramp means the trader who wants that gap must choose between paying for it early and waiting for a lower fee while the price moves against them, which is precisely the tradeoff that makes the gap get closed gradually and by more than one participant. Sessions are expressed in UTC seconds-of-day and may wrap midnight (`open > close` describes an overnight session). `daysMask` selects the days of the week the session runs, bit 0 being Monday. A pool with `daysMask` covering all seven days and a 24-hour session is always in session, which is a valid way to disable the calendar. Prior art: \"New York Trading Hours\" and \"Trading Hours\" hooks revert outside a window. Continuous fee ramps around scheduled events appear in the `UniCast` design for known catalysts. Expressing a *recurring weekly calendar* as a continuous fee surface, with no revert path and no oracle, is the contribution here.",
-  "priorArt": "",
-  "limitation": "",
+  "priorArt": "The published calendar hooks (\"New York Trading Hours\", \"Trading Hours\") revert outside a window. Continuous fee ramps around a single scheduled event appear in the UniCast design. Expressing a recurring weekly calendar as a continuous fee surface, with no revert path and no oracle, is the contribution here.",
+  "limitation": "The calendar is a fixed weekly pattern in UTC. It does not know about holidays, half days, or daylight-saving shifts in the reference market, so a pool tracking an asset with an irregular schedule has to pick a session that is correct most weeks and accept that it is wrong on the exceptions.",
   "tags": [
     "dynamic-fee",
     "schedule",
     "rwa",
     "oracle-free"
   ],
-  "recommendedChains": [],
+  "recommendedChains": [
+    "base",
+    "arbitrum",
+    "unichain",
+    "robinhood",
+    "ethereum",
+    "optimism",
+    "polygon",
+    "bnb"
+  ],
   "source": "contracts/src/hooks/TradingCalendarHook.sol",
-  "docs": "https://hookforge.dev/hooks/tradingcalendarhook",
+  "docs": "https://hookforge.dev/hooks/trading-calendar",
   "permissions": null,
   "properties": {
     "dynamicFee": true,

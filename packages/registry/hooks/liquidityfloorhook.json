@@ -1,96 +1,60 @@
 {
   "$schema": "https://hookforge.dev/schema/hook-manifest.json",
-  "slug": "anti-snipe-ramp",
-  "name": "AntiSnipeRamp",
-  "contract": "AntiSnipeRampHook",
+  "slug": "liquidityfloorhook",
+  "name": "LiquidityFloor",
+  "contract": "LiquidityFloorHook",
   "version": "1.0.0",
-  "family": "Launch",
-  "summary": "Opens a pool at a punitive fee that decays to normal over a fixed window, and pays every cent of the difference to liquidity providers rather than to the deployer.",
-  "description": "The first block of a new pool is the most valuable block it will ever have. A bot that buys in it and sells an hour later takes the entire launch premium, and everyone who arrives through the front door pays for it. The usual answers are a whitelist, which is a promise rather than a mechanism, or a bonding curve that hands the premium to the deployer, which moves the extraction rather than removing it. This hook makes the first block expensive to trade in and lets that expense decay:   fee(t) = startFee - (startFee - endFee) * min(t, rampSeconds) / rampSeconds A sniper in the first second pays `startFee`, which can be set high enough that the trade is not worth making. A buyer twenty minutes later pays close to `endFee`. Because the fee is an LP fee, the premium the early trader surrenders is paid to the people who put the liquidity up, not to whoever deployed the token. There is no address in this contract that can receive anything. A second lever handles the case where the fee alone is not enough. While the ramp is running, a single swap may not exceed `maxSwapDuringRamp` units of the specified currency. This is a size cap, not an identity check, and it is deliberately not per-address: a hook sees the router that called the `PoolManager`, not the person behind it, so any per-address limit is a limit on routers and is defeated by a fresh key. Capping size is enforceable against everyone equally, including the deployer. Set it to zero to disable it. Prior art: liquidity bootstrapping pools ramp the *price* down and were built for price discovery; several launchpad hooks charge a launch fee and route it to a creator or a protocol treasury. Ramping the *fee* down while directing the proceeds to liquidity is a different mechanism with a different beneficiary, and it composes with any curve rather than replacing it.",
-  "priorArt": "Liquidity bootstrapping pools ramp the price down and were built for price discovery; several launchpad hooks charge a launch fee and route it to a creator or a treasury. Ramping the fee down while directing the proceeds to liquidity is a different mechanism with a different beneficiary, and it composes with any curve rather than replacing it.",
-  "limitation": "The size cap is per swap, not per address: a hook sees the router that called the PoolManager, not the person behind it, so a determined buyer can split across transactions. The cap raises the cost of sniping rather than preventing it, and the fee ramp is what does the real work.",
+  "family": "Uncategorised",
+  "summary": "A liquidity commitment enforced per position: a fraction of what you add cannot leave until the pool's unlock date, and every provider is held to that fraction of their own stake rather than to a shared pool total.",
+  "description": "A new pool has a bootstrapping problem that is really a credibility problem. Swappers cannot tell the difference between liquidity that intends to stay and liquidity that will leave the moment the pool is quoted by an aggregator, and the second kind is indistinguishable from the first right up until it is gone. The published answers lock whole positions for a term. That works and it is also badly mispriced: a provider who would happily commit a third of their capital for six months has to choose between committing all of it and committing none. Term locks therefore select for the providers least sensitive to the lock, which is not the same set as the providers most useful to the pool. This hook takes the commitment as a *fraction*. Configure `floorBps` and `unlockTimestamp`, and thereafter each position may freely withdraw down to `floorBps` of everything it has ever added, with the remainder released at the unlock. Adding more liquidity raises your own floor proportionally, so topping up is never a trap: you keep the same ratio of free to committed capital that you signed up for. The design is deliberately race-free, which is the property that distinguishes it from a pool-wide minimum. A floor expressed as \"total pool liquidity must stay above X\" is a bank run waiting to happen: it is satisfiable by whoever withdraws first and binding only on whoever is last, so rational providers race for the exit precisely when the pool most needs them. Holding each position to its own commitment removes the race entirely. Nothing another provider does can change what you are allowed to withdraw. The hook takes no fee, holds no funds and has no privileged role. It cannot stop a provider from ceasing to quote, only from removing committed liquidity, and it does not restrict swaps at all. Position identity is the v4 position key: the address that called `modifyLiquidity` on the `PoolManager` (in practice a position manager or a router), the tick range, and the caller's salt. Two providers sharing one position manager therefore share a commitment only if they also share a salt, which position managers do not do. Prior art: `LiquidityLock`, `Timelock Addition` and `LockingLiquidity` all lock positions wholesale for a term. Fractional, per-position, top-up-safe commitments are the contribution here.",
+  "priorArt": "",
+  "limitation": "",
   "tags": [
+    "lp-economics",
+    "commitment",
     "launch",
-    "anti-snipe",
-    "dynamic-fee",
-    "no-admin"
+    "rug-resistance"
   ],
-  "recommendedChains": [
-    "base",
-    "arbitrum",
-    "unichain",
-    "robinhood",
-    "ethereum",
-    "optimism",
-    "polygon",
-    "bnb"
-  ],
-  "source": "contracts/src/hooks/AntiSnipeRampHook.sol",
-  "docs": "https://hookforge.dev/hooks/anti-snipe-ramp",
-  "permissions": {
-    "afterRemoveLiquidityReturnsDelta": false,
-    "afterAddLiquidityReturnsDelta": false,
-    "afterSwapReturnsDelta": false,
-    "beforeSwapReturnsDelta": false,
-    "afterDonate": false,
-    "beforeDonate": false,
-    "afterSwap": false,
-    "beforeSwap": true,
-    "afterRemoveLiquidity": false,
-    "beforeRemoveLiquidity": false,
-    "afterAddLiquidity": false,
-    "beforeAddLiquidity": false,
-    "afterInitialize": true,
-    "beforeInitialize": false
-  },
+  "recommendedChains": [],
+  "source": "contracts/src/hooks/LiquidityFloorHook.sol",
+  "docs": "https://hookforge.dev/hooks/liquidityfloorhook",
+  "permissions": null,
   "properties": {
-    "dynamicFee": true,
+    "dynamicFee": false,
     "upgradeable": false,
     "requiresCustomSwapData": false,
     "vanillaSwap": true,
     "swapAccess": "none"
   },
   "configure": {
-    "signature": "configure((address,address,uint24,int24,address),(uint24,uint24,uint32,uint128))",
+    "signature": "configure((address,address,uint24,int24,address),(uint16,uint64))",
     "fields": [
       {
-        "name": "startFee",
-        "type": "uint24"
+        "name": "floorBps",
+        "type": "uint16"
       },
       {
-        "name": "endFee",
-        "type": "uint24"
-      },
-      {
-        "name": "rampSeconds",
-        "type": "uint32"
-      },
-      {
-        "name": "maxSwapDuringRamp",
-        "type": "uint128"
+        "name": "unlockTimestamp",
+        "type": "uint64"
       }
     ]
   },
   "errors": [
     {
-      "signature": "FeeTooLarge(uint24)",
-      "notice": "A fee was configured above the protocol maximum of 100%."
+      "signature": "CommitmentBreached(uint256,uint256)",
+      "notice": "The withdrawal would take the position below its commitment."
     },
     {
       "signature": "HookNotImplemented()",
       "notice": "The hook function is not implemented."
     },
     {
-      "signature": "InvalidConfig()",
-      "notice": "`rampSeconds` was zero, or `endFee` was above `startFee`, which would ramp the fee upward."
+      "signature": "InvalidFloor()",
+      "notice": "`floorBps` was zero (no commitment) or above 100%."
     },
     {
       "signature": "InvalidPool()",
       "notice": "The pool is not configured to use this hook."
-    },
-    {
-      "signature": "NotDynamicFee()",
-      "notice": "The hook was attempted to be initialized with a non-dynamic fee."
     },
     {
       "signature": "PoolAlreadyInitialized()",
@@ -101,36 +65,11 @@
       "notice": "The pool was initialized without a configuration for this hook."
     },
     {
-      "signature": "SwapTooLargeDuringRamp(uint256,uint128)",
-      "notice": "The swap is larger than the pool allows while its launch ramp is running."
+      "signature": "UnlockInThePast()",
+      "notice": "The unlock must be in the future at configuration time, or the commitment means nothing."
     }
   ],
-  "deployments": [
-    {
-      "chain": "unichain",
-      "chainId": 130,
-      "address": "0xa712fa3ecD3a5260389a9115d09E7A8Ccf5e5080",
-      "status": "deterministic"
-    },
-    {
-      "chain": "robinhood",
-      "chainId": 4663,
-      "address": "0x885B7D5F9C96B9434a14Cfd0BdC8D8c6aE5F5080",
-      "status": "deterministic"
-    },
-    {
-      "chain": "base",
-      "chainId": 8453,
-      "address": "0x3C2ebA98374549AF1f7FC909265146E78C881080",
-      "status": "deterministic"
-    },
-    {
-      "chain": "arbitrum",
-      "chainId": 42161,
-      "address": "0xd0Debb7531F0960ccd0061306bDeC1FBF6Da5080",
-      "status": "deterministic"
-    }
-  ],
+  "deployments": [],
   "abi": [
     {
       "type": "constructor",
@@ -142,6 +81,30 @@
         }
       ],
       "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "addedLiquidity",
+      "inputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "PoolId"
+        },
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -932,6 +895,30 @@
     },
     {
       "type": "function",
+      "name": "committedLiquidity",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "internalType": "PoolId"
+        },
+        {
+          "name": "position",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "configOf",
       "inputs": [
         {
@@ -942,24 +929,14 @@
       ],
       "outputs": [
         {
-          "name": "startFee",
-          "type": "uint24",
-          "internalType": "uint24"
+          "name": "floorBps",
+          "type": "uint16",
+          "internalType": "uint16"
         },
         {
-          "name": "endFee",
-          "type": "uint24",
-          "internalType": "uint24"
-        },
-        {
-          "name": "rampSeconds",
-          "type": "uint32",
-          "internalType": "uint32"
-        },
-        {
-          "name": "maxSwapDuringRamp",
-          "type": "uint128",
-          "internalType": "uint128"
+          "name": "unlockTimestamp",
+          "type": "uint64",
+          "internalType": "uint64"
         }
       ],
       "stateMutability": "view"
@@ -1003,27 +980,17 @@
         {
           "name": "cfg",
           "type": "tuple",
-          "internalType": "struct AntiSnipeRampHook.Config",
+          "internalType": "struct LiquidityFloorHook.Config",
           "components": [
             {
-              "name": "startFee",
-              "type": "uint24",
-              "internalType": "uint24"
+              "name": "floorBps",
+              "type": "uint16",
+              "internalType": "uint16"
             },
             {
-              "name": "endFee",
-              "type": "uint24",
-              "internalType": "uint24"
-            },
-            {
-              "name": "rampSeconds",
-              "type": "uint32",
-              "internalType": "uint32"
-            },
-            {
-              "name": "maxSwapDuringRamp",
-              "type": "uint128",
-              "internalType": "uint128"
+              "name": "unlockTimestamp",
+              "type": "uint64",
+              "internalType": "uint64"
             }
           ]
         }
@@ -1037,7 +1004,7 @@
       "inputs": [],
       "outputs": [
         {
-          "name": "permissions",
+          "name": "",
           "type": "tuple",
           "internalType": "struct Hooks.Permissions",
           "components": [
@@ -1176,44 +1143,6 @@
     },
     {
       "type": "function",
-      "name": "isRamping",
-      "inputs": [
-        {
-          "name": "id",
-          "type": "bytes32",
-          "internalType": "PoolId"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool",
-          "internalType": "bool"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "openedAt",
-      "inputs": [
-        {
-          "name": "",
-          "type": "bytes32",
-          "internalType": "PoolId"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint64",
-          "internalType": "uint64"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
       "name": "poolManager",
       "inputs": [],
       "outputs": [
@@ -1227,19 +1156,58 @@
     },
     {
       "type": "function",
-      "name": "quoteFee",
+      "name": "positionKey",
       "inputs": [
         {
-          "name": "id",
+          "name": "owner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "tickLower",
+          "type": "int24",
+          "internalType": "int24"
+        },
+        {
+          "name": "tickUpper",
+          "type": "int24",
+          "internalType": "int24"
+        },
+        {
+          "name": "salt",
           "type": "bytes32",
-          "internalType": "PoolId"
+          "internalType": "bytes32"
         }
       ],
       "outputs": [
         {
           "name": "",
-          "type": "uint24",
-          "internalType": "uint24"
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "pure"
+    },
+    {
+      "type": "function",
+      "name": "removedLiquidity",
+      "inputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "PoolId"
+        },
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
         }
       ],
       "stateMutability": "view"
@@ -1277,6 +1245,61 @@
       "stateMutability": "view"
     },
     {
+      "type": "function",
+      "name": "withdrawableLiquidity",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "internalType": "PoolId"
+        },
+        {
+          "name": "position",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "event",
+      "name": "CommitmentIncreased",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "PoolId"
+        },
+        {
+          "name": "position",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "added",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "committed",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
       "type": "event",
       "name": "PoolConfigured",
       "inputs": [
@@ -1287,65 +1310,33 @@
           "internalType": "PoolId"
         },
         {
-          "name": "startFee",
-          "type": "uint24",
+          "name": "floorBps",
+          "type": "uint16",
           "indexed": false,
-          "internalType": "uint24"
+          "internalType": "uint16"
         },
         {
-          "name": "endFee",
-          "type": "uint24",
+          "name": "unlockTimestamp",
+          "type": "uint64",
           "indexed": false,
-          "internalType": "uint24"
-        },
-        {
-          "name": "rampSeconds",
-          "type": "uint32",
-          "indexed": false,
-          "internalType": "uint32"
-        },
-        {
-          "name": "maxSwap",
-          "type": "uint128",
-          "indexed": false,
-          "internalType": "uint128"
-        }
-      ],
-      "anonymous": false
-    },
-    {
-      "type": "event",
-      "name": "RampPriced",
-      "inputs": [
-        {
-          "name": "id",
-          "type": "bytes32",
-          "indexed": true,
-          "internalType": "PoolId"
-        },
-        {
-          "name": "elapsedSeconds",
-          "type": "uint256",
-          "indexed": false,
-          "internalType": "uint256"
-        },
-        {
-          "name": "fee",
-          "type": "uint24",
-          "indexed": false,
-          "internalType": "uint24"
+          "internalType": "uint64"
         }
       ],
       "anonymous": false
     },
     {
       "type": "error",
-      "name": "FeeTooLarge",
+      "name": "CommitmentBreached",
       "inputs": [
         {
-          "name": "fee",
-          "type": "uint24",
-          "internalType": "uint24"
+          "name": "committed",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "remaining",
+          "type": "uint256",
+          "internalType": "uint256"
         }
       ]
     },
@@ -1356,17 +1347,12 @@
     },
     {
       "type": "error",
-      "name": "InvalidConfig",
+      "name": "InvalidFloor",
       "inputs": []
     },
     {
       "type": "error",
       "name": "InvalidPool",
-      "inputs": []
-    },
-    {
-      "type": "error",
-      "name": "NotDynamicFee",
       "inputs": []
     },
     {
@@ -1386,19 +1372,8 @@
     },
     {
       "type": "error",
-      "name": "SwapTooLargeDuringRamp",
-      "inputs": [
-        {
-          "name": "requested",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "allowed",
-          "type": "uint128",
-          "internalType": "uint128"
-        }
-      ]
+      "name": "UnlockInThePast",
+      "inputs": []
     }
   ]
 }

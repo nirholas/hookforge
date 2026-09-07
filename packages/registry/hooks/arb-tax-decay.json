@@ -109,6 +109,12 @@
       "status": "deterministic"
     },
     {
+      "chain": "robinhood",
+      "chainId": 4663,
+      "address": "0xB3eaD21616aAC0aBC83E8f4CE826242d5fEdD080",
+      "status": "deterministic"
+    },
+    {
       "chain": "base",
       "chainId": 8453,
       "address": "0x1A0e586A71F401c2E511c7e6fAf7197112915080",
