@@ -8,6 +8,7 @@ import {chainName, connect, formatAmount, provider, publicClientFor, readableErr
 import {clear, el} from "./ui.js";
 import {mountX402Gate} from "./panels/x402-gate.js";
 import {mountFeeHook} from "./panels/fee-hook.js";
+import {mountCurve} from "./panels/curve.js";
 
 
 /** Whether a deployment points at an RPC only reachable from the machine running the chain. */
@@ -25,6 +26,7 @@ function walletIsOnChain(chainId) {
 const PANELS = {
   "x402-gate": mountX402Gate,
   fee: mountFeeHook,
+  curve: mountCurve,
 };
 
 const root = document.querySelector("[data-demo]");

@@ -58,6 +58,35 @@ function write(root, path, contents) {
   writeFileSync(full, contents);
 }
 
+
+/**
+ * The constructor arguments a hook's deploy script passes.
+ *
+ * Most hooks take only the `PoolManager`. A curve hook also takes the parameters that define its curve, and those are
+ * decisions the deployer has to make rather than something a generator can invent, so they arrive as script
+ * variables the deployer sets before running it. Emitting `manager` alone for those hooks would produce a script
+ * that does not compile, which is how this was found.
+ */
+function constructorArgs(hook) {
+  const inputs = (hook.abi ?? []).find((entry) => entry.type === "constructor")?.inputs ?? [];
+  if (inputs.length <= 1) return "manager";
+  return ["manager", ...inputs.slice(1).map((input) => input.name)].join(", ");
+}
+
+/** Declarations for the constructor parameters beyond the `PoolManager`, for the deployer to fill in. */
+function constructorDeclarations(hook) {
+  const inputs = (hook.abi ?? []).find((entry) => entry.type === "constructor")?.inputs ?? [];
+  if (inputs.length <= 1) return "";
+
+  // State variables take no data location, and the names must match exactly what the call site passes.
+  const lines = inputs.slice(1).map(
+    (input) =>
+      `    /// @notice Set before deploying: this is part of what the pool is, and it cannot change afterwards.\n` +
+      `    ${input.type} public ${input.name};`,
+  );
+  return `\n${lines.join("\n\n")}\n`;
+}
+
 /** The deploy script for one hook: mine the salt its flags require, deploy, record the address. */
 function deployScript(hook) {
   return `// SPDX-License-Identifier: Apache-2.0
@@ -97,13 +126,14 @@ import {${hook.contract}} from "src/hooks/${hook.contract}.sol";
  */
 contract Deploy${hook.name} is Script {
     uint160 internal constant FLAGS = ${flagExpression(hook)};
+${constructorDeclarations(hook)}
 
     function run() external {
         IPoolManager manager = Chains.poolManager(block.chainid);
         require(address(manager) != address(0), "no Uniswap v4 PoolManager known for this chain");
 
         bytes memory creationCode = type(${hook.contract}).creationCode;
-        bytes memory constructorArgs = abi.encode(manager);
+        bytes memory constructorArgs = abi.encode(${constructorArgs(hook)});
 
         (address predicted, bytes32 salt) =
             HookMiner.find(Chains.CREATE2_DEPLOYER, FLAGS, creationCode, constructorArgs);
@@ -118,7 +148,7 @@ contract Deploy${hook.name} is Script {
         }
 
         vm.startBroadcast();
-        ${hook.contract} hook = new ${hook.contract}{salt: salt}(manager);
+        ${hook.contract} hook = new ${hook.contract}{salt: salt}(${constructorArgs(hook)});
         vm.stopBroadcast();
 
         require(address(hook) == predicted, "mined address did not match the deployment");

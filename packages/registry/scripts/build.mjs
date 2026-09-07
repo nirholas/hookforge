@@ -132,7 +132,14 @@ function readDeployments(chains) {
  */
 function permissionsFromSource(source) {
   const declared = source.match(/function getHookPermissions\(\)[\s\S]*?Hooks\.Permissions\(\{([\s\S]*?)\}\)/);
-  const body = declared?.[1] ?? (source.includes("ForgeFeeHook") ? "afterInitialize: true, beforeSwap: true" : null);
+  // Bases that declare permissions on the hook's behalf. A hook that overrides `getHookPermissions` wins; one that
+  // inherits them would otherwise be published as claiming nothing, which is the opposite of the truth.
+  const inherited = source.includes("ForgeFeeHook")
+    ? "afterInitialize: true, beforeSwap: true"
+    : source.includes("ForgeCurveHook")
+      ? "beforeInitialize: true, beforeAddLiquidity: true, beforeRemoveLiquidity: true, beforeSwap: true, beforeSwapReturnDelta: true"
+      : null;
+  const body = declared?.[1] ?? inherited;
   if (body === null) return null;
 
   const set = Object.fromEntries(

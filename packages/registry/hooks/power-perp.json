@@ -30,7 +30,22 @@
   "docs": "https://hookforge.pages.dev/hooks/power-perp",
   "repo": null,
   "site": null,
-  "permissions": null,
+  "permissions": {
+    "afterRemoveLiquidityReturnsDelta": false,
+    "afterAddLiquidityReturnsDelta": false,
+    "afterSwapReturnsDelta": false,
+    "beforeSwapReturnsDelta": true,
+    "afterDonate": false,
+    "beforeDonate": false,
+    "afterSwap": false,
+    "beforeSwap": true,
+    "afterRemoveLiquidity": false,
+    "beforeRemoveLiquidity": true,
+    "afterAddLiquidity": false,
+    "beforeAddLiquidity": true,
+    "afterInitialize": false,
+    "beforeInitialize": true
+  },
   "permissionsSource": "declaration",
   "properties": {
     "dynamicFee": false,
