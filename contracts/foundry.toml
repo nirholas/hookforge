@@ -10,6 +10,9 @@ optimizer = true
 optimizer_runs = 800
 via_ir = false
 bytecode_hash = 'none'
+# devdoc/userdoc are the source of truth for the docs site and the published hook manifests:
+# packages/registry reads them straight out of the build artifacts, so a NatSpec edit updates the website.
+extra_output = ['devdoc', 'userdoc']
 ffi = false
 gas_limit = 300000000
 fs_permissions = [{ access = 'read', path = './' }, { access = 'read-write', path = './deployments' }]

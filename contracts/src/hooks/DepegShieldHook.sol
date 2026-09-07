@@ -156,6 +156,11 @@ contract DepegShieldHook is ForgeFeeHook, PoolConfigurable {
         if (restoring) {
             uint256 discount =
                 FeeMath.saturating(uint256(cfg.baseFee) - cfg.minFee, deviationTicks, cfg.halfDeviationTicks);
+            // Safe against timestamp drift: the comparison is on ticks, not on time; this line reads no clock a proposer controls.
+            // forge-lint: disable-next-line(block-timestamp)
+            // casting to 'uint24' is safe because `discount` is capped at `baseFee - minFee` by the saturating
+            // curve, so the difference lies in [minFee, baseFee] and baseFee is itself a uint24.
+            // forge-lint: disable-next-line(unsafe-typecast)
             fee = uint24(uint256(cfg.baseFee) - discount);
         } else {
             fee = FeeMath.addClamped(

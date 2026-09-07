@@ -100,6 +100,9 @@ contract CircuitBreakerHook is ForgeHook, PoolConfigurable {
 
     /// @notice Whether swapping is currently halted for `id`.
     function isHalted(PoolId id) public view returns (bool) {
+        // Safe against timestamp drift: the window and the cooldown are measured in minutes, so the seconds a proposer can shift
+        // `block.timestamp` by cannot lift a halt early or hold one open.
+        // forge-lint: disable-next-line(block-timestamp)
         return block.timestamp < haltedUntil[id];
     }
 
@@ -148,9 +151,15 @@ contract CircuitBreakerHook is ForgeHook, PoolConfigurable {
         PoolId id = PoolId.wrap(keccak256(abi.encode(key)));
 
         uint64 until = haltedUntil[id];
+        // Safe against timestamp drift: the window and the cooldown are measured in minutes, so the seconds a proposer can shift
+        // `block.timestamp` by cannot lift a halt early or hold one open.
+        // forge-lint: disable-next-line(block-timestamp)
         if (block.timestamp < until) revert PoolHalted(until);
 
         Reference memory window = referenceOf[id];
+        // Safe against timestamp drift: the window and the cooldown are measured in minutes, so the seconds a proposer can shift
+        // `block.timestamp` by cannot lift a halt early or hold one open.
+        // forge-lint: disable-next-line(block-timestamp)
         if (block.timestamp - window.at >= configOf[id].windowSeconds) {
             (, int24 tick,,) = poolManager.getSlot0(id);
             referenceOf[id] = Reference(tick, uint64(block.timestamp));

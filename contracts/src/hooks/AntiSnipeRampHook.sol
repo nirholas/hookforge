@@ -91,6 +91,9 @@ contract AntiSnipeRampHook is ForgeFeeHook, PoolConfigurable {
 
     /// @notice Whether the launch ramp is still running for `id`.
     function isRamping(PoolId id) public view returns (bool) {
+        // Safe against timestamp drift: the launch ramp is measured in minutes, so the seconds a proposer can shift `block.timestamp` by
+        // cannot buy a materially cheaper fee, and shifting it forward only ends the ramp sooner for everyone.
+        // forge-lint: disable-next-line(block-timestamp)
         return block.timestamp - openedAt[id] < configOf[id].rampSeconds;
     }
 
@@ -131,6 +134,12 @@ contract AntiSnipeRampHook is ForgeFeeHook, PoolConfigurable {
     function _feeAt(Config memory cfg, uint256 elapsed) private pure returns (uint24) {
         if (elapsed >= cfg.rampSeconds) return cfg.endFee;
         uint256 shed = FeeMath.mulDiv(uint256(cfg.startFee) - cfg.endFee, elapsed, cfg.rampSeconds);
+        // Safe against timestamp drift: the launch ramp is measured in minutes, so the seconds a proposer can shift `block.timestamp` by
+        // cannot buy a materially cheaper fee, and shifting it forward only ends the ramp sooner for everyone.
+        // forge-lint: disable-next-line(block-timestamp)
+        // casting to 'uint24' is safe because `shed` is `(startFee - endFee) * elapsed / rampSeconds` with
+        // `elapsed < rampSeconds`, so it is strictly less than `startFee` and the difference stays a uint24.
+        // forge-lint: disable-next-line(unsafe-typecast)
         return uint24(uint256(cfg.startFee) - shed);
     }
 

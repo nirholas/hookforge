@@ -87,11 +87,13 @@ contract DepegShieldHookTest is ForgeTest {
     }
 
     function test_previewFee_halfDeviation_isHalfTheSurcharge() public view {
+        // forge-lint: disable-next-line(unsafe-typecast)
         (uint24 fee,,) = hook.previewFee(cfg, int24(int256(uint256(HALF_DEVIATION))), false);
         assertEq(fee, BASE_FEE + MAX_SURCHARGE / 2);
     }
 
     function test_previewFee_halfDeviation_isHalfTheDiscount() public view {
+        // forge-lint: disable-next-line(unsafe-typecast)
         (uint24 fee,,) = hook.previewFee(cfg, int24(int256(uint256(HALF_DEVIATION))), true);
         assertEq(fee, BASE_FEE - (BASE_FEE - MIN_FEE) / 2);
     }
@@ -135,6 +137,7 @@ contract DepegShieldHookTest is ForgeTest {
         int128 amount = zeroForOne
             ? swap(poolKey, true, -1e15, ZERO_BYTES).amount1()
             : swap(poolKey, false, -1e15, ZERO_BYTES).amount0();
+        // forge-lint: disable-next-line(unsafe-typecast)
         out = uint256(uint128(amount));
         vm.revertToState(snapshot);
     }
