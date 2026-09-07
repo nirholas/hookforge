@@ -2,7 +2,18 @@ import {esc, h} from "./html.mjs";
 
 export const SITE = {
   name: "HookForge",
-  url: "https://hookforge.pages.dev",
+  /**
+   * Where this build will actually be served from.
+   *
+   * Canonical URLs, Open Graph images, JSON-LD and llms.txt all derive from this, so it has to be the domain the
+   * pages really answer on or every one of them is a lie to a crawler. It is an environment variable because the
+   * catalogue's permanent home and the URL a given build is deployed to are not always the same thing yet.
+   *
+   * One caveat worth keeping in view: every deployed hook returns `SPEC_BASE + slug + ".json"` from `specURI()`, and
+   * that string is immutable once the contract is deployed. The contracts point at hookforge.dev, so that domain has
+   * to be the one serving `/schema/hooks/` before any hook ships to a mainnet.
+   */
+  url: process.env.SITE_URL ?? "https://hookforge.pages.dev",
   tagline: "50 production Uniswap v4 hooks that do not exist yet",
   repo: "https://github.com/nirholas/hookforge",
   description:

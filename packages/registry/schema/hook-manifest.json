@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://hookforge.pages.dev/schema/hook-manifest.json",
+  "title": "HookForge hook manifest",
+  "description": "The machine-readable description of one Uniswap v4 hook. Every deployed HookForge hook returns the URL of its manifest from specURI(), so a caller holding only a hook address can reach this document in one eth_call and one fetch. Generated from the contract: the prose is its NatSpec, the parameters are its configure ABI, the permission flags are what it declares and the deploy script mines its address to satisfy.",
+  "type": "object",
+  "required": ["slug", "name", "contract", "version", "family", "summary", "tags", "source", "permissions", "properties", "deployments"],
+  "properties": {
+    "$schema": {"type": "string", "format": "uri"},
+    "slug": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "Stable identifier. Also the manifest filename and the last path segment of the hook's page."},
+    "name": {"type": "string", "minLength": 1, "maxLength": 64, "description": "Exactly what the deployed contract returns from hookName()."},
+    "contract": {"type": "string", "description": "Solidity contract name."},
+    "version": {"type": "string", "description": "Exactly what the deployed contract returns from hookVersion()."},
+    "family": {"type": "string", "description": "Taxonomy group, e.g. \"Risk\" or \"Order flow and MEV\"."},
+    "summary": {"type": "string", "description": "One sentence: the contract's @notice."},
+    "description": {"type": "string", "description": "The mechanism in full: the contract's @dev block."},
+    "priorArt": {"type": "string", "description": "What already exists and what is actually new here. Empty only if the author stated nothing."},
+    "limitation": {"type": "string", "description": "Where the hook does not help, in the author's words. Surface this rather than summarising it away."},
+    "tags": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"}, "description": "Exactly what the deployed contract returns from hookTags()."},
+    "recommendedChains": {"type": "array", "items": {"type": "string"}, "description": "Chain slugs where the mechanism actually does something. A hook may be deployable but inert elsewhere."},
+    "source": {"type": "string", "description": "Path to the contract within the repository."},
+    "docs": {"type": "string", "format": "uri"},
+    "permissions": {
+      "type": "object",
+      "description": "The fourteen Uniswap v4 hook callbacks and whether this hook implements each.",
+      "required": ["beforeInitialize", "afterInitialize", "beforeAddLiquidity", "afterAddLiquidity", "beforeRemoveLiquidity", "afterRemoveLiquidity", "beforeSwap", "afterSwap", "beforeDonate", "afterDonate", "beforeSwapReturnsDelta", "afterSwapReturnsDelta", "afterAddLiquidityReturnsDelta", "afterRemoveLiquidityReturnsDelta"],
+      "additionalProperties": {"type": "boolean"}
+    },
+    "permissionsSource": {
+      "type": "string",
+      "enum": ["address", "declaration"],
+      "description": "\"address\" means decoded from the low fourteen bits of a published address, which is the only place v4 itself looks. \"declaration\" means read from the hook's getHookPermissions(), because it has no published address yet."
+    },
+    "properties": {
+      "type": "object",
+      "required": ["dynamicFee", "upgradeable", "requiresCustomSwapData", "vanillaSwap", "swapAccess"],
+      "properties": {
+        "dynamicFee": {"type": "boolean", "description": "The pool must be initialized with LPFeeLibrary.DYNAMIC_FEE_FLAG or the hook reverts."},
+        "upgradeable": {"type": "boolean"},
+        "requiresCustomSwapData": {"type": "boolean", "description": "The hook reads hookData, so a standard router cannot drive it unmodified."},
+        "vanillaSwap": {"type": "boolean", "description": "The hook returns no delta of its own, so the pool's own curve settles the swap."},
+        "swapAccess": {"type": "string", "enum": ["none", "temporal", "allowlist", "governance", "other"]}
+      }
+    },
+    "configure": {
+      "type": ["object", "null"],
+      "description": "The hook's per-pool configuration entry point. Uniswap v4 removed hookData from initialize, so parameters arrive here instead, callable once for a pool key whose pool does not exist yet.",
+      "properties": {
+        "signature": {"type": "string"},
+        "fields": {"type": "array", "items": {"type": "object", "required": ["name", "type"], "properties": {"name": {"type": "string"}, "type": {"type": "string"}}}}
+      }
+    },
+    "errors": {
+      "type": "array",
+      "description": "Custom errors the hook can revert with, and what each means.",
+      "items": {"type": "object", "required": ["signature"], "properties": {"signature": {"type": "string"}, "notice": {"type": "string"}}}
+    },
+    "deployments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["chain", "chainId", "address", "status"],
+        "properties": {
+          "chain": {"type": "string"},
+          "chainId": {"type": "integer"},
+          "address": {"type": "string", "pattern": "^0x[a-fA-F0-9]{40}$"},
+          "status": {
+            "type": "string",
+            "enum": ["deterministic", "deployed"],
+            "description": "\"deterministic\" is the CREATE2 address the deploy script mines so the low fourteen bits encode the permissions. There is no code at it until the deploy runs. Never present one as a live deployment."
+          }
+        }
+      }
+    },
+    "abi": {"type": "array", "description": "The contract ABI, as emitted by solc."}
+  }
+}

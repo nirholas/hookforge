@@ -10,7 +10,8 @@
 
   --text: #e8eaef;
   --text-dim: #9aa3b2;
-  --text-faint: #6b7280;
+  /* Raised from #6b7280, which measured 3.96:1 on the card background and failed WCAG AA for small text. */
+  --text-faint: #868e9c;
 
   --forge: #ff6a2b;
   --forge-soft: #ff9d6b;
