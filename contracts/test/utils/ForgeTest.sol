@@ -34,8 +34,18 @@ abstract contract ForgeTest is Test, Deployers {
      * @param args ABI-encoded constructor arguments.
      */
     function deployHookTo(string memory artifact, uint160 flags, bytes memory args) internal returns (address hook) {
-        // Offset the namespace so two hooks with identical flags in one test never collide.
-        hook = address(flags | (uint160(0x4444) << 144));
+        return deployHookToNamespace(artifact, flags, args, 0x4444);
+    }
+
+    /**
+     * @notice As {deployHookTo}, but with an explicit namespace, so one test can hold two hooks with identical flags.
+     * @param namespace Any value; it only has to differ between hooks in the same test.
+     */
+    function deployHookToNamespace(string memory artifact, uint160 flags, bytes memory args, uint160 namespace)
+        internal
+        returns (address hook)
+    {
+        hook = address(flags | (namespace << 144));
         deployCodeTo(artifact, args, hook);
     }
 

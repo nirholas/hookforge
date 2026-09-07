@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 16,
+  "count": 17,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -473,6 +473,24 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "step-curve",
+      "name": "StepCurve",
+      "family": "Curves",
+      "summary": "A pool whose price moves in discrete steps instead of continuously, so there is no infinitesimal arbitrage to take and a quote holds still long enough to be worth quoting.",
+      "tags": [
+        "curve",
+        "custom-curve",
+        "discrete-pricing",
+        "mev",
+        "oracle-free"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/step-curve",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/step-curve.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
     },
     {
       "slug": "trading-calendar",

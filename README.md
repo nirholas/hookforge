@@ -63,7 +63,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | [`RatchetFloor`](contracts/src/hooks/RatchetFloorHook.sol) | A protocol-owned bid that can only move up, giving a token a floor price that is enforced by the curve. | shipped |
 | `GridLadder` | Asymmetric bid and ask ladders in one position, so an LP can quote a spread rather than a symmetric range. | building |
 | [`DutchClearingLaunch`](contracts/src/hooks/DutchClearingLaunchHook.sol) | A descending-price launch enforced as a floor on what the pool will sell at, so the opening price is discovered rather than declared. | shipped |
-| `StepCurve` | Piecewise-constant prices, for assets that should trade in discrete steps rather than on a continuum. | building |
+| [`StepCurve`](contracts/src/hooks/StepCurveHook.sol) | Prices in discrete increments instead of continuously, so a quote is firm below the increment and there is no infinitesimal arbitrage to take. | shipped |
 
 ### Token mechanics
 
