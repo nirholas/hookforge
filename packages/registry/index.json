@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 18,
+  "count": 19,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -565,6 +565,24 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/x402-gate",
       "manifest": "https://hookforge.pages.dev/schema/hooks/x402-gate.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
+    },
+    {
+      "slug": "yield-space",
+      "name": "YieldSpace",
+      "family": "Curves",
+      "summary": "An interest-rate market as a Uniswap v4 pool: the curve quotes a yield rather than a price, and converges to par at maturity on its own.",
+      "tags": [
+        "curve",
+        "custom-curve",
+        "fixed-rate",
+        "maturity",
+        "rates"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/yield-space",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/yield-space.json",
       "repo": null,
       "site": null,
       "deployments": []

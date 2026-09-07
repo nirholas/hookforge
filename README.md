@@ -57,7 +57,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 
 | Hook | What it does | Status |
 | --- | --- | --- |
-| `YieldSpace` | A fixed-rate curve with a maturity, converging to par at expiry. Interest-rate markets as a native v4 pool. | building |
+| [`YieldSpace`](contracts/src/hooks/YieldSpaceHook.sol) | A fixed-rate curve with a maturity that converges to par on its own, so a rates market is an ordinary v4 pool. | shipped |
 | `LMSR` | A logarithmic market scoring rule curve, giving prediction markets bounded loss and always-available liquidity. | building |
 | [`PowerPerp`](contracts/src/hooks/PowerPerpHook.sol) | A weighted geometric-mean curve, so a provider chooses how much of the price move they want instead of always getting the square root of it. | shipped |
 | [`RatchetFloor`](contracts/src/hooks/RatchetFloorHook.sol) | A protocol-owned bid that can only move up, giving a token a floor price that is enforced by the curve. | shipped |
