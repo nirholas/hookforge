@@ -28,6 +28,8 @@
   ],
   "source": "contracts/src/hooks/MarkoutFeeHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/markout-fee",
+  "repo": "https://github.com/nirholas/markout-fee",
+  "site": "https://markout-fee.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

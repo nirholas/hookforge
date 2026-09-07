@@ -23,6 +23,10 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..", "..", "..");
 const CONTRACTS = join(ROOT, "contracts");
 const OUT = join(HERE, "..");
+const SPINOUTS = join(ROOT, "tools", "spinout", "sites.json");
+
+/** Where each hook's own repository and site live, once it has been spun out into one. */
+const spinouts = existsSync(SPINOUTS) ? JSON.parse(readFileSync(SPINOUTS, "utf8")) : {};
 
 /** The fourteen Uniswap v4 hook permission bits, least significant first. */
 const FLAG_BITS = [
@@ -189,6 +193,9 @@ function buildHook(contractName, chains, deployments) {
     recommendedChains: (tags.chains ?? "").split(",").filter(Boolean),
     source: `contracts/src/hooks/${contractName}.sol`,
     docs: `https://hookforge.pages.dev/hooks/${tags.slug ?? contractName.toLowerCase()}`,
+    // A spun-out hook has a repository and a site of its own. Absent until it does.
+    repo: spinouts[tags.slug] ? `https://github.com/nirholas/${tags.slug}` : null,
+    site: spinouts[tags.slug] ?? null,
     permissions,
     permissionsSource,
     properties: {
@@ -239,6 +246,8 @@ function main() {
       tags: hook.tags,
       docs: hook.docs,
       manifest: `https://hookforge.pages.dev/schema/hooks/${hook.slug}.json`,
+      repo: hook.repo,
+      site: hook.site,
       // `status` rides along: a deterministic address is where the hook *will* be, and a consumer that cannot
       // tell that from a live deployment would misreport an undeployed hook as live.
       deployments: hook.deployments.map((d) => ({chain: d.chain, chainId: d.chainId, address: d.address, status: d.status})),

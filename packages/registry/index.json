@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 14,
+  "count": 15,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -20,6 +20,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/agent-budget",
       "manifest": "https://hookforge.pages.dev/schema/hooks/agent-budget.json",
+      "repo": "https://github.com/nirholas/agent-budget",
+      "site": "https://agent-budget.pages.dev",
       "deployments": []
     },
     {
@@ -35,6 +37,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/anti-snipe-ramp",
       "manifest": "https://hookforge.pages.dev/schema/hooks/anti-snipe-ramp.json",
+      "repo": "https://github.com/nirholas/anti-snipe-ramp",
+      "site": "https://anti-snipe-ramp.pages.dev",
       "deployments": [
         {
           "chain": "unichain",
@@ -75,6 +79,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/arb-tax-decay",
       "manifest": "https://hookforge.pages.dev/schema/hooks/arb-tax-decay.json",
+      "repo": "https://github.com/nirholas/arb-tax-decay",
+      "site": "https://arb-tax-decay.pages.dev",
       "deployments": [
         {
           "chain": "unichain",
@@ -115,6 +121,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/circuit-breaker",
       "manifest": "https://hookforge.pages.dev/schema/hooks/circuit-breaker.json",
+      "repo": "https://github.com/nirholas/circuit-breaker",
+      "site": "https://circuit-breaker-1bp.pages.dev",
       "deployments": [
         {
           "chain": "unichain",
@@ -155,6 +163,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/depeg-shield",
       "manifest": "https://hookforge.pages.dev/schema/hooks/depeg-shield.json",
+      "repo": "https://github.com/nirholas/depeg-shield",
+      "site": "https://depeg-shield.pages.dev",
       "deployments": [
         {
           "chain": "unichain",
@@ -195,6 +205,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/drawdown-cap",
       "manifest": "https://hookforge.pages.dev/schema/hooks/drawdown-cap.json",
+      "repo": "https://github.com/nirholas/drawdown-cap",
+      "site": "https://drawdown-cap.pages.dev",
       "deployments": [
         {
           "chain": "unichain",
@@ -236,6 +248,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/expiry-settle",
       "manifest": "https://hookforge.pages.dev/schema/hooks/expiry-settle.json",
+      "repo": "https://github.com/nirholas/expiry-settle",
+      "site": "https://expiry-settle.pages.dev",
       "deployments": []
     },
     {
@@ -252,6 +266,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/flow-classifier",
       "manifest": "https://hookforge.pages.dev/schema/hooks/flow-classifier.json",
+      "repo": "https://github.com/nirholas/flow-classifier",
+      "site": "https://flow-classifier.pages.dev",
       "deployments": []
     },
     {
@@ -267,6 +283,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/liquidity-floor",
       "manifest": "https://hookforge.pages.dev/schema/hooks/liquidity-floor.json",
+      "repo": "https://github.com/nirholas/liquidity-floor",
+      "site": "https://liquidity-floor.pages.dev",
       "deployments": [
         {
           "chain": "unichain",
@@ -308,6 +326,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/markout-fee",
       "manifest": "https://hookforge.pages.dev/schema/hooks/markout-fee.json",
+      "repo": "https://github.com/nirholas/markout-fee",
+      "site": "https://markout-fee.pages.dev",
       "deployments": []
     },
     {
@@ -323,6 +343,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/oracle-band",
       "manifest": "https://hookforge.pages.dev/schema/hooks/oracle-band.json",
+      "repo": "https://github.com/nirholas/oracle-band",
+      "site": "https://oracle-band.pages.dev",
       "deployments": [
         {
           "chain": "unichain",
@@ -363,6 +385,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/priority-fee-tax",
       "manifest": "https://hookforge.pages.dev/schema/hooks/priority-fee-tax.json",
+      "repo": "https://github.com/nirholas/priority-fee-tax",
+      "site": "https://priority-fee-tax.pages.dev",
       "deployments": [
         {
           "chain": "unichain",
@@ -403,6 +427,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/ratchet-floor",
       "manifest": "https://hookforge.pages.dev/schema/hooks/ratchet-floor.json",
+      "repo": "https://github.com/nirholas/ratchet-floor",
+      "site": "https://ratchet-floor.pages.dev",
       "deployments": [
         {
           "chain": "unichain",
@@ -443,6 +469,8 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/trading-calendar",
       "manifest": "https://hookforge.pages.dev/schema/hooks/trading-calendar.json",
+      "repo": "https://github.com/nirholas/trading-calendar",
+      "site": "https://trading-calendar-6bp.pages.dev",
       "deployments": [
         {
           "chain": "unichain",
@@ -469,6 +497,23 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "x402-gate",
+      "name": "X402Gate",
+      "family": "Agent-native",
+      "summary": "Makes the pool an x402 resource server: a swapper that presents a signed x402 payment gets a cheaper fee on that swap, and the payment settles atomically with the trade.",
+      "tags": [
+        "agent-native",
+        "x402",
+        "dynamic-fee",
+        "metering"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/x402-gate",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/x402-gate.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
     }
   ]
 }

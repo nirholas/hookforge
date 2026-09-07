@@ -1,0 +1,16 @@
+{
+  "agent-budget": "https://agent-budget.pages.dev",
+  "anti-snipe-ramp": "https://anti-snipe-ramp.pages.dev",
+  "arb-tax-decay": "https://arb-tax-decay.pages.dev",
+  "circuit-breaker": "https://circuit-breaker-1bp.pages.dev",
+  "depeg-shield": "https://depeg-shield.pages.dev",
+  "drawdown-cap": "https://drawdown-cap.pages.dev",
+  "expiry-settle": "https://expiry-settle.pages.dev",
+  "flow-classifier": "https://flow-classifier.pages.dev",
+  "liquidity-floor": "https://liquidity-floor.pages.dev",
+  "markout-fee": "https://markout-fee.pages.dev",
+  "oracle-band": "https://oracle-band.pages.dev",
+  "priority-fee-tax": "https://priority-fee-tax.pages.dev",
+  "ratchet-floor": "https://ratchet-floor.pages.dev",
+  "trading-calendar": "https://trading-calendar-6bp.pages.dev"
+}

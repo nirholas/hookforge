@@ -24,6 +24,8 @@
   ],
   "source": "contracts/src/hooks/PriorityFeeTaxHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/priority-fee-tax",
+  "repo": "https://github.com/nirholas/priority-fee-tax",
+  "site": "https://priority-fee-tax.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

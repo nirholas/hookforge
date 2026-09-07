@@ -247,6 +247,21 @@ cast call $HOOK "hookTags()(string[])"  # ${esc(hook.tags.join(", "))}</code></p
       </p>
     </div>
 
+    ${
+      hook.repo
+        ? `<div class="panel">
+      <h4>Its own home</h4>
+      <p style="margin:0 0 .6rem;font-size:.9rem;color:var(--text-dim)">
+        Every hook here is also published on its own, with its own repository, documentation and site.
+      </p>
+      <ul>
+        <li><a href="${esc(hook.site)}" rel="noopener">${esc((hook.site ?? "").replace("https://", ""))}</a></li>
+        <li><a href="${esc(hook.repo)}" rel="noopener">Repository</a></li>
+      </ul>
+    </div>`
+        : ""
+    }
+
     <div class="panel">
       <h4>Machine readable</h4>
       <ul>

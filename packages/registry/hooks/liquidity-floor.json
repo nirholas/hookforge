@@ -27,6 +27,8 @@
   ],
   "source": "contracts/src/hooks/LiquidityFloorHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/liquidity-floor",
+  "repo": "https://github.com/nirholas/liquidity-floor",
+  "site": "https://liquidity-floor.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

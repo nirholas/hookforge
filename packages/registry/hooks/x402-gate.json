@@ -1,19 +1,19 @@
 {
   "$schema": "https://hookforge.pages.dev/schema/hook-manifest.json",
-  "slug": "depeg-shield",
-  "name": "DepegShield",
-  "contract": "DepegShieldHook",
+  "slug": "x402-gate",
+  "name": "X402Gate",
+  "contract": "X402GateHook",
   "version": "1.0.0",
-  "family": "Risk",
-  "summary": "Makes leaving a peg expensive and returning to it cheap, in proportion to how far the pool has already strayed.",
-  "description": "A pegged pool fails in a specific way. Something spooks the market, the first sellers cross, the price slips, and the slip is itself the signal that brings the next sellers. Liquidity providers are filled the whole way down at a fee that was set for a pool sitting at par. By the time anyone reacts, the pool is one-sided and the providers own the asset that broke. This hook makes the fee a function of two things: how far the pool is from the peg, and which way the swap pushes it. A swap that widens the gap pays `baseFee` plus a surcharge that grows with the existing deviation. A swap that closes the gap pays less than `baseFee`, down to a floor, with the discount growing the same way. The result is a spread that opens as the pool strays and pays anyone willing to push it back.   widening:  fee = baseFee + maxSurcharge * deviation / (deviation + halfDeviation)   restoring: fee = baseFee - (baseFee - minFee) * deviation / (deviation + halfDeviation) Both are LP fees, so the surcharge is paid to liquidity and the discount is given up by liquidity. That is the right trade for a provider in a pegged pool: paying for the flow that repairs the pool is cheaper than being filled on the way out. The peg is a tick, not an oracle. `pegTick = 0` is a one-to-one pool; a pair whose par is not one-to-one sets the tick that corresponds to par. Since it is fixed at initialization, there is nothing to manipulate and no feed to go stale, and a pool whose peg genuinely re-bases has to be re-created, which for a pegged pair is the honest outcome. Deviation is measured in ticks. One tick is one basis point to within rounding, so `halfDeviationTicks = 50` means half the surcharge applies once the pool is fifty basis points off par. Prior art: stable-swap curves flatten the price impact near par, and dynamic-fee hooks keyed on volatility exist. Neither is directional. A curve treats a swap toward the peg and a swap away from it identically, and a volatility fee charges the repairing flow exactly as much as the flow that broke the pool. Charging asymmetrically by direction of travel is what is new here.",
-  "priorArt": "Stable-swap curves flatten price impact near par, and dynamic-fee hooks keyed on volatility exist. Neither is directional: a curve prices a swap toward the peg and one away from it identically, and a volatility fee charges the repairing flow exactly as much as the flow that broke the pool. Charging asymmetrically by direction of travel is what is new.",
-  "limitation": "The peg is fixed at initialization, so a pair whose par genuinely re-bases has to be re-created. For a pegged pair that is the honest outcome, but it does mean this is the wrong hook for a drifting reference such as a yield-bearing wrapper.",
+  "family": "Agent-native",
+  "summary": "Makes the pool an x402 resource server: a swapper that presents a signed x402 payment gets a cheaper fee on that swap, and the payment settles atomically with the trade.",
+  "description": "x402 is how autonomous agents already pay for things. An agent asks for a resource, gets back HTTP 402 with a machine-readable price, signs an EIP-3009 authorization for that amount, retries with the signature in a header, and the resource server settles it. Thousands of endpoints speak it and every agent framework has a client for it. What nothing speaks it for is liquidity, which is odd, because a fee tier is exactly the kind of thing an agent would want to buy: it is metered, it is worth different amounts to different callers, and the caller knows its own value better than the venue does. The usual way to give one class of swapper a better price is to gate on what they *are*: hold this NFT, be on this allowlist, pass this KYC check. Every one of those is a proxy for willingness to pay, maintained by hand, and wrong at the edges. This hook gates on the thing itself. Pay the pool's posted price and the swap is cheaper. Do not, and it is not. Nobody curates anything. Three properties fall out of doing this in the hook rather than over HTTP: The 402 challenge is on-chain. {quote} returns the same fields an x402 client reads out of a 402 response body: scheme, network, amount, asset, recipient, resource, timeout. An agent discovers the price with one `eth_call` against the pool it was already going to trade, with no endpoint to find, no server to be up, and no TLS. Payment and delivery are atomic, which over HTTP they are not. An x402 client that pays for an API call and then receives a 500 has paid for nothing and must argue about a refund. Here the payment settles inside `beforeSwap`, so if the swap reverts for any reason afterwards, slippage, liquidity, another hook, the payment reverts with it. The failure mode that makes x402 awkward to build on does not exist in this direction. There is no facilitator. The x402 deployment model puts a trusted service between payer and resource server to verify and broadcast the authorization. The pool can do both itself, because it is already a contract and the payment is already an on-chain object, so the trusted third party is simply absent rather than decentralized. How the discount is applied matters. The fee this hook returns is an *LP* fee, so the discount is paid for by liquidity providers taking less on that swap, and the payment is what compensates them. Providers are therefore selling cheap execution for a fixed fee up front instead of a variable one on the back end, which is a trade they can price: if the posted price is set below the fee revenue given up, the pool leaks, and setting it is the one judgement the pool creator has to get right. Payments are pulled with `receiveWithAuthorization` rather than `transferWithAuthorization`. Both are EIP-3009 and x402's own reference facilitator uses the latter, but the latter can be broadcast by anyone: a bystander could submit the payer's authorization on its own, the payment would land, the nonce would burn, and the swap that the payment was for would then revert with the payer out of pocket. Requiring `msg.sender == to` removes that. Unrecognised `hookData` is ignored rather than rejected. The payload is prefixed with {X402_PAYMENT_MAGIC}, and anything that does not start with it is treated as \"no payment offered\" and charged the base fee. A pool that reverted on hookData it did not understand would be untradeable through any router that puts its own data there, which is most of them.",
+  "priorArt": "Fee discounts gated on NFT or token ownership, allowlists and KYC attestations are among the most common hook patterns, and x402 itself is a widely deployed HTTP payment protocol with an EIP-3009 settlement scheme. Neither has met the other: making an AMM pool an x402 resource server, so that the 402 challenge is an `eth_call` and settlement is atomic with the swap it paid for, is the contribution here.",
+  "limitation": "A payment costs a full EIP-3009 transfer, so the discount only repays its own gas above a swap size that depends on the chain and the spread between the two fee tiers. On a mainnet-priced chain that floor is high enough that this is a hook for agents moving real size, not for retail swaps. It also inherits the hookData problem: an aggregator that does not forward hookData cannot present a payment, and its users silently pay the base fee rather than getting an error telling them why.",
   "tags": [
-    "risk",
-    "stablecoin",
+    "agent-native",
+    "x402",
     "dynamic-fee",
-    "oracle-free"
+    "metering"
   ],
   "recommendedChains": [
     "base",
@@ -22,13 +22,12 @@
     "robinhood",
     "ethereum",
     "optimism",
-    "polygon",
-    "bnb"
+    "polygon"
   ],
-  "source": "contracts/src/hooks/DepegShieldHook.sol",
-  "docs": "https://hookforge.pages.dev/hooks/depeg-shield",
-  "repo": "https://github.com/nirholas/depeg-shield",
-  "site": "https://depeg-shield.pages.dev",
+  "source": "contracts/src/hooks/X402GateHook.sol",
+  "docs": "https://hookforge.pages.dev/hooks/x402-gate",
+  "repo": null,
+  "site": null,
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,
@@ -45,40 +44,44 @@
     "afterInitialize": true,
     "beforeInitialize": false
   },
-  "permissionsSource": "address",
+  "permissionsSource": "declaration",
   "properties": {
     "dynamicFee": true,
     "upgradeable": false,
-    "requiresCustomSwapData": false,
+    "requiresCustomSwapData": true,
     "vanillaSwap": true,
     "swapAccess": "none"
   },
   "configure": {
-    "signature": "configure((address,address,uint24,int24,address),(int24,uint24,uint24,uint24,uint24))",
+    "signature": "configure((address,address,uint24,int24,address),(address,address,uint256,uint24,uint24))",
     "fields": [
       {
-        "name": "pegTick",
-        "type": "int24"
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "name": "payTo",
+        "type": "address"
+      },
+      {
+        "name": "price",
+        "type": "uint256"
       },
       {
         "name": "baseFee",
         "type": "uint24"
       },
       {
-        "name": "minFee",
-        "type": "uint24"
-      },
-      {
-        "name": "maxSurcharge",
-        "type": "uint24"
-      },
-      {
-        "name": "halfDeviationTicks",
+        "name": "discountedFee",
         "type": "uint24"
       }
     ]
   },
   "errors": [
+    {
+      "signature": "DiscountNotADiscount(uint24,uint24)",
+      "notice": "A pool posted a discounted fee that is not below its base fee, so paying would buy nothing."
+    },
     {
       "signature": "FeeTooLarge(uint24)",
       "notice": "A fee was configured above the protocol maximum of 100%."
@@ -88,16 +91,24 @@
       "notice": "The hook function is not implemented."
     },
     {
-      "signature": "InvalidConfig()",
-      "notice": "`halfDeviationTicks` was zero, or `minFee` exceeded `baseFee`."
-    },
-    {
       "signature": "InvalidPool()",
       "notice": "The pool is not configured to use this hook."
     },
     {
+      "signature": "InvalidTerms()",
+      "notice": "Terms named the zero address as the payment asset or the payee."
+    },
+    {
       "signature": "NotDynamicFee()",
       "notice": "The hook was attempted to be initialized with a non-dynamic fee."
+    },
+    {
+      "signature": "NothingCollected()",
+      "notice": "There is nothing accrued for this pool to withdraw."
+    },
+    {
+      "signature": "PaymentBelowPrice(uint256,uint256)",
+      "notice": "The payment offered is smaller than the pool's posted price."
     },
     {
       "signature": "PoolAlreadyInitialized()",
@@ -108,36 +119,15 @@
       "notice": "The pool was initialized without a configuration for this hook."
     },
     {
-      "signature": "SurchargeTooLarge()",
-      "notice": "`baseFee + maxSurcharge` must leave room under the 100% protocol maximum."
+      "signature": "PriceRequired()",
+      "notice": "Terms posted a price of zero, which would make the discount free and the gate pointless."
+    },
+    {
+      "signature": "SafeERC20FailedOperation(address)",
+      "notice": "An operation with an ERC-20 token failed."
     }
   ],
-  "deployments": [
-    {
-      "chain": "unichain",
-      "chainId": 130,
-      "address": "0x6536608422113CFF4cbDb9c413E447EEd1fF1080",
-      "status": "deterministic"
-    },
-    {
-      "chain": "robinhood",
-      "chainId": 4663,
-      "address": "0x6D7B49F497e6Dec999147dF461038AE312609080",
-      "status": "deterministic"
-    },
-    {
-      "chain": "base",
-      "chainId": 8453,
-      "address": "0xFe88b1eECB9AeFF393f4E7a7fFBB1f80392D9080",
-      "status": "deterministic"
-    },
-    {
-      "chain": "arbitrum",
-      "chainId": 42161,
-      "address": "0xb888b2e1886d4C703c53C2a1650ced1262bCd080",
-      "status": "deterministic"
-    }
-  ],
+  "deployments": [],
   "abi": [
     {
       "type": "constructor",
@@ -149,6 +139,45 @@
         }
       ],
       "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "QUOTE_TIMEOUT_SECONDS",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "X402_PAYMENT_MAGIC",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes4",
+          "internalType": "bytes4"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "X402_SCHEME",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -939,7 +968,7 @@
     },
     {
       "type": "function",
-      "name": "configOf",
+      "name": "collected",
       "inputs": [
         {
           "name": "",
@@ -949,29 +978,9 @@
       ],
       "outputs": [
         {
-          "name": "pegTick",
-          "type": "int24",
-          "internalType": "int24"
-        },
-        {
-          "name": "baseFee",
-          "type": "uint24",
-          "internalType": "uint24"
-        },
-        {
-          "name": "minFee",
-          "type": "uint24",
-          "internalType": "uint24"
-        },
-        {
-          "name": "maxSurcharge",
-          "type": "uint24",
-          "internalType": "uint24"
-        },
-        {
-          "name": "halfDeviationTicks",
-          "type": "uint24",
-          "internalType": "uint24"
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
         }
       ],
       "stateMutability": "view"
@@ -1013,14 +1022,24 @@
           ]
         },
         {
-          "name": "cfg",
+          "name": "terms",
           "type": "tuple",
-          "internalType": "struct DepegShieldHook.Config",
+          "internalType": "struct X402GateHook.Terms",
           "components": [
             {
-              "name": "pegTick",
-              "type": "int24",
-              "internalType": "int24"
+              "name": "asset",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "payTo",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "price",
+              "type": "uint256",
+              "internalType": "uint256"
             },
             {
               "name": "baseFee",
@@ -1028,17 +1047,7 @@
               "internalType": "uint24"
             },
             {
-              "name": "minFee",
-              "type": "uint24",
-              "internalType": "uint24"
-            },
-            {
-              "name": "maxSurcharge",
-              "type": "uint24",
-              "internalType": "uint24"
-            },
-            {
-              "name": "halfDeviationTicks",
+              "name": "discountedFee",
               "type": "uint24",
               "internalType": "uint24"
             }
@@ -1047,6 +1056,81 @@
       ],
       "outputs": [],
       "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "encodePayment",
+      "inputs": [
+        {
+          "name": "payment",
+          "type": "tuple",
+          "internalType": "struct X402GateHook.Payment",
+          "components": [
+            {
+              "name": "from",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "validAfter",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "validBefore",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "nonce",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "stateMutability": "pure"
+    },
+    {
+      "type": "function",
+      "name": "feeTiers",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "internalType": "PoolId"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "baseFee",
+          "type": "uint24",
+          "internalType": "uint24"
+        },
+        {
+          "name": "discountedFee",
+          "type": "uint24",
+          "internalType": "uint24"
+        }
+      ],
+      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -1206,100 +1290,56 @@
     },
     {
       "type": "function",
-      "name": "previewFee",
-      "inputs": [
-        {
-          "name": "cfg",
-          "type": "tuple",
-          "internalType": "struct DepegShieldHook.Config",
-          "components": [
-            {
-              "name": "pegTick",
-              "type": "int24",
-              "internalType": "int24"
-            },
-            {
-              "name": "baseFee",
-              "type": "uint24",
-              "internalType": "uint24"
-            },
-            {
-              "name": "minFee",
-              "type": "uint24",
-              "internalType": "uint24"
-            },
-            {
-              "name": "maxSurcharge",
-              "type": "uint24",
-              "internalType": "uint24"
-            },
-            {
-              "name": "halfDeviationTicks",
-              "type": "uint24",
-              "internalType": "uint24"
-            }
-          ]
-        },
-        {
-          "name": "tick",
-          "type": "int24",
-          "internalType": "int24"
-        },
-        {
-          "name": "zeroForOne",
-          "type": "bool",
-          "internalType": "bool"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "fee",
-          "type": "uint24",
-          "internalType": "uint24"
-        },
-        {
-          "name": "deviationTicks",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "restoring",
-          "type": "bool",
-          "internalType": "bool"
-        }
-      ],
-      "stateMutability": "pure"
-    },
-    {
-      "type": "function",
-      "name": "quoteFee",
+      "name": "quote",
       "inputs": [
         {
           "name": "id",
           "type": "bytes32",
           "internalType": "PoolId"
-        },
-        {
-          "name": "zeroForOne",
-          "type": "bool",
-          "internalType": "bool"
         }
       ],
       "outputs": [
         {
-          "name": "fee",
-          "type": "uint24",
-          "internalType": "uint24"
-        },
-        {
-          "name": "deviationTicks",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "restoring",
-          "type": "bool",
-          "internalType": "bool"
+          "name": "",
+          "type": "tuple",
+          "internalType": "struct X402GateHook.PaymentRequirements",
+          "components": [
+            {
+              "name": "scheme",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "network",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "maxAmountRequired",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "asset",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "payTo",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "resource",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "maxTimeoutSeconds",
+              "type": "uint256",
+              "internalType": "uint256"
+            }
+          ]
         }
       ],
       "stateMutability": "view"
@@ -1337,8 +1377,60 @@
       "stateMutability": "view"
     },
     {
+      "type": "function",
+      "name": "termsOf",
+      "inputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "PoolId"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "asset",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "payTo",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "price",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "baseFee",
+          "type": "uint24",
+          "internalType": "uint24"
+        },
+        {
+          "name": "discountedFee",
+          "type": "uint24",
+          "internalType": "uint24"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "withdraw",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "internalType": "PoolId"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
       "type": "event",
-      "name": "DeviationPriced",
+      "name": "PaymentSettled",
       "inputs": [
         {
           "name": "id",
@@ -1347,22 +1439,22 @@
           "internalType": "PoolId"
         },
         {
-          "name": "deviationTicks",
+          "name": "from",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "value",
           "type": "uint256",
           "indexed": false,
           "internalType": "uint256"
         },
         {
-          "name": "restoring",
-          "type": "bool",
+          "name": "nonce",
+          "type": "bytes32",
           "indexed": false,
-          "internalType": "bool"
-        },
-        {
-          "name": "fee",
-          "type": "uint24",
-          "indexed": false,
-          "internalType": "uint24"
+          "internalType": "bytes32"
         }
       ],
       "anonymous": false
@@ -1378,10 +1470,22 @@
           "internalType": "PoolId"
         },
         {
-          "name": "pegTick",
-          "type": "int24",
+          "name": "asset",
+          "type": "address",
           "indexed": false,
-          "internalType": "int24"
+          "internalType": "address"
+        },
+        {
+          "name": "payTo",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        },
+        {
+          "name": "price",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
         },
         {
           "name": "baseFee",
@@ -1390,19 +1494,54 @@
           "internalType": "uint24"
         },
         {
-          "name": "minFee",
-          "type": "uint24",
-          "indexed": false,
-          "internalType": "uint24"
-        },
-        {
-          "name": "maxSurcharge",
+          "name": "discountedFee",
           "type": "uint24",
           "indexed": false,
           "internalType": "uint24"
         }
       ],
       "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "Withdrawn",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "PoolId"
+        },
+        {
+          "name": "payTo",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "amount",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "error",
+      "name": "DiscountNotADiscount",
+      "inputs": [
+        {
+          "name": "baseFee",
+          "type": "uint24",
+          "internalType": "uint24"
+        },
+        {
+          "name": "discountedFee",
+          "type": "uint24",
+          "internalType": "uint24"
+        }
+      ]
     },
     {
       "type": "error",
@@ -1422,12 +1561,12 @@
     },
     {
       "type": "error",
-      "name": "InvalidConfig",
+      "name": "InvalidPool",
       "inputs": []
     },
     {
       "type": "error",
-      "name": "InvalidPool",
+      "name": "InvalidTerms",
       "inputs": []
     },
     {
@@ -1442,6 +1581,27 @@
     },
     {
       "type": "error",
+      "name": "NothingCollected",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "PaymentBelowPrice",
+      "inputs": [
+        {
+          "name": "offered",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "required",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ]
+    },
+    {
+      "type": "error",
       "name": "PoolAlreadyInitialized",
       "inputs": []
     },
@@ -1452,8 +1612,19 @@
     },
     {
       "type": "error",
-      "name": "SurchargeTooLarge",
+      "name": "PriceRequired",
       "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "SafeERC20FailedOperation",
+      "inputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "address"
+        }
+      ]
     }
   ]
 }

@@ -27,6 +27,8 @@
   ],
   "source": "contracts/src/hooks/ArbTaxDecayHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/arb-tax-decay",
+  "repo": "https://github.com/nirholas/arb-tax-decay",
+  "site": "https://arb-tax-decay.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

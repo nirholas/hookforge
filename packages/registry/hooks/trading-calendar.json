@@ -27,6 +27,8 @@
   ],
   "source": "contracts/src/hooks/TradingCalendarHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/trading-calendar",
+  "repo": "https://github.com/nirholas/trading-calendar",
+  "site": "https://trading-calendar-6bp.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

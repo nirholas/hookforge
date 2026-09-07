@@ -27,6 +27,8 @@
   ],
   "source": "contracts/src/hooks/DrawdownCapHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/drawdown-cap",
+  "repo": "https://github.com/nirholas/drawdown-cap",
+  "site": "https://drawdown-cap.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

@@ -28,6 +28,8 @@
   ],
   "source": "contracts/src/hooks/AgentBudgetHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/agent-budget",
+  "repo": "https://github.com/nirholas/agent-budget",
+  "site": "https://agent-budget.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

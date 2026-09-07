@@ -27,6 +27,8 @@
   ],
   "source": "contracts/src/hooks/AntiSnipeRampHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/anti-snipe-ramp",
+  "repo": "https://github.com/nirholas/anti-snipe-ramp",
+  "site": "https://anti-snipe-ramp.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

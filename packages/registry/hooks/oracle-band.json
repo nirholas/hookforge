@@ -26,6 +26,8 @@
   ],
   "source": "contracts/src/hooks/OracleBandHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/oracle-band",
+  "repo": "https://github.com/nirholas/oracle-band",
+  "site": "https://oracle-band.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

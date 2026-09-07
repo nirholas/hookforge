@@ -28,6 +28,8 @@
   ],
   "source": "contracts/src/hooks/ExpirySettleHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/expiry-settle",
+  "repo": "https://github.com/nirholas/expiry-settle",
+  "site": "https://expiry-settle.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

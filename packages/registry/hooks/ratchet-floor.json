@@ -27,6 +27,8 @@
   ],
   "source": "contracts/src/hooks/RatchetFloorHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/ratchet-floor",
+  "repo": "https://github.com/nirholas/ratchet-floor",
+  "site": "https://ratchet-floor.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

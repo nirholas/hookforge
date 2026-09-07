@@ -27,6 +27,8 @@
   ],
   "source": "contracts/src/hooks/CircuitBreakerHook.sol",
   "docs": "https://hookforge.pages.dev/hooks/circuit-breaker",
+  "repo": "https://github.com/nirholas/circuit-breaker",
+  "site": "https://circuit-breaker-1bp.pages.dev",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,
