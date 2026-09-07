@@ -26,7 +26,7 @@ import {fileURLToPath} from "node:url";
 
 import {closure} from "./resolve.mjs";
 import {claimedFlags, deployingDoc, flagExpression, integratingDoc, readme} from "./templates.mjs";
-import {emitSite} from "./site.mjs";
+import {emitSite, hasLocalDemo} from "./site.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..", "..");
@@ -169,6 +169,12 @@ export function generate(slug, outRoot) {
   // The hook's own closure, plus the two files every deploy script needs.
   const files = new Set([...closure(CONTRACTS, entries), "src/libraries/Chains.sol", "src/interfaces/IHookMetadata.sol"]);
 
+  // A hook that ships a local-deploy script also needs the demo contracts that script stands up. They are not in the
+  // hook's import graph, so they have to be named.
+  if (hasLocalDemo(slug)) {
+    for (const file of closure(CONTRACTS, ["src/demo/DemoToken.sol", "src/demo/DemoRouter.sol"])) files.add(file);
+  }
+
   mkdirSync(repo, {recursive: true});
   for (const file of files) {
     mkdirSync(dirname(join(repo, file)), {recursive: true});
@@ -206,6 +212,9 @@ broadcast/*/dry-run/
 # Node
 node_modules/
 web/dist/
+
+# Written by script/DeployLocal.s.sol. Names addresses that exist only on the machine that ran it.
+web/local.json
 
 # Env and secrets: never commit a key or an RPC with a token in it
 .env

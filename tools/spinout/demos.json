@@ -1,58 +1,128 @@
 {
-  "x402-gate": {"panel": "x402-gate"},
-
+  "x402-gate": {
+    "panel": "x402-gate"
+  },
   "arb-tax-decay": {
     "panel": "fee",
     "title": "The longer it sits, the more the next swap pays",
     "lede": "This pool prices staleness. Trade it twice in a row and the second swap is cheap; leave it alone and the price of going first climbs.",
     "liveLabel": "the fee right now, given how long the pool has been quiet",
-    "liveFee": {"name": "quoteFee"},
-    "curve": {"name": "feeAfter", "from": 0, "to": 7200, "steps": 24, "scale": 60, "xLabel": "minutes since the last trade"},
-    "compareHint": "Swap twice in quick succession: the second one is cheaper, because the pool was not stale."
+    "liveFee": {
+      "name": "quoteFee"
+    },
+    "curve": {
+      "name": "feeAfter",
+      "from": 0,
+      "to": 7200,
+      "steps": 24,
+      "scale": 60,
+      "xLabel": "minutes since the last trade"
+    },
+    "compareHint": "Swap twice in quick succession: the second one is cheaper, because the pool was not stale.",
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG",
+      "config": "ArbTaxDecayHook.Config({baseFee: 500, maxSurcharge: 9_500, halfLife: 600})",
+      "dynamicFee": true
+    }
   },
-
   "priority-fee-tax": {
     "panel": "fee",
     "title": "What you bid for position is what you pay",
     "lede": "Racing flow bids for its place in the block. This pool reads that bid and charges for it.",
     "liveLabel": "the fee for a swap at the current priority fee",
-    "liveFee": {"name": "quoteFee"},
-    "curve": {"name": "feeAtPriority", "from": 0, "to": 20000000000, "steps": 24, "scale": 1000000000, "xLabel": "priority fee bid, gwei per gas"}
+    "liveFee": {
+      "name": "quoteFee"
+    },
+    "curve": {
+      "name": "feeAtPriority",
+      "from": 0,
+      "to": 20000000000,
+      "steps": 24,
+      "scale": 1000000000,
+      "xLabel": "priority fee bid, gwei per gas"
+    },
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG",
+      "config": "PriorityFeeTaxHook.Config({baseFee: 500, maxSurcharge: 9_500, halfPriorityWei: 1 gwei})",
+      "dynamicFee": true
+    }
   },
-
   "markout-fee": {
     "panel": "fee",
     "title": "A fee that learns what its own flow is worth",
     "lede": "The pool grades each swap after the fact by whether the price kept moving its way, and prices the next one from the running average.",
     "liveLabel": "the fee at the toxicity this pool has measured",
-    "liveFee": {"name": "quoteFee"},
-    "curve": {"name": "feeAtToxicity", "from": 0, "to": 1000000000000000000, "steps": 20, "scale": 10000000000000000, "xLabel": "measured toxicity, percent"}
+    "liveFee": {
+      "name": "quoteFee"
+    },
+    "curve": {
+      "name": "feeAtToxicity",
+      "from": 0,
+      "to": 1000000000000000000,
+      "steps": 20,
+      "scale": 10000000000000000,
+      "xLabel": "measured toxicity, percent"
+    },
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG",
+      "config": "MarkoutFeeHook.Config({baseFee: 500, maxSurcharge: 9_500, alphaWad: 0.5e18, minHorizon: 60, saturationTicks: 50})",
+      "dynamicFee": true
+    }
   },
-
   "anti-snipe-ramp": {
     "panel": "fee",
     "title": "Sniping the first block buys nothing",
     "lede": "The pool opens at a punitive fee that decays to normal, and every cent of the difference goes to liquidity providers rather than the deployer.",
     "liveLabel": "the fee at this point in the ramp",
-    "liveFee": {"name": "quoteFee"},
-    "curve": {"name": "feeAfter", "from": 0, "to": 3600, "steps": 24, "scale": 60, "xLabel": "minutes since the pool opened"}
+    "liveFee": {
+      "name": "quoteFee"
+    },
+    "curve": {
+      "name": "feeAfter",
+      "from": 0,
+      "to": 3600,
+      "steps": 24,
+      "scale": 60,
+      "xLabel": "minutes since the pool opened"
+    }
   },
-
   "trading-calendar": {
     "panel": "fee",
     "title": "A session, priced rather than enforced",
     "lede": "The pool never stops quoting. Outside its trading session immediacy simply costs more, and the open and close are ramps rather than cliffs.",
     "liveLabel": "the fee at this moment in the week",
-    "liveFee": {"name": "quoteFee"},
-    "curve": {"name": "feeAt", "from": 1704067200, "to": 1704153600, "steps": 32, "scale": 1, "xLabel": "one day, UTC"}
+    "liveFee": {
+      "name": "quoteFee"
+    },
+    "curve": {
+      "name": "feeAt",
+      "from": 1704067200,
+      "to": 1704153600,
+      "steps": 32,
+      "scale": 1,
+      "xLabel": "one day, UTC"
+    },
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG",
+      "config": "TradingCalendarHook.Config({openSecond: 13 hours + 30 minutes, closeSecond: 20 hours, rampSeconds: 30 minutes, sessionFee: 500, closedFee: 20_000, daysMask: 0x1F})",
+      "dynamicFee": true
+    }
   },
-
   "expiry-settle": {
     "panel": "fee",
     "title": "Moving the settlement price gets dearer as it approaches",
     "lede": "The fee ramps quadratically into maturity, so the print is most expensive to move exactly when moving it would pay most.",
     "liveLabel": "the fee at this distance from maturity",
-    "liveFee": {"name": "quoteFee"},
-    "curve": {"name": "feeAt", "from": 0, "to": 0, "steps": 24, "scale": 1, "xLabel": "time toward maturity"}
+    "liveFee": {
+      "name": "quoteFee"
+    },
+    "curve": {
+      "name": "feeAt",
+      "from": 0,
+      "to": 0,
+      "steps": 24,
+      "scale": 1,
+      "xLabel": "time toward maturity"
+    }
   }
 }

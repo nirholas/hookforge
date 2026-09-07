@@ -445,6 +445,135 @@ tr:last-child td { border-bottom: 0; }
 const DEMOS = JSON.parse(readFileSync(join(HERE, "demos.json"), "utf8"));
 const DEMO_PANELS = new Set(Object.keys(DEMOS));
 
+
+/**
+ * The local deploy script a spun-out repository ships, so anybody can bring the hook up and use its demo in one
+ * command, with no funds and no wallet risk.
+ *
+ * Generated from the hook's own configure signature rather than written by hand per repository, because a script
+ * that drifts from the contract it deploys is worse than no script.
+ */
+function localDeployScript(hook, recipe) {
+  return `// SPDX-License-Identifier: Apache-2.0
+pragma solidity ^0.8.26;
+
+import {Script, console2} from "forge-std/Script.sol";
+import {PoolManager} from "@uniswap/v4-core/src/PoolManager.sol";
+import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
+import {Hooks} from "@uniswap/v4-core/src/libraries/Hooks.sol";
+import {PoolKey} from "@uniswap/v4-core/src/types/PoolKey.sol";
+import {PoolId} from "@uniswap/v4-core/src/types/PoolId.sol";
+import {Currency} from "@uniswap/v4-core/src/types/Currency.sol";
+import {IHooks} from "@uniswap/v4-core/src/interfaces/IHooks.sol";
+import {LPFeeLibrary} from "@uniswap/v4-core/src/libraries/LPFeeLibrary.sol";
+import {ModifyLiquidityParams} from "@uniswap/v4-core/src/types/PoolOperation.sol";
+import {HookMiner} from "@uniswap/v4-periphery/test/shared/HookMiner.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+import {DemoToken} from "src/demo/DemoToken.sol";
+import {DemoRouter} from "src/demo/DemoRouter.sol";
+import {${hook.contract}} from "src/hooks/${hook.contract}.sol";
+
+/**
+ * @title DeployLocal
+ * @notice Brings the whole demo up on a local chain: a PoolManager, two faucet tokens, a router a browser can drive,
+ * this hook, a configured pool and enough liquidity to trade it.
+ *
+ * @dev A hook nobody can click is a blog post. This is what makes the site's "Try it" section work without anybody
+ * spending anything on a public network:
+ *
+ *   anvil &
+ *   forge script script/DeployLocal.s.sol --rpc-url http://127.0.0.1:8545 --broadcast \\
+ *     --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+ *
+ * The last line is the JSON the site's web/src/deployments.json wants. Anvil's first account is pre-funded and its
+ * key is public by design; never use it anywhere real.
+ */
+contract DeployLocal is Script {
+    uint160 internal constant FLAGS = uint160(${recipe.flags});
+    address internal constant CREATE2_DEPLOYER = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
+    uint160 internal constant SQRT_PRICE_1_1 = 79228162514264337593543950336;
+
+    PoolManager internal manager;
+    DemoToken internal weth;
+    DemoToken internal dai;
+    DemoRouter internal router;
+    ${hook.contract} internal hook;
+    PoolKey internal key;
+
+    function run() external {
+        vm.startBroadcast();
+
+        manager = new PoolManager(msg.sender);
+        weth = new DemoToken("Hook Demo Ether", "hETH");
+        dai = new DemoToken("Hook Demo Dollar", "hUSD");
+        router = new DemoRouter(IPoolManager(address(manager)));
+
+        (address predicted, bytes32 salt) = HookMiner.find(
+            CREATE2_DEPLOYER, FLAGS, type(${hook.contract}).creationCode, abi.encode(IPoolManager(address(manager)))
+        );
+        hook = new ${hook.contract}{salt: salt}(IPoolManager(address(manager)));
+        require(address(hook) == predicted, "hook landed at an unexpected address");
+
+        _openPool();
+        vm.stopBroadcast();
+
+        string memory config = string.concat(
+                '{"chains":{"31337":{"rpcUrl":"http://127.0.0.1:8545","poolManager":"', vm.toString(address(manager)),
+                '","router":"', vm.toString(address(router)),
+                '","hook":"', vm.toString(address(hook)),
+                '","currency0":"', vm.toString(Currency.unwrap(key.currency0)),
+                '","currency1":"', vm.toString(Currency.unwrap(key.currency1)),
+                '","poolId":"', vm.toString(PoolId.unwrap(key.toId())),
+                '","fee":', vm.toString(uint256(key.fee)),
+                ',"tickSpacing":', vm.toString(uint256(uint24(key.tickSpacing))),
+                ',"zeroForOne":true,"faucet":true,"demoSwapAmount":"10000000000000000"}}}'
+        );
+
+        // Written rather than printed, so bringing the demo up is one command and not a copy-paste. The site's
+        // build merges this over whatever is baked in, and .gitignore keeps it out of the repository: it names
+        // addresses that exist only on the machine that ran this.
+        vm.writeFile("web/local.json", config);
+
+        console2.log("Wrote web/local.json. Now: node web/build.mjs && npx serve web/dist");
+        console2.log(config);
+    }
+
+    function _openPool() private {
+        (Currency currency0, Currency currency1) = address(weth) < address(dai)
+            ? (Currency.wrap(address(weth)), Currency.wrap(address(dai)))
+            : (Currency.wrap(address(dai)), Currency.wrap(address(weth)));
+
+        key = PoolKey({
+            currency0: currency0,
+            currency1: currency1,
+            fee: ${recipe.dynamicFee ? "LPFeeLibrary.DYNAMIC_FEE_FLAG" : "3000"},
+            tickSpacing: 60,
+            hooks: IHooks(address(hook))
+        });
+
+        hook.configure(key, ${recipe.config});
+        router.initialize(key, SQRT_PRICE_1_1);
+
+        weth.claim();
+        dai.claim();
+        IERC20(Currency.unwrap(currency0)).approve(address(router), type(uint256).max);
+        IERC20(Currency.unwrap(currency1)).approve(address(router), type(uint256).max);
+        router.modifyLiquidity(
+            key,
+            ModifyLiquidityParams({tickLower: -60000, tickUpper: 60000, liquidityDelta: 5e18, salt: bytes32(0)}),
+            ""
+        );
+    }
+}
+`;
+}
+
+/** Whether a hook ships a script that stands its demo up on a local chain. */
+export function hasLocalDemo(slug) {
+  return Boolean(DEMOS[slug]?.localDeploy);
+}
+
 /** Bundles the demo app once and returns the code, so every repository ships a build with no install step. */
 function demoBundle() {
   const entry = join(HERE, "app", "main.js");
@@ -503,6 +632,11 @@ forge script script/DeployLocal.s.sol --rpc-url http://127.0.0.1:8545 --broadcas
 
 node web/build.mjs &amp;&amp; npx serve web/dist</code></pre>
       <p class="muted">
+        The deploy script writes <code>web/local.json</code> itself and the build merges it, so the page points at the
+        chain you just created without you editing anything. Point a wallet at
+        <code>http://127.0.0.1:8545</code> and every button on this page works.
+      </p>
+      <p class="muted">
         Anvil's first account is pre-funded and its key is public by design. Never use it anywhere real.
       </p>
     </details>
@@ -535,7 +669,27 @@ const SITE = ${JSON.stringify(siteUrl)};
 const REPO = ${JSON.stringify(repoUrl)};
 const CATALOGUE = ${JSON.stringify(catalogueUrl)};
 
-const page = readFileSync(join(HERE, "src", "index.html"), "utf8");
+let page = readFileSync(join(HERE, "src", "index.html"), "utf8");
+
+// A local deploy writes web/local.json. Merge it over the baked-in config so the demo points at the chain the
+// person running it actually has, without them editing anything. Spliced by index rather than by regular
+// expression: the pattern would have to survive several layers of templating to get here intact, and this cannot
+// be got subtly wrong.
+const localPath = join(HERE, "local.json");
+if (existsSync(localPath)) {
+  const openTag = '<script type="application/json" id="deployments">';
+  const closeTag = "</" + "script>";
+  const from = page.indexOf(openTag);
+  const to = from === -1 ? -1 : page.indexOf(closeTag, from);
+  if (from !== -1 && to !== -1) {
+    const baked = JSON.parse(page.slice(from + openTag.length, to).split("\\u003c").join("<"));
+    const local = JSON.parse(readFileSync(localPath, "utf8"));
+    const merged = {...baked, chains: {...baked.chains, ...local.chains}};
+    const encoded = JSON.stringify(merged).split("<").join("\\u003c");
+    page = page.slice(0, from + openTag.length) + encoded + page.slice(to);
+    console.log("merged web/local.json into the page config");
+  }
+}
 
 mkdirSync(join(DIST, "assets"), {recursive: true});
 writeFileSync(join(DIST, "index.html"), page);
@@ -848,6 +1002,11 @@ export function emitSite(repo, hook, {siteUrl, repoUrl, catalogueUrl}) {
   write(repo, "web/build.mjs", buildScript(hook, siteUrl, repoUrl, catalogueUrl));
   write(repo, "web/src/index.html", indexHtml(hook, {siteUrl, repoUrl, catalogueUrl, deployments}));
   if (DEMO_PANELS.has(hook.slug)) write(repo, "web/src/demo.js", demoBundle());
+
+  // A hook with a local-deploy recipe ships the script and the demo contracts it needs, so its "Try it" section
+  // works for anybody with Foundry and no funds at all.
+  const recipe = DEMOS[hook.slug]?.localDeploy;
+  if (recipe) write(repo, "script/DeployLocal.s.sol", localDeployScript(hook, recipe));
   write(repo, "web/src/site.css", CSS);
   write(repo, "web/src/scene.js", SCENE);
   writeFileSync(join(repo, "web", "src", "og.png"), hookCard(hook));
