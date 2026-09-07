@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 8,
+  "count": 10,
   "hooks": [
     {
       "slug": "anti-snipe-ramp",
@@ -167,6 +167,46 @@
       ]
     },
     {
+      "slug": "drawdown-cap",
+      "name": "DrawdownCap",
+      "family": "Risk",
+      "summary": "A limit down. The pool may not fall more than a fixed distance below where the current epoch opened, and the limit resets on a schedule rather than on anyone's say-so.",
+      "tags": [
+        "risk",
+        "circuit-breaker",
+        "oracle-free",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/drawdown-cap",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/drawdown-cap.json",
+      "deployments": [
+        {
+          "chain": "unichain",
+          "chainId": 130,
+          "address": "0x96DEB6525EACf0847E7a1E0250ABe65a892dd0c0",
+          "status": "deterministic"
+        },
+        {
+          "chain": "robinhood",
+          "chainId": 4663,
+          "address": "0xCDbF94558886fB07615550c21CDbAf3b9b68d0c0",
+          "status": "deterministic"
+        },
+        {
+          "chain": "base",
+          "chainId": 8453,
+          "address": "0xd9bDc663eaDf9f1Cf3dEEa393D45Be6342b510C0",
+          "status": "deterministic"
+        },
+        {
+          "chain": "arbitrum",
+          "chainId": 42161,
+          "address": "0xf3dffF3782A5789fC987389a647C8061A76e10c0",
+          "status": "deterministic"
+        }
+      ]
+    },
+    {
       "slug": "liquidity-floor",
       "name": "LiquidityFloor",
       "family": "Liquidity provider economics",
@@ -282,6 +322,46 @@
           "chain": "arbitrum",
           "chainId": 42161,
           "address": "0x8092f20876753cb41A4CCEA20665288C58af1080",
+          "status": "deterministic"
+        }
+      ]
+    },
+    {
+      "slug": "ratchet-floor",
+      "name": "RatchetFloor",
+      "family": "Curves",
+      "summary": "A price floor that only ever moves up.",
+      "tags": [
+        "price-floor",
+        "launch",
+        "no-admin",
+        "oracle-free"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/ratchet-floor",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/ratchet-floor.json",
+      "deployments": [
+        {
+          "chain": "unichain",
+          "chainId": 130,
+          "address": "0x1EC0A28410eE094Ab636b2cf90174b878A75D040",
+          "status": "deterministic"
+        },
+        {
+          "chain": "robinhood",
+          "chainId": 4663,
+          "address": "0xee7bd53C33B8a3ffd2b2fbcBB9f1f99C0c42d040",
+          "status": "deterministic"
+        },
+        {
+          "chain": "base",
+          "chainId": 8453,
+          "address": "0x0Bc7Fe634b8fe736fcb7c96ee180f7DeB4bED040",
+          "status": "deterministic"
+        },
+        {
+          "chain": "arbitrum",
+          "chainId": 42161,
+          "address": "0xD70b7e7F9b45598167EB5199078ED15160345040",
           "status": "deterministic"
         }
       ]
