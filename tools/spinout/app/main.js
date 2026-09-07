@@ -10,6 +10,8 @@ import {mountX402Gate} from "./panels/x402-gate.js";
 import {mountFeeHook} from "./panels/fee-hook.js";
 import {mountCurve} from "./panels/curve.js";
 import {mountGuard} from "./panels/guard.js";
+import {mountRewards} from "./panels/rewards.js";
+import {mountDelegation} from "./panels/delegation.js";
 
 
 /** Whether a deployment points at an RPC only reachable from the machine running the chain. */
@@ -29,6 +31,8 @@ const PANELS = {
   fee: mountFeeHook,
   curve: mountCurve,
   guard: mountGuard,
+  rewards: mountRewards,
+  delegation: mountDelegation,
 };
 
 const root = document.querySelector("[data-demo]");

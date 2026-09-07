@@ -437,5 +437,304 @@
       "config": "DutchClearingLaunchHook.Config({startPriceX96: uint160(4 * Q96), floorPriceX96: uint160(Q96 / 2), startTime: uint64(block.timestamp), duration: 3600, buyIsZeroForOne: false})",
       "dynamicFee": false
     }
+  },
+  "flow-classifier": {
+    "panel": "guard",
+    "title": "What this pool's flow is actually made of",
+    "lede": "The hook counts how many swaps arrive first in their block and how far each population moves the price, and publishes both. It changes nothing about the pool it measures.",
+    "calls": [
+      {
+        "name": "leadShareBps",
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Swaps that led their block",
+            "format": "bps"
+          }
+        ]
+      },
+      {
+        "name": "leadImpactRatioBps",
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Lead impact ratio (10000 = equal)",
+            "format": "raw"
+          }
+        ]
+      },
+      {
+        "name": "flowStats",
+        "outputs": [
+          "uint256",
+          "uint256",
+          "uint256",
+          "uint256"
+        ],
+        "reads": [
+          {
+            "index": 0,
+            "label": "Swaps seen",
+            "format": "raw"
+          },
+          {
+            "index": 1,
+            "label": "Of those, leading",
+            "format": "raw"
+          }
+        ]
+      }
+    ],
+    "tryLabel": "Swap and watch the numbers move",
+    "tryOtherLabel": "Swap the other way",
+    "localDeploy": {
+      "flags": "Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG",
+      "config": null,
+      "noConfigure": true,
+      "dynamicFee": false
+    }
+  },
+  "ratchet-floor": {
+    "panel": "guard",
+    "title": "A floor that only moves up",
+    "lede": "The pool refuses to trade below a floor that ratchets upward as the price rises and never falls back.",
+    "calls": [
+      {
+        "name": "floorTick",
+        "outputs": [
+          "int24"
+        ],
+        "reads": [
+          {
+            "label": "Floor tick",
+            "format": "raw"
+          }
+        ]
+      },
+      {
+        "name": "sqrtPriceFloorX96",
+        "outputs": [
+          "uint160"
+        ],
+        "reads": [
+          {
+            "label": "Floor price (sqrt Q96)",
+            "format": "raw"
+          }
+        ]
+      }
+    ],
+    "tryLabel": "Try to sell through the floor",
+    "tryOtherLabel": "Buy (raises the floor)"
+  },
+  "reputation-fee": {
+    "panel": "guard",
+    "title": "Priced by who you are, without a signature",
+    "lede": "An agent registers the router it trades through, once. After that the pool prices its flow from an on-chain reputation score, with nothing for a router to forward.",
+    "calls": [
+      {
+        "name": "feeFor",
+        "inputs": [
+          "bytes32",
+          "address"
+        ],
+        "args": [
+          "poolId",
+          "0x0000000000000000000000000000000000000000"
+        ],
+        "outputs": [
+          "uint24",
+          "address",
+          "uint256"
+        ],
+        "reads": [
+          {
+            "index": 0,
+            "label": "Fee for an unregistered router",
+            "format": "pips"
+          }
+        ]
+      }
+    ],
+    "tryLabel": "Swap as an unknown counterparty",
+    "tryOtherLabel": "Swap the other way"
+  },
+  "retro-rebate": {
+    "panel": "rewards",
+    "title": "A volume rebate settled on-chain",
+    "lede": "Each swap skims into that epoch's pot. Once the epoch closes both the pot and the totals are final, so a claim is one division anybody can check and nobody can withhold.",
+    "calls": [
+      {
+        "name": "currentEpoch",
+        "inputs": [],
+        "args": [],
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Current epoch",
+            "format": "raw"
+          }
+        ]
+      }
+    ],
+    "owed": {
+      "name": "claimable",
+      "args": [
+        "epoch",
+        "account"
+      ],
+      "types": {
+        "epoch": "uint256"
+      }
+    },
+    "owedLabel": "claimable for that epoch",
+    "claim": {
+      "name": "claim",
+      "inputs": [
+        {
+          "type": "uint256",
+          "from": "epoch"
+        },
+        {
+          "type": "address",
+          "from": "account"
+        }
+      ],
+      "form": [
+        {
+          "name": "epoch",
+          "label": "Epoch to claim",
+          "hint": "Must be a closed epoch: the running one is not final.",
+          "default": "0"
+        }
+      ]
+    },
+    "claimLabel": "Claim that epoch"
+  },
+  "tenure-weighted-fees": {
+    "panel": "rewards",
+    "title": "Paid for staying, not for arriving",
+    "lede": "A slice of every swap goes to a pot shared by tenure, so capital that has been quoting for a month earns more than capital that arrived for one trade.",
+    "calls": [
+      {
+        "name": "totalShares",
+        "inputs": [],
+        "args": [],
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Total tenure-weighted shares",
+            "format": "raw"
+          }
+        ]
+      },
+      {
+        "name": "multiplierFor",
+        "inputs": [
+          "uint256"
+        ],
+        "args": [
+          2592000
+        ],
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Multiplier after 30 days",
+            "format": "bps"
+          }
+        ]
+      }
+    ],
+    "owed": {
+      "name": "pending",
+      "args": [
+        "position"
+      ],
+      "types": {
+        "position": "bytes32"
+      }
+    },
+    "owedLabel": "owed to that position",
+    "claim": {
+      "name": "claim",
+      "inputs": [
+        {
+          "type": "int24",
+          "from": "tickLower"
+        },
+        {
+          "type": "int24",
+          "from": "tickUpper"
+        },
+        {
+          "type": "bytes32",
+          "from": "salt"
+        },
+        {
+          "type": "address",
+          "from": "account"
+        }
+      ],
+      "form": [
+        {
+          "name": "position",
+          "label": "Position key",
+          "hint": "keccak256(owner, tickLower, tickUpper, salt). Shown here so you can read what a position has earned.",
+          "default": ""
+        },
+        {
+          "name": "tickLower",
+          "label": "Tick lower",
+          "default": "-12000"
+        },
+        {
+          "name": "tickUpper",
+          "label": "Tick upper",
+          "default": "12000"
+        },
+        {
+          "name": "salt",
+          "label": "Salt",
+          "default": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    "claimLabel": "Claim for that position"
+  },
+  "liquidity-floor": {
+    "panel": "guard",
+    "title": "A commitment the pool enforces",
+    "lede": "Each position may withdraw freely down to the fraction it committed, and no further until the unlock. Nothing another provider does changes what you may take.",
+    "calls": [
+      {
+        "name": "isPoolInitialized",
+        "outputs": [
+          "bool"
+        ],
+        "reads": [
+          {
+            "label": "Pool live",
+            "format": "bool"
+          }
+        ]
+      }
+    ],
+    "tryLabel": "Swap (never restricted)",
+    "tryOtherLabel": "Swap the other way"
+  },
+  "agent-budget": {
+    "panel": "delegation",
+    "title": "A spending limit the venue enforces",
+    "lede": "A principal signs one budget for an agent; the agent signs each swap under it. The pool refuses anything past the cap, so the limit lives in the venue rather than in the agent's own code."
   }
 }
