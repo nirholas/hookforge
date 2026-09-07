@@ -61,7 +61,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | `LMSR` | A logarithmic market scoring rule curve, giving prediction markets bounded loss and always-available liquidity. | building |
 | [`PowerPerp`](contracts/src/hooks/PowerPerpHook.sol) | A weighted geometric-mean curve, so a provider chooses how much of the price move they want instead of always getting the square root of it. | shipped |
 | [`RatchetFloor`](contracts/src/hooks/RatchetFloorHook.sol) | A protocol-owned bid that can only move up, giving a token a floor price that is enforced by the curve. | shipped |
-| `GridLadder` | Asymmetric bid and ask ladders in one position, so an LP can quote a spread rather than a symmetric range. | building |
+| [`GridLadder`](contracts/src/hooks/GridLadderHook.sol) | Quotes an independent bid and ask, so a pool can hold a market maker's position rather than a fee schedule. | shipped |
 | [`DutchClearingLaunch`](contracts/src/hooks/DutchClearingLaunchHook.sol) | A descending-price launch enforced as a floor on what the pool will sell at, so the opening price is discovered rather than declared. | shipped |
 | [`StepCurve`](contracts/src/hooks/StepCurveHook.sol) | Prices in discrete increments instead of continuously, so a quote is firm below the increment and there is no infinitesimal arbitrage to take. | shipped |
 
