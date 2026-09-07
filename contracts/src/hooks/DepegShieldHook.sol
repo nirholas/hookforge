@@ -44,6 +44,12 @@ import {FeeMath} from "../libraries/FeeMath.sol";
  * Neither is directional. A curve treats a swap toward the peg and a swap away from it identically, and a volatility
  * fee charges the repairing flow exactly as much as the flow that broke the pool. Charging asymmetrically by direction
  * of travel is what is new here.
+ *
+ * @custom:slug depeg-shield
+ * @custom:family Risk
+ * @custom:prior-art Stable-swap curves flatten price impact near par, and dynamic-fee hooks keyed on volatility exist. Neither is directional: a curve prices a swap toward the peg and one away from it identically, and a volatility fee charges the repairing flow exactly as much as the flow that broke the pool. Charging asymmetrically by direction of travel is what is new.
+ * @custom:limitation The peg is fixed at initialization, so a pair whose par genuinely re-bases has to be re-created. For a pegged pair that is the honest outcome, but it does mean this is the wrong hook for a drifting reference such as a yield-bearing wrapper.
+ * @custom:chains base,arbitrum,unichain,robinhood,ethereum,optimism,polygon,bnb
  */
 contract DepegShieldHook is ForgeFeeHook, PoolConfigurable {
     using StateLibrary for IPoolManager;

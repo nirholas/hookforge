@@ -39,6 +39,12 @@ import {FeeMath} from "../libraries/FeeMath.sol";
  * hooks charge a launch fee and route it to a creator or a protocol treasury. Ramping the *fee* down while directing
  * the proceeds to liquidity is a different mechanism with a different beneficiary, and it composes with any curve
  * rather than replacing it.
+ *
+ * @custom:slug anti-snipe-ramp
+ * @custom:family Launch
+ * @custom:prior-art Liquidity bootstrapping pools ramp the price down and were built for price discovery; several launchpad hooks charge a launch fee and route it to a creator or a treasury. Ramping the fee down while directing the proceeds to liquidity is a different mechanism with a different beneficiary, and it composes with any curve rather than replacing it.
+ * @custom:limitation The size cap is per swap, not per address: a hook sees the router that called the PoolManager, not the person behind it, so a determined buyer can split across transactions. The cap raises the cost of sniping rather than preventing it, and the fee ramp is what does the real work.
+ * @custom:chains base,arbitrum,unichain,robinhood,ethereum,optimism,polygon,bnb
  */
 contract AntiSnipeRampHook is ForgeFeeHook, PoolConfigurable {
     /// @notice Per-pool parameters, fixed at initialization.

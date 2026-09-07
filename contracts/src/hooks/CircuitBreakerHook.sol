@@ -42,6 +42,12 @@ import {PoolConfigurable} from "../base/PoolConfigurable.sol";
  *
  * Prior art: pause-guardian patterns are everywhere and oracle-deviation checks exist as hooks. An autonomous,
  * self-clearing, per-pool halt with no privileged role and no oracle does not.
+ *
+ * @custom:slug circuit-breaker
+ * @custom:family Risk
+ * @custom:prior-art Pause-guardian patterns are everywhere and oracle-deviation checks exist as hooks. An autonomous, self-clearing, per-pool halt with no privileged role and no oracle does not.
+ * @custom:limitation A halt is a blunt instrument: it stops honest trading as well as the attack, and it leaves the pool arbitrageable the moment it lifts. It is the right trade only where the alternative is a pool drained at a price nobody would have quoted.
+ * @custom:chains base,arbitrum,unichain,robinhood,ethereum,optimism,polygon,bnb
  */
 contract CircuitBreakerHook is ForgeHook, PoolConfigurable {
     using StateLibrary for IPoolManager;

@@ -40,6 +40,12 @@ import {FeeMath} from "../libraries/FeeMath.sol";
  * Limitation, stated plainly: on a pool that trades continuously the surcharge is near zero, so this hook does nothing
  * for a busy major pair. It is aimed at the long tail, where pools are quiet for minutes or hours at a time and the
  * arbitrage on the first trade back is the whole of the LP's loss.
+ *
+ * @custom:slug arb-tax-decay
+ * @custom:family Order flow and MEV
+ * @custom:prior-art Dynamic-fee hooks keyed on realized volatility or on price movement are common, and the loss-versus-rebalancing literature (Milionis, Moallemi, Roughgarden, Zhang) motivates charging arbitrageurs more. Keying the fee on time since the last trade rather than on a price signal is what is new here, and it is what removes the oracle.
+ * @custom:limitation On a pool that trades continuously the surcharge is near zero, so this does nothing for a busy major pair. It is aimed at the long tail, where pools sit quiet for minutes or hours and the arbitrage on the first trade back is the whole of the provider loss.
+ * @custom:chains base,arbitrum,unichain,robinhood,ethereum,optimism,polygon,bnb
  */
 contract ArbTaxDecayHook is ForgeFeeHook, PoolConfigurable {
     /// @notice Per-pool parameters, fixed at initialization.

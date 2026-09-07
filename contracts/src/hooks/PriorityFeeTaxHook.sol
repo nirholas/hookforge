@@ -41,6 +41,12 @@ import {FeeMath} from "../libraries/FeeMath.sol";
  * Optimism, Blast and other OP-stack chains. On Arbitrum One transactions are ordered first-come-first-served and the
  * priority fee is normally zero, so on that chain the hook charges `baseFee` and nothing more. It is safe there, it is
  * simply inert, and a pool on Arbitrum should use {ArbTaxDecayHook} instead.
+ *
+ * @custom:slug priority-fee-tax
+ * @custom:family Order flow and MEV
+ * @custom:prior-art Fee mechanisms keyed on realized volatility, on price movement and on swap size are all well covered. That priority fees reveal flow toxicity is discussed in the ordering-fee literature and in Uniswap research on priority-ordering auctions, but the surcharge has only ever been implemented at the sequencer or the router, never inside the pool where the liquidity providers who bear the cost can be paid directly.
+ * @custom:limitation Needs a real priority-fee market. On Arbitrum One, where ordering is first-come-first-served and the priority fee is normally zero, the hook is safe but inert and a pool there should use ArbTaxDecay instead.
+ * @custom:chains base,unichain,ethereum,optimism,robinhood
  */
 contract PriorityFeeTaxHook is ForgeFeeHook, PoolConfigurable {
     /// @notice Per-pool parameters, fixed at initialization.
