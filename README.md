@@ -46,7 +46,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | Hook | What it does | Status |
 | --- | --- | --- |
 | [`ArbTaxDecay`](contracts/src/hooks/ArbTaxDecayHook.sol) | Prices staleness: the longer a pool sits untraded, the more the next swap pays, on a saturating curve. Recaptures loss-versus-rebalancing with no oracle. | shipped |
-| `PriorityFeeTax` | Charges a surcharge proportional to the swap's own priority fee, on the theory that toxic flow bids for position and benign flow does not. | building |
+| [`PriorityFeeTax`](contracts/src/hooks/PriorityFeeTaxHook.sol) | Charges a surcharge proportional to the swap's own priority fee, on the theory that toxic flow bids for position and benign flow does not. | shipped |
 | `BlockBatchClearing` | Queues every swap in a block and clears them at one uniform price, so ordering inside the block stops being worth anything. | building |
 | `TopOfBlockAuction` | An on-chain auction for the right to trade first in a block. The winning bid is paid to liquidity providers. | building |
 | `FlowClassifier` | Publishes a running toxic-versus-benign classification of a pool's order flow on-chain, as a public good other hooks can read. | building |

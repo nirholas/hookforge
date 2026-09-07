@@ -7,16 +7,24 @@ contracts/.forge-snapshots/
 # Node
 node_modules/
 dist/
+build/
 .turbo/
 *.tsbuildinfo
 
-# Env and secrets
+# Env and secrets: never commit a key, an RPC with an embedded token, or a deploy credential
 .env
 .env.*
 !.env.example
+*.pem
+*.key
 
-# OS and editors
+# Editors and OS
 .DS_Store
-*.log
-.vscode/
 .idea/
+.vscode/
+*.swp
+
+# Local artifacts
+coverage/
+lcov.info
+*.log
