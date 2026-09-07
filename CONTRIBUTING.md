@@ -17,8 +17,7 @@ filename is a real failure mode rather than a theoretical one. Before writing a 
 
 | Hook | Claimed by | Status |
 | --- | --- | --- |
-| `ExpirySettle` | three-ws-62 | in progress |
-| `VestedBuy` | three-ws-62 | queued |
+| `VestedBuy` | three-ws-62 | in progress |
 | `StreamDCA` | three-ws-62 | queued |
 
 ## What a hook needs before it is done

@@ -112,7 +112,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 
 | Hook | What it does | Status |
 | --- | --- | --- |
-| `ExpirySettle` | Gives a pool a maturity date at which it settles, turning it into a dated instrument. | building |
+| [`ExpirySettle`](contracts/src/hooks/ExpirySettleHook.sol) | Gives a pool a maturity, and ramps the fee quadratically into it, so the settlement price is dearest to move exactly when moving it would pay most. | shipped |
 | `VestedBuy` | Vests purchases linearly and enforces the schedule at the pool rather than in a token contract. | building |
 | `EpochRebalance` | Rebalances the pool toward a target weight each epoch, making the pool itself an index. | building |
 | `StreamDCA` | Executes recurring dollar-cost-average streams block by block. | building |

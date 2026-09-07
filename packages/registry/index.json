@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 13,
+  "count": 14,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -221,6 +221,22 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "expiry-settle",
+      "name": "ExpirySettle",
+      "family": "Time",
+      "summary": "Gives a pool a maturity, and makes moving its price monotonically more expensive as that maturity approaches, so the settlement price is dearest to manipulate exactly when manipulating it would pay most.",
+      "tags": [
+        "expiry",
+        "settlement",
+        "dynamic-fee",
+        "derivatives",
+        "oracle-free"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/expiry-settle",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/expiry-settle.json",
+      "deployments": []
     },
     {
       "slug": "flow-classifier",
