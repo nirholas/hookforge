@@ -1,0 +1,48 @@
+[profile.default]
+src = 'src'
+test = 'test'
+script = 'script'
+out = 'out'
+libs = ['lib']
+solc = '0.8.26'
+evm_version = 'cancun'
+optimizer = true
+optimizer_runs = 800
+via_ir = false
+bytecode_hash = 'none'
+ffi = false
+gas_limit = 300000000
+fs_permissions = [{ access = 'read', path = './' }, { access = 'read-write', path = './deployments' }]
+
+[profile.default.fuzz]
+runs = 512
+seed = '0x484f4f4b'
+
+[profile.ci.fuzz]
+runs = 5000
+
+[profile.deep.fuzz]
+runs = 50000
+
+[profile.default.invariant]
+runs = 32
+depth = 200
+fail_on_revert = false
+
+[rpc_endpoints]
+base = "${BASE_RPC_URL}"
+arbitrum = "${ARBITRUM_RPC_URL}"
+unichain = "${UNICHAIN_RPC_URL}"
+robinhood = "${ROBINHOOD_RPC_URL}"
+ethereum = "${ETHEREUM_RPC_URL}"
+
+[etherscan]
+base = { key = "${ETHERSCAN_API_KEY}", chain = 8453 }
+arbitrum = { key = "${ETHERSCAN_API_KEY}", chain = 42161 }
+unichain = { key = "${ETHERSCAN_API_KEY}", chain = 130 }
+
+[fmt]
+line_length = 120
+tab_width = 4
+bracket_spacing = false
+int_types = 'long'
