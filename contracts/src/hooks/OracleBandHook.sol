@@ -134,6 +134,7 @@ contract OracleBandHook is ForgeHook, PoolConfigurable {
     /// @dev Requires a configuration, and requires the pool to open inside its own band.
     function _afterInitialize(address, PoolKey calldata key, uint160 sqrtPriceX96, int24)
         internal
+        view
         override
         returns (bytes4)
     {
@@ -148,6 +149,7 @@ contract OracleBandHook is ForgeHook, PoolConfigurable {
     /// @dev Refuses to trade from a price that is already outside the band.
     function _beforeSwap(address, PoolKey calldata key, SwapParams calldata, bytes calldata)
         internal
+        view
         override
         returns (bytes4, BeforeSwapDelta, uint24)
     {
@@ -161,6 +163,7 @@ contract OracleBandHook is ForgeHook, PoolConfigurable {
     /// @dev Refuses to leave the pool outside the band, which is what stops a walk rather than merely noticing it.
     function _afterSwap(address, PoolKey calldata key, SwapParams calldata, BalanceDelta, bytes calldata)
         internal
+        view
         override
         returns (bytes4, int128)
     {

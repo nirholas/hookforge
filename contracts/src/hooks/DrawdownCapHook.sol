@@ -172,6 +172,7 @@ contract DrawdownCapHook is ForgeHook, PoolConfigurable {
     /// @dev Refuses to leave the pool below this epoch's limit.
     function _afterSwap(address, PoolKey calldata key, SwapParams calldata, BalanceDelta, bytes calldata)
         internal
+        view
         override
         returns (bytes4, int128)
     {

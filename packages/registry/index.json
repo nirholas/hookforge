@@ -4,8 +4,24 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 10,
+  "count": 11,
   "hooks": [
+    {
+      "slug": "agent-budget",
+      "name": "AgentBudget",
+      "family": "Agent-native",
+      "summary": "A spending limit the venue itself enforces: an autonomous agent may swap on this pool only within a budget its principal signed, and the pool refuses the swap that would exceed it.",
+      "tags": [
+        "agent",
+        "delegation",
+        "spending-limit",
+        "eip712",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/agent-budget",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/agent-budget.json",
+      "deployments": []
+    },
     {
       "slug": "anti-snipe-ramp",
       "name": "AntiSnipeRamp",
