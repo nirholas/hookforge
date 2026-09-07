@@ -1,32 +1,31 @@
 {
   "$schema": "https://hookforge.pages.dev/schema/hook-manifest.json",
-  "slug": "liquidity-floor",
-  "name": "LiquidityFloor",
-  "contract": "LiquidityFloorHook",
+  "slug": "oracle-band",
+  "name": "OracleBand",
+  "contract": "OracleBandHook",
   "version": "1.0.0",
-  "family": "Liquidity provider economics",
-  "summary": "A liquidity commitment enforced per position: a fraction of what you add cannot leave until the pool's unlock date, and every provider is held to that fraction of their own stake rather than to a shared pool total.",
-  "description": "A new pool has a bootstrapping problem that is really a credibility problem. Swappers cannot tell the difference between liquidity that intends to stay and liquidity that will leave the moment the pool is quoted by an aggregator, and the second kind is indistinguishable from the first right up until it is gone. The published answers lock whole positions for a term. That works and it is also badly mispriced: a provider who would happily commit a third of their capital for six months has to choose between committing all of it and committing none. Term locks therefore select for the providers least sensitive to the lock, which is not the same set as the providers most useful to the pool. This hook takes the commitment as a *fraction*. Configure `floorBps` and `unlockTimestamp`, and thereafter each position may freely withdraw down to `floorBps` of everything it has ever added, with the remainder released at the unlock. Adding more liquidity raises your own floor proportionally, so topping up is never a trap: you keep the same ratio of free to committed capital that you signed up for. The design is deliberately race-free, which is the property that distinguishes it from a pool-wide minimum. A floor expressed as \"total pool liquidity must stay above X\" is a bank run waiting to happen: it is satisfiable by whoever withdraws first and binding only on whoever is last, so rational providers race for the exit precisely when the pool most needs them. Holding each position to its own commitment removes the race entirely. Nothing another provider does can change what you are allowed to withdraw. The hook takes no fee, holds no funds and has no privileged role. It cannot stop a provider from ceasing to quote, only from removing committed liquidity, and it does not restrict swaps at all. Position identity is the v4 position key: the address that called `modifyLiquidity` on the `PoolManager` (in practice a position manager or a router), the tick range, and the caller's salt. Two providers sharing one position manager therefore share a commitment only if they also share a salt, which position managers do not do. Prior art: `LiquidityLock`, `Timelock Addition` and `LockingLiquidity` all lock positions wholesale for a term. Fractional, per-position, top-up-safe commitments are the contribution here.",
-  "priorArt": "LiquidityLock, Timelock Addition and LockingLiquidity all lock positions wholesale for a term. Fractional, per-position, top-up-safe commitments are the contribution here, along with the observation that a pool-wide minimum is a bank run rather than a floor.",
-  "limitation": "The commitment binds the v4 position key, which is the address that called modifyLiquidity. A provider who routes through a position manager that pools many users under one key would share a commitment with them; every mainstream position manager gives each position its own key, but a custom router need not.",
+  "family": "Risk",
+  "summary": "Refuses to let a pool settle at a price the wider market does not recognise.",
+  "description": "A thin pool can be walked anywhere. Buy through the last tick of liquidity and the pool will quote you a price no other venue would, and whatever reads that pool afterwards, a lending market, a vault, another pool's oracle, inherits the number. The pool is not wrong: it faithfully reports what it was paid. It is simply alone. This hook gives the pool a second opinion. Before and after every swap it compares the pool price against a reference from an {IPriceOracle} and rejects the swap if the result lands outside a band around it:   deviation = |poolPrice / referencePrice - 1|, rejected when deviation > maxDeviationBps The check runs on both sides of the swap, and the pair is what makes it hard to defeat. The `beforeSwap` check refuses to trade from a price that is already outside the band, so a pool pushed out of line in one transaction cannot be traded against in the next. The `afterSwap` check refuses to leave the pool outside the band, which is what stops the walk in the first place. Neither check can be satisfied by splitting a large swap into small ones, because the constraint is on the resulting price rather than on the size of the trade. Prices are compared in `sqrtPriceX96`, squared back through `FullMath` so the comparison is on the actual price ratio and not on an approximation of it that drifts as the deviation grows. Liquidity operations are untouched. A provider can always withdraw, including while the band is refusing swaps, which is the property that makes it safe to sit behind one. The obvious objection: this makes the pool depend on an oracle, and oracles fail. So the hook treats failure as refusal rather than as permission. A feed older than `maxStaleness` halts swapping instead of waving it through, and a feed that reverts propagates rather than being caught. A pool that would rather trade blind than not trade should not use this hook, and the fee-based hooks in this catalogue are the oracle-free alternative.",
+  "priorArt": "Oracle-deviation checks exist inside individual protocols, and Detox uses Pyth to detect MEV and redirect it. Both act after the fact, on a pool that has already printed the price. Enforcing the band as a precondition on both sides of the swap, so the out-of-band price is never written at all, is what is new here.",
+  "limitation": "The pool inherits the oracle's liveness. If the feed stops, swapping stops, and on a chain where the feed updates on a deviation threshold rather than a heartbeat, a quiet market can look stale. Set maxStaleness against the feed's actual publication cadence, not against how fresh you would like it to be.",
   "tags": [
-    "lp-economics",
-    "commitment",
-    "launch",
-    "rug-resistance"
+    "risk",
+    "oracle",
+    "manipulation-resistance",
+    "no-admin"
   ],
   "recommendedChains": [
     "base",
     "arbitrum",
     "unichain",
-    "robinhood",
     "ethereum",
     "optimism",
     "polygon",
     "bnb"
   ],
-  "source": "contracts/src/hooks/LiquidityFloorHook.sol",
-  "docs": "https://hookforge.pages.dev/hooks/liquidity-floor",
+  "source": "contracts/src/hooks/OracleBandHook.sol",
+  "docs": "https://hookforge.pages.dev/hooks/oracle-band",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,
@@ -34,11 +33,11 @@
     "beforeSwapReturnsDelta": false,
     "afterDonate": false,
     "beforeDonate": false,
-    "afterSwap": false,
-    "beforeSwap": false,
+    "afterSwap": true,
+    "beforeSwap": true,
     "afterRemoveLiquidity": false,
-    "beforeRemoveLiquidity": true,
-    "afterAddLiquidity": true,
+    "beforeRemoveLiquidity": false,
+    "afterAddLiquidity": false,
     "beforeAddLiquidity": false,
     "afterInitialize": true,
     "beforeInitialize": false
@@ -52,34 +51,38 @@
     "swapAccess": "none"
   },
   "configure": {
-    "signature": "configure((address,address,uint24,int24,address),(uint16,uint64))",
+    "signature": "configure((address,address,uint24,int24,address),(address,uint32,uint32))",
     "fields": [
       {
-        "name": "floorBps",
-        "type": "uint16"
+        "name": "oracle",
+        "type": "address"
       },
       {
-        "name": "unlockTimestamp",
-        "type": "uint64"
+        "name": "maxDeviationBps",
+        "type": "uint32"
+      },
+      {
+        "name": "maxStaleness",
+        "type": "uint32"
       }
     ]
   },
   "errors": [
     {
-      "signature": "CommitmentBreached(uint256,uint256)",
-      "notice": "The withdrawal would take the position below its commitment."
-    },
-    {
       "signature": "HookNotImplemented()",
       "notice": "The hook function is not implemented."
     },
     {
-      "signature": "InvalidFloor()",
-      "notice": "`floorBps` was zero (no commitment) or above 100%."
+      "signature": "InvalidConfig()",
+      "notice": "`maxDeviationBps` or `maxStaleness` was zero, or no oracle was given."
     },
     {
       "signature": "InvalidPool()",
       "notice": "The pool is not configured to use this hook."
+    },
+    {
+      "signature": "OutsideBand(uint256,uint32)",
+      "notice": "The pool price is outside the band around the reference."
     },
     {
       "signature": "PoolAlreadyInitialized()",
@@ -90,33 +93,33 @@
       "notice": "The pool was initialized without a configuration for this hook."
     },
     {
-      "signature": "UnlockInThePast()",
-      "notice": "The unlock must be in the future at configuration time, or the commitment means nothing."
+      "signature": "ReferenceStale(uint256,uint32)",
+      "notice": "The reference price is older than the pool tolerates, so the pool declines to trade."
     }
   ],
   "deployments": [
     {
       "chain": "unichain",
       "chainId": 130,
-      "address": "0xFeCAf8bb3DD7fBE0Df1b6eFa0E865ef598535600",
+      "address": "0x1EF02aDF27051C3Ce6675D106239471f3D4C50C0",
       "status": "deterministic"
     },
     {
       "chain": "robinhood",
       "chainId": 4663,
-      "address": "0x3041fD311d0f39428655f45ce4501DEC7BfAD600",
+      "address": "0x81702603B79E31274F4BA493c8bb06b48c5CD0c0",
       "status": "deterministic"
     },
     {
       "chain": "base",
       "chainId": 8453,
-      "address": "0x375ae2136a29aaA49E5f17c2Fc2A6A4832385600",
+      "address": "0x24A6D3d3822D2aabAa21cCD12E5f35B1dC1F90C0",
       "status": "deterministic"
     },
     {
       "chain": "arbitrum",
       "chainId": 42161,
-      "address": "0x1b142F790e2FfEb875a36FAED37Bbf8cE1Cf9600",
+      "address": "0x92724249d217BFC7d14277E83844645C5862d0c0",
       "status": "deterministic"
     }
   ],
@@ -131,30 +134,6 @@
         }
       ],
       "stateMutability": "nonpayable"
-    },
-    {
-      "type": "function",
-      "name": "addedLiquidity",
-      "inputs": [
-        {
-          "name": "",
-          "type": "bytes32",
-          "internalType": "PoolId"
-        },
-        {
-          "name": "",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -945,30 +924,6 @@
     },
     {
       "type": "function",
-      "name": "committedLiquidity",
-      "inputs": [
-        {
-          "name": "id",
-          "type": "bytes32",
-          "internalType": "PoolId"
-        },
-        {
-          "name": "position",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
       "name": "configOf",
       "inputs": [
         {
@@ -979,14 +934,19 @@
       ],
       "outputs": [
         {
-          "name": "floorBps",
-          "type": "uint16",
-          "internalType": "uint16"
+          "name": "oracle",
+          "type": "address",
+          "internalType": "contract IPriceOracle"
         },
         {
-          "name": "unlockTimestamp",
-          "type": "uint64",
-          "internalType": "uint64"
+          "name": "maxDeviationBps",
+          "type": "uint32",
+          "internalType": "uint32"
+        },
+        {
+          "name": "maxStaleness",
+          "type": "uint32",
+          "internalType": "uint32"
         }
       ],
       "stateMutability": "view"
@@ -1030,23 +990,52 @@
         {
           "name": "cfg",
           "type": "tuple",
-          "internalType": "struct LiquidityFloorHook.Config",
+          "internalType": "struct OracleBandHook.Config",
           "components": [
             {
-              "name": "floorBps",
-              "type": "uint16",
-              "internalType": "uint16"
+              "name": "oracle",
+              "type": "address",
+              "internalType": "contract IPriceOracle"
             },
             {
-              "name": "unlockTimestamp",
-              "type": "uint64",
-              "internalType": "uint64"
+              "name": "maxDeviationBps",
+              "type": "uint32",
+              "internalType": "uint32"
+            },
+            {
+              "name": "maxStaleness",
+              "type": "uint32",
+              "internalType": "uint32"
             }
           ]
         }
       ],
       "outputs": [],
       "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "deviation",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "internalType": "PoolId"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "deviationBps",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "withinBand",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -1206,64 +1195,6 @@
     },
     {
       "type": "function",
-      "name": "positionKey",
-      "inputs": [
-        {
-          "name": "owner",
-          "type": "address",
-          "internalType": "address"
-        },
-        {
-          "name": "tickLower",
-          "type": "int24",
-          "internalType": "int24"
-        },
-        {
-          "name": "tickUpper",
-          "type": "int24",
-          "internalType": "int24"
-        },
-        {
-          "name": "salt",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
-      "stateMutability": "pure"
-    },
-    {
-      "type": "function",
-      "name": "removedLiquidity",
-      "inputs": [
-        {
-          "name": "",
-          "type": "bytes32",
-          "internalType": "PoolId"
-        },
-        {
-          "name": "",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
       "name": "specURI",
       "inputs": [],
       "outputs": [
@@ -1295,61 +1226,6 @@
       "stateMutability": "view"
     },
     {
-      "type": "function",
-      "name": "withdrawableLiquidity",
-      "inputs": [
-        {
-          "name": "id",
-          "type": "bytes32",
-          "internalType": "PoolId"
-        },
-        {
-          "name": "position",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "event",
-      "name": "CommitmentIncreased",
-      "inputs": [
-        {
-          "name": "id",
-          "type": "bytes32",
-          "indexed": true,
-          "internalType": "PoolId"
-        },
-        {
-          "name": "position",
-          "type": "bytes32",
-          "indexed": true,
-          "internalType": "bytes32"
-        },
-        {
-          "name": "added",
-          "type": "uint256",
-          "indexed": false,
-          "internalType": "uint256"
-        },
-        {
-          "name": "committed",
-          "type": "uint256",
-          "indexed": false,
-          "internalType": "uint256"
-        }
-      ],
-      "anonymous": false
-    },
-    {
       "type": "event",
       "name": "PoolConfigured",
       "inputs": [
@@ -1360,35 +1236,25 @@
           "internalType": "PoolId"
         },
         {
-          "name": "floorBps",
-          "type": "uint16",
+          "name": "oracle",
+          "type": "address",
           "indexed": false,
-          "internalType": "uint16"
+          "internalType": "address"
         },
         {
-          "name": "unlockTimestamp",
-          "type": "uint64",
+          "name": "maxDeviationBps",
+          "type": "uint32",
           "indexed": false,
-          "internalType": "uint64"
+          "internalType": "uint32"
+        },
+        {
+          "name": "maxStaleness",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
         }
       ],
       "anonymous": false
-    },
-    {
-      "type": "error",
-      "name": "CommitmentBreached",
-      "inputs": [
-        {
-          "name": "committed",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "remaining",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ]
     },
     {
       "type": "error",
@@ -1397,7 +1263,7 @@
     },
     {
       "type": "error",
-      "name": "InvalidFloor",
+      "name": "InvalidConfig",
       "inputs": []
     },
     {
@@ -1412,6 +1278,22 @@
     },
     {
       "type": "error",
+      "name": "OutsideBand",
+      "inputs": [
+        {
+          "name": "deviationBps",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "maxDeviationBps",
+          "type": "uint32",
+          "internalType": "uint32"
+        }
+      ]
+    },
+    {
+      "type": "error",
       "name": "PoolAlreadyInitialized",
       "inputs": []
     },
@@ -1422,8 +1304,19 @@
     },
     {
       "type": "error",
-      "name": "UnlockInThePast",
-      "inputs": []
+      "name": "ReferenceStale",
+      "inputs": [
+        {
+          "name": "updatedAt",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "maxStaleness",
+          "type": "uint32",
+          "internalType": "uint32"
+        }
+      ]
     }
   ]
 }

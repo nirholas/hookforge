@@ -43,7 +43,7 @@
     "afterInitialize": true,
     "beforeInitialize": false
   },
-  "permissionsSource": "declaration",
+  "permissionsSource": "address",
   "properties": {
     "dynamicFee": true,
     "upgradeable": false,
@@ -122,7 +122,32 @@
       "notice": "The ramp cannot be longer than the session or the gap between sessions it has to fit inside."
     }
   ],
-  "deployments": [],
+  "deployments": [
+    {
+      "chain": "unichain",
+      "chainId": 130,
+      "address": "0x55cE2fB1636B6E4E70C51689156d0088D48d5080",
+      "status": "deterministic"
+    },
+    {
+      "chain": "robinhood",
+      "chainId": 4663,
+      "address": "0x66341c30B3b860f0255bF51EEb431C2e92Bdd080",
+      "status": "deterministic"
+    },
+    {
+      "chain": "base",
+      "chainId": 8453,
+      "address": "0x58b9359042e81aA137972AF2Ff082476dDE09080",
+      "status": "deterministic"
+    },
+    {
+      "chain": "arbitrum",
+      "chainId": 42161,
+      "address": "0x0bB9D56c24767E5250C5BacE6100C11cb78FD080",
+      "status": "deterministic"
+    }
+  ],
   "abi": [
     {
       "type": "constructor",

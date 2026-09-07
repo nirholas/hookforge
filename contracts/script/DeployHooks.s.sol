@@ -13,6 +13,9 @@ import {PriorityFeeTaxHook} from "src/hooks/PriorityFeeTaxHook.sol";
 import {CircuitBreakerHook} from "src/hooks/CircuitBreakerHook.sol";
 import {DepegShieldHook} from "src/hooks/DepegShieldHook.sol";
 import {AntiSnipeRampHook} from "src/hooks/AntiSnipeRampHook.sol";
+import {OracleBandHook} from "src/hooks/OracleBandHook.sol";
+import {LiquidityFloorHook} from "src/hooks/LiquidityFloorHook.sol";
+import {TradingCalendarHook} from "src/hooks/TradingCalendarHook.sol";
 
 /**
  * @title DeployHooks
@@ -49,6 +52,9 @@ contract DeployHooks is Script {
     uint160 internal constant FEE_HOOK_FLAGS = uint160(Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG);
     uint160 internal constant BREAKER_FLAGS =
         uint160(Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG);
+    uint160 internal constant LIQUIDITY_FLOOR_FLAGS = uint160(
+        Hooks.AFTER_INITIALIZE_FLAG | Hooks.AFTER_ADD_LIQUIDITY_FLAG | Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG
+    );
 
     function run() external {
         manager = Chains.poolManager();
@@ -62,6 +68,9 @@ contract DeployHooks is Script {
         _record("CircuitBreaker", _deployCircuitBreaker());
         _record("DepegShield", _deployDepegShield());
         _record("AntiSnipeRamp", _deployAntiSnipeRamp());
+        _record("OracleBand", _deployOracleBand());
+        _record("LiquidityFloor", _deployLiquidityFloor());
+        _record("TradingCalendar", _deployTradingCalendar());
 
         vm.stopBroadcast();
 
@@ -122,6 +131,39 @@ contract DeployHooks is Script {
 
         AntiSnipeRampHook hook = new AntiSnipeRampHook{salt: salt}(manager);
         require(address(hook) == expected, "AntiSnipeRamp: mined address mismatch");
+        return address(hook);
+    }
+
+    function _deployOracleBand() internal returns (address) {
+        bytes memory args = abi.encode(manager);
+        (address expected, bytes32 salt) =
+            HookMiner.find(Chains.CREATE2_DEPLOYER, BREAKER_FLAGS, type(OracleBandHook).creationCode, args);
+        if (expected.code.length > 0) return expected;
+
+        OracleBandHook hook = new OracleBandHook{salt: salt}(manager);
+        require(address(hook) == expected, "OracleBand: mined address mismatch");
+        return address(hook);
+    }
+
+    function _deployLiquidityFloor() internal returns (address) {
+        bytes memory args = abi.encode(manager);
+        (address expected, bytes32 salt) =
+            HookMiner.find(Chains.CREATE2_DEPLOYER, LIQUIDITY_FLOOR_FLAGS, type(LiquidityFloorHook).creationCode, args);
+        if (expected.code.length > 0) return expected;
+
+        LiquidityFloorHook hook = new LiquidityFloorHook{salt: salt}(manager);
+        require(address(hook) == expected, "LiquidityFloor: mined address mismatch");
+        return address(hook);
+    }
+
+    function _deployTradingCalendar() internal returns (address) {
+        bytes memory args = abi.encode(manager);
+        (address expected, bytes32 salt) =
+            HookMiner.find(Chains.CREATE2_DEPLOYER, FEE_HOOK_FLAGS, type(TradingCalendarHook).creationCode, args);
+        if (expected.code.length > 0) return expected;
+
+        TradingCalendarHook hook = new TradingCalendarHook{salt: salt}(manager);
+        require(address(hook) == expected, "TradingCalendar: mined address mismatch");
         return address(hook);
     }
 

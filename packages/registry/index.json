@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 7,
+  "count": 8,
   "hooks": [
     {
       "slug": "anti-snipe-ramp",
@@ -179,7 +179,72 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/liquidity-floor",
       "manifest": "https://hookforge.pages.dev/schema/hooks/liquidity-floor.json",
-      "deployments": []
+      "deployments": [
+        {
+          "chain": "unichain",
+          "chainId": 130,
+          "address": "0xFeCAf8bb3DD7fBE0Df1b6eFa0E865ef598535600",
+          "status": "deterministic"
+        },
+        {
+          "chain": "robinhood",
+          "chainId": 4663,
+          "address": "0x3041fD311d0f39428655f45ce4501DEC7BfAD600",
+          "status": "deterministic"
+        },
+        {
+          "chain": "base",
+          "chainId": 8453,
+          "address": "0x375ae2136a29aaA49E5f17c2Fc2A6A4832385600",
+          "status": "deterministic"
+        },
+        {
+          "chain": "arbitrum",
+          "chainId": 42161,
+          "address": "0x1b142F790e2FfEb875a36FAED37Bbf8cE1Cf9600",
+          "status": "deterministic"
+        }
+      ]
+    },
+    {
+      "slug": "oracle-band",
+      "name": "OracleBand",
+      "family": "Risk",
+      "summary": "Refuses to let a pool settle at a price the wider market does not recognise.",
+      "tags": [
+        "risk",
+        "oracle",
+        "manipulation-resistance",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/oracle-band",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/oracle-band.json",
+      "deployments": [
+        {
+          "chain": "unichain",
+          "chainId": 130,
+          "address": "0x1EF02aDF27051C3Ce6675D106239471f3D4C50C0",
+          "status": "deterministic"
+        },
+        {
+          "chain": "robinhood",
+          "chainId": 4663,
+          "address": "0x81702603B79E31274F4BA493c8bb06b48c5CD0c0",
+          "status": "deterministic"
+        },
+        {
+          "chain": "base",
+          "chainId": 8453,
+          "address": "0x24A6D3d3822D2aabAa21cCD12E5f35B1dC1F90C0",
+          "status": "deterministic"
+        },
+        {
+          "chain": "arbitrum",
+          "chainId": 42161,
+          "address": "0x92724249d217BFC7d14277E83844645C5862d0c0",
+          "status": "deterministic"
+        }
+      ]
     },
     {
       "slug": "priority-fee-tax",
@@ -234,7 +299,32 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/trading-calendar",
       "manifest": "https://hookforge.pages.dev/schema/hooks/trading-calendar.json",
-      "deployments": []
+      "deployments": [
+        {
+          "chain": "unichain",
+          "chainId": 130,
+          "address": "0x55cE2fB1636B6E4E70C51689156d0088D48d5080",
+          "status": "deterministic"
+        },
+        {
+          "chain": "robinhood",
+          "chainId": 4663,
+          "address": "0x66341c30B3b860f0255bF51EEb431C2e92Bdd080",
+          "status": "deterministic"
+        },
+        {
+          "chain": "base",
+          "chainId": 8453,
+          "address": "0x58b9359042e81aA137972AF2Ff082476dDE09080",
+          "status": "deterministic"
+        },
+        {
+          "chain": "arbitrum",
+          "chainId": 42161,
+          "address": "0x0bB9D56c24767E5250C5BacE6100C11cb78FD080",
+          "status": "deterministic"
+        }
+      ]
     }
   ]
 }
