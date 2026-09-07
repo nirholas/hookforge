@@ -94,7 +94,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | [`TenureWeightedFees`](contracts/src/hooks/TenureWeightedFeesHook.sol) | Skims a slice of each swap into a pot shared by tenure, so staying is paid without arriving being taxed. | shipped |
 | `RangeRent` | Charges and pays rent for range occupancy based on how much of the range was actually used. | building |
 | `AutoCompoundDonate` | Donates accrued fees straight back to in-range liquidity, compounding without touching positions. | building |
-| `RetroRebate` | Pays volume rebates from on-chain epoch accounting, with no Merkle drop and no off-chain claim. | building |
+| [`RetroRebate`](contracts/src/hooks/RetroRebateHook.sol) | Pays volume rebates from closed on-chain epochs, so there is no Merkle root, no off-chain script and nobody who can decline to publish it. | shipped |
 | `FungibleRange` | Tokenises a range position as an ERC-20 so it can be traded, lent and used as collateral. | building |
 
 ### Agent-native

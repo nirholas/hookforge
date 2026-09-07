@@ -1,19 +1,19 @@
 {
   "$schema": "https://hookforge.pages.dev/schema/hook-manifest.json",
-  "slug": "tenure-weighted-fees",
-  "name": "TenureWeightedFees",
-  "contract": "TenureWeightedFeesHook",
+  "slug": "retro-rebate",
+  "name": "RetroRebate",
+  "contract": "RetroRebateHook",
   "version": "1.0.0",
   "family": "Liquidity provider economics",
-  "summary": "Pays liquidity that stays more than liquidity that visits, by skimming a slice of every swap into a pot and sharing it out in proportion to how long each position has been in the pool.",
-  "description": "A Uniswap pool pays for capital present at the moment of a swap and is indifferent to everything else. That is a defensible rule and it has a consequence: the most profitable way to provide liquidity is to not provide it. Wait until a large trade is visible, add liquidity in front of it, collect the fee, and remove. The position existed for two transactions, earned the same rate as capital that had been quoting for a month, and took none of the risk that month carried. Just-in-time provision is the sharpest version, and hooks exist that penalise it directly. But the penalty is treating a symptom: the pool's fee schedule genuinely does not distinguish a month of quoting from a moment of it, and every provider who does the useful thing is underpaid relative to one who does not. This hook adds a second, parallel payment that does distinguish. It skims `skimBps` of every swap into a pot, and shares the pot by tenure-weighted stake: a position's share is its liquidity multiplied by a tenure multiplier that steps up as it stays. The ordinary Uniswap fee is untouched and still goes to whoever is in range, so nobody is taxed for arriving; the tenure pot is simply money a passer-through never accrues any claim on. The multiplier steps at configured thresholds rather than growing continuously, and that is deliberate. A share that grows continuously cannot be tracked by a reward accumulator without either re-deriving every position on every swap or accepting drift. Discrete tiers change a position's share at known instants, which an accumulator handles exactly, so nobody is short-changed by an approximation. A position's tier is applied when it is next touched, and {poke} lets anybody touch any position, so realising an upgrade never depends on the pool being busy. Rewards accrue in whichever currency each swap paid them in, so the pot holds both. Claims settle both sides.",
-  "priorArt": "Liquidity-mining schemes weight by liquidity and time, off-pool and funded by an emissions budget. LiquidityPenalty and the JIT-defence hooks punish short-lived positions. Curve's vote-escrow weights governance by lock length. Paying tenure out of the pool's own trading flow, alongside an untouched Uniswap fee, so that staying is rewarded without arriving being taxed, is the contribution here.",
-  "limitation": "Tenure is measured per position key, so a provider who removes and re-adds starts again, and one who tops up an existing position keeps their tier on the larger amount. That is the intended behaviour but it means the tier is a property of the position rather than of the provider, and a provider holding several positions accrues several independent tenures. The pot is also funded by a skim, so it is not free: swappers pay it, and a pool that sets `skimBps` too high will simply be routed around.",
+  "summary": "A volume rebate the pool pays out of its own flow, settled on-chain at the end of each epoch, with no Merkle root, no off-chain calculation and nobody who can decline to publish it.",
+  "description": "Volume rebates are how every venue rewards its best flow, and on-chain they are almost always a lie about where the computation happens. A team totals volume off-chain, posts a Merkle root, and traders claim against it. The rebate is real; the decentralisation is not. Whoever runs the script chooses who is in the tree, can publish late, can publish never, and is the only party who can tell you whether the number is right. The reason it is done that way is that per-trader accounting looks expensive, and in a continuous scheme it is: paying a share of a pot that is still growing means either an accumulator per trader or an unbounded loop. Epochs make it cheap. The hook skims `skimBps` of every swap into that epoch's pot and records the volume each account traded in it, which is two storage writes. Once an epoch has closed, both numbers are final, so a claim is one multiplication and a transfer:   payout = pot(epoch) * volume(epoch, account) / totalVolume(epoch) There is nothing to publish, nothing to compute off-chain, and nothing anybody can withhold. A trader who never claims simply leaves their share, and because a closed epoch's pot is fixed, that costs nobody else anything. Volume is attributed to whatever address the swap names in `hookData`, and this deliberately needs no signature. Naming somebody else credits them with volume you paid for, so the only thing a forged attribution achieves is giving away your own rebate. A swap that names nobody credits the router it came through, which lets a router run the rebate for its users and split it however it likes.",
+  "priorArt": "Volume rebates, referral fees and loyalty discounts all exist as hooks, and all of them either discount at the point of trade (which cannot depend on a total that is not known yet) or settle against an off-chain Merkle root. Doing the accounting on-chain in closed epochs, so the rebate is a division anybody can verify and nobody can withhold, is the contribution here.",
+  "limitation": "The rebate arrives after the epoch ends, so it is worth less than the same value taken off the trade, and a trader who wants a discount now is better served by a hook that discounts now. Epoch length is a real tradeoff rather than a parameter to shrug at: short epochs pay out sooner and let a single large trade dominate a small pot, long ones smooth that out and make the rebate feel remote.",
   "tags": [
-    "lp-economics",
-    "tenure",
-    "jit-defence",
-    "rewards",
+    "rebate",
+    "volume",
+    "epochs",
+    "no-merkle",
     "no-admin"
   ],
   "recommendedChains": [
@@ -26,8 +26,8 @@
     "polygon",
     "bnb"
   ],
-  "source": "contracts/src/hooks/TenureWeightedFeesHook.sol",
-  "docs": "https://hookforge.pages.dev/hooks/tenure-weighted-fees",
+  "source": "contracts/src/hooks/RetroRebateHook.sol",
+  "docs": "https://hookforge.pages.dev/hooks/retro-rebate",
   "repo": null,
   "site": null,
   "permissions": {
@@ -39,9 +39,9 @@
     "beforeDonate": false,
     "afterSwap": true,
     "beforeSwap": false,
-    "afterRemoveLiquidity": true,
+    "afterRemoveLiquidity": false,
     "beforeRemoveLiquidity": false,
-    "afterAddLiquidity": true,
+    "afterAddLiquidity": false,
     "beforeAddLiquidity": false,
     "afterInitialize": true,
     "beforeInitialize": false
@@ -50,12 +50,20 @@
   "properties": {
     "dynamicFee": false,
     "upgradeable": false,
-    "requiresCustomSwapData": false,
+    "requiresCustomSwapData": true,
     "vanillaSwap": true,
     "swapAccess": "none"
   },
   "configure": null,
   "errors": [
+    {
+      "signature": "AlreadyClaimed(uint256)",
+      "notice": "This account has already taken its share of that epoch."
+    },
+    {
+      "signature": "EpochNotClosed(uint256)",
+      "notice": "The epoch is still running, so its pot and its total are not final."
+    },
     {
       "signature": "HookFeeTooLarge()",
       "notice": "Fee is higher than the maximum allowed fee."
@@ -65,12 +73,16 @@
       "notice": "The hook function is not implemented."
     },
     {
+      "signature": "InvalidEpoch()",
+      "notice": "An epoch length of zero would make every swap its own epoch and every pot a rounding error."
+    },
+    {
       "signature": "InvalidPool()",
       "notice": "The pool is not configured to use this hook."
     },
     {
-      "signature": "InvalidTiers()",
-      "notice": "The tier schedule was empty, too long, out of order, or started above the unweighted multiplier."
+      "signature": "NothingToClaim(uint256)",
+      "notice": "The account traded nothing in that epoch."
     },
     {
       "signature": "PayoutNotPoolManager()",
@@ -96,68 +108,17 @@
           "internalType": "contract IPoolManager"
         },
         {
-          "name": "tiers_",
-          "type": "tuple[]",
-          "internalType": "struct TenureWeightedFeesHook.Tier[]",
-          "components": [
-            {
-              "name": "heldFor",
-              "type": "uint64",
-              "internalType": "uint64"
-            },
-            {
-              "name": "multiplierBps",
-              "type": "uint32",
-              "internalType": "uint32"
-            }
-          ]
-        },
-        {
           "name": "_skimBps",
           "type": "uint24",
           "internalType": "uint24"
+        },
+        {
+          "name": "_epochLength",
+          "type": "uint32",
+          "internalType": "uint32"
         }
       ],
       "stateMutability": "nonpayable"
-    },
-    {
-      "type": "function",
-      "name": "MAX_TIERS",
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "accPerShare0",
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "accPerShare1",
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -964,19 +925,9 @@
       "name": "claim",
       "inputs": [
         {
-          "name": "tickLower",
-          "type": "int24",
-          "internalType": "int24"
-        },
-        {
-          "name": "tickUpper",
-          "type": "int24",
-          "internalType": "int24"
-        },
-        {
-          "name": "salt",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "name": "epoch",
+          "type": "uint256",
+          "internalType": "uint256"
         },
         {
           "name": "to",
@@ -997,6 +948,104 @@
         }
       ],
       "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "claimable",
+      "inputs": [
+        {
+          "name": "epoch",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "account",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "amount0",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "amount1",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "claimed",
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "currentEpoch",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "epochAt",
+      "inputs": [
+        {
+          "name": "timestamp",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "epochLength",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint32",
+          "internalType": "uint32"
+        }
+      ],
+      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -1137,62 +1186,6 @@
     },
     {
       "type": "function",
-      "name": "multiplierFor",
-      "inputs": [
-        {
-          "name": "heldSeconds",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "pending",
-      "inputs": [
-        {
-          "name": "position",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "amount0",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "amount1",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "poke",
-      "inputs": [
-        {
-          "name": "position",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
-      "outputs": [],
-      "stateMutability": "nonpayable"
-    },
-    {
-      "type": "function",
       "name": "poolManager",
       "inputs": [],
       "outputs": [
@@ -1206,86 +1199,36 @@
     },
     {
       "type": "function",
-      "name": "positionKey",
+      "name": "pot0",
       "inputs": [
         {
-          "name": "owner",
-          "type": "address",
-          "internalType": "address"
-        },
-        {
-          "name": "tickLower",
-          "type": "int24",
-          "internalType": "int24"
-        },
-        {
-          "name": "tickUpper",
-          "type": "int24",
-          "internalType": "int24"
-        },
-        {
-          "name": "salt",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
         }
       ],
       "outputs": [
         {
           "name": "",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "type": "uint256",
+          "internalType": "uint256"
         }
       ],
-      "stateMutability": "pure"
+      "stateMutability": "view"
     },
     {
       "type": "function",
-      "name": "positions",
+      "name": "pot1",
       "inputs": [
         {
           "name": "",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "type": "uint256",
+          "internalType": "uint256"
         }
       ],
       "outputs": [
         {
-          "name": "liquidity",
-          "type": "uint128",
-          "internalType": "uint128"
-        },
-        {
-          "name": "openedAt",
-          "type": "uint64",
-          "internalType": "uint64"
-        },
-        {
-          "name": "tier",
-          "type": "uint32",
-          "internalType": "uint32"
-        },
-        {
-          "name": "shares",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "debt0",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "debt1",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "owed0",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "owed1",
+          "name": "",
           "type": "uint256",
           "internalType": "uint256"
         }
@@ -1339,52 +1282,14 @@
     },
     {
       "type": "function",
-      "name": "tierFor",
+      "name": "totalVolume",
       "inputs": [
         {
-          "name": "heldSeconds",
+          "name": "",
           "type": "uint256",
           "internalType": "uint256"
         }
       ],
-      "outputs": [
-        {
-          "name": "tier",
-          "type": "uint32",
-          "internalType": "uint32"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "tiers",
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "",
-          "type": "tuple[]",
-          "internalType": "struct TenureWeightedFeesHook.Tier[]",
-          "components": [
-            {
-              "name": "heldFor",
-              "type": "uint64",
-              "internalType": "uint64"
-            },
-            {
-              "name": "multiplierBps",
-              "type": "uint32",
-              "internalType": "uint32"
-            }
-          ]
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "totalShares",
-      "inputs": [],
       "outputs": [
         {
           "name": "",
@@ -1414,35 +1319,28 @@
       "stateMutability": "nonpayable"
     },
     {
-      "type": "event",
-      "name": "Claimed",
+      "type": "function",
+      "name": "volumeOf",
       "inputs": [
         {
-          "name": "position",
-          "type": "bytes32",
-          "indexed": true,
-          "internalType": "bytes32"
-        },
-        {
-          "name": "to",
-          "type": "address",
-          "indexed": true,
-          "internalType": "address"
-        },
-        {
-          "name": "amount0",
+          "name": "",
           "type": "uint256",
-          "indexed": false,
           "internalType": "uint256"
         },
         {
-          "name": "amount1",
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
           "type": "uint256",
-          "indexed": false,
           "internalType": "uint256"
         }
       ],
-      "anonymous": false
+      "stateMutability": "view"
     },
     {
       "type": "event",
@@ -1576,28 +1474,81 @@
     },
     {
       "type": "event",
-      "name": "TierApplied",
+      "name": "RebateClaimed",
       "inputs": [
         {
-          "name": "position",
-          "type": "bytes32",
+          "name": "epoch",
+          "type": "uint256",
           "indexed": true,
-          "internalType": "bytes32"
+          "internalType": "uint256"
         },
         {
-          "name": "tier",
-          "type": "uint32",
+          "name": "account",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "amount0",
+          "type": "uint256",
           "indexed": false,
-          "internalType": "uint32"
+          "internalType": "uint256"
         },
         {
-          "name": "shares",
+          "name": "amount1",
           "type": "uint256",
           "indexed": false,
           "internalType": "uint256"
         }
       ],
       "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "VolumeRecorded",
+      "inputs": [
+        {
+          "name": "epoch",
+          "type": "uint256",
+          "indexed": true,
+          "internalType": "uint256"
+        },
+        {
+          "name": "account",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "volume",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "error",
+      "name": "AlreadyClaimed",
+      "inputs": [
+        {
+          "name": "epoch",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "EpochNotClosed",
+      "inputs": [
+        {
+          "name": "epoch",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ]
     },
     {
       "type": "error",
@@ -1611,18 +1562,29 @@
     },
     {
       "type": "error",
-      "name": "InvalidPool",
+      "name": "InvalidEpoch",
       "inputs": []
     },
     {
       "type": "error",
-      "name": "InvalidTiers",
+      "name": "InvalidPool",
       "inputs": []
     },
     {
       "type": "error",
       "name": "NotPoolManager",
       "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "NothingToClaim",
+      "inputs": [
+        {
+          "name": "epoch",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ]
     },
     {
       "type": "error",

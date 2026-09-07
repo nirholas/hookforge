@@ -242,7 +242,7 @@ contract StepCurveHookTest is ForgeTest {
         fine.quote(true, true, 0.5e18);
     }
 
-    function testFuzz_sellingThenBuyingBackNeverProfits(uint96 size) public {
+    function testFuzz_sellingThenBuyingBackNeverProfits(uint96 size) public view {
         uint256 amount = bound(size, 1e15, 5e18);
 
         uint256 out1 = hook.quote(true, true, amount);

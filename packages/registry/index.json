@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 23,
+  "count": 24,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -542,6 +542,24 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/reputation-fee",
       "manifest": "https://hookforge.pages.dev/schema/hooks/reputation-fee.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
+    },
+    {
+      "slug": "retro-rebate",
+      "name": "RetroRebate",
+      "family": "Liquidity provider economics",
+      "summary": "A volume rebate the pool pays out of its own flow, settled on-chain at the end of each epoch, with no Merkle root, no off-chain calculation and nobody who can decline to publish it.",
+      "tags": [
+        "rebate",
+        "volume",
+        "epochs",
+        "no-merkle",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/retro-rebate",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/retro-rebate.json",
       "repo": null,
       "site": null,
       "deployments": []
