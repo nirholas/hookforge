@@ -14,7 +14,7 @@ its tests pass against a real `PoolManager`, and it can be deployed with one com
 - **Chains:** Base, Arbitrum One, Unichain, Robinhood Chain, and any EVM chain with a v4 `PoolManager`.
 - **Built on:** [Uniswap v4-core](https://github.com/Uniswap/v4-core) and OpenZeppelin's audited
   [uniswap-hooks](https://github.com/OpenZeppelin/uniswap-hooks) base contracts.
-- **Licence:** MIT.
+- **Licence:** Apache-2.0.
 
 ## Why the hooks are discoverable
 

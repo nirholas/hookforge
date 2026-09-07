@@ -25,7 +25,7 @@ export function homePage({hooks, planned, chains, assets, testCount}) {
       description: SITE.description,
       codeRepository: SITE.repo,
       programmingLanguage: ["Solidity", "TypeScript"],
-      license: "https://opensource.org/licenses/MIT",
+      license: "https://www.apache.org/licenses/LICENSE-2.0",
       runtimePlatform: "Ethereum Virtual Machine",
     },
   ];

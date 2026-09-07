@@ -132,7 +132,7 @@ A production Uniswap v4 hook. ${hook.properties?.dynamicFee ? "It prices every s
 - **Site:** ${siteUrl}
 - **Catalogue:** ${catalogueUrl}
 - **Contract:** [\`src/hooks/${hook.contract}.sol\`](src/hooks/${hook.contract}.sol)
-- **Licence:** MIT
+- **Licence:** Apache-2.0
 
 ## How it works
 

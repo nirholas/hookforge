@@ -60,7 +60,7 @@ function write(root, path, contents) {
 
 /** The deploy script for one hook: mine the salt its flags require, deploy, record the address. */
 function deployScript(hook) {
-  return `// SPDX-License-Identifier: MIT
+  return `// SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.26;
 
 import {Script, console2} from "forge-std/Script.sol";
@@ -141,7 +141,7 @@ function packageJson(hook) {
       version: hook.version,
       private: true,
       description: hook.summary,
-      license: "MIT",
+      license: "Apache-2.0",
       repository: {type: "git", url: `https://github.com/${OWNER}/${hook.slug}.git`},
       homepage: SITES[hook.slug] ?? `https://${hook.slug}.pages.dev`,
       keywords: ["uniswap", "uniswap-v4", "uniswap-hooks", "defi", "amm", "solidity", ...hook.tags],
@@ -178,6 +178,8 @@ export function generate(slug, outRoot) {
   cpSync(join(CONTRACTS, "foundry.toml"), join(repo, "foundry.toml"));
   cpSync(join(CONTRACTS, "remappings.txt"), join(repo, "remappings.txt"));
   cpSync(join(ROOT, "LICENSE"), join(repo, "LICENSE"));
+  // Apache-2.0 asks that a NOTICE travel with the work, and it is where the MIT dependencies are credited.
+  cpSync(join(ROOT, "NOTICE"), join(repo, "NOTICE"));
 
   // Cloudflare appends a suffix when a project name is already taken globally, so the site a repository actually
   // answers on is not always derivable from its slug. `sites.json` records what each project really resolved to, and

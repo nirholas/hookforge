@@ -2,7 +2,7 @@
   "name": "@hookforge/sdk",
   "version": "1.0.0",
   "description": "TypeScript client for HookForge Uniswap v4 hooks: discover a hook on-chain, read its parameters, quote its fee, and configure a pool.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

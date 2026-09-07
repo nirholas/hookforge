@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "50 production Uniswap v4 hooks: novel AMM mechanisms, a TypeScript SDK, an MCP server for agents, and a 3D catalogue.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": { "type": "git", "url": "https://github.com/nirholas/hookforge.git" },
   "workspaces": ["packages/*", "apps/*"],
   "engines": { "node": ">=20" },

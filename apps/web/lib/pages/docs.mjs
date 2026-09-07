@@ -13,7 +13,7 @@ function doc({slug, title, description, body, toc, assets}) {
       description,
       url: `${SITE.url}${path}`,
       isPartOf: {"@type": "WebSite", name: SITE.name, url: SITE.url},
-      license: "https://opensource.org/licenses/MIT",
+      license: "https://www.apache.org/licenses/LICENSE-2.0",
     },
   ];
 
@@ -64,7 +64,7 @@ export function startHere({assets, hooks}) {
 <p>
   HookForge is a catalogue of Uniswap v4 hooks for mechanisms that did not have one. There are
   <strong>${hooks.length}</strong> shipped: contract, tests, deploy script, manifest and documentation, all in
-  <a href="${esc(SITE.repo)}" rel="noopener">one repository</a>, MIT licensed.
+  <a href="${esc(SITE.repo)}" rel="noopener">one repository</a>, Apache-2.0 licensed.
 </p>
 
 <h2 id="what">What this is</h2>
@@ -325,7 +325,7 @@ cast call $HOOK "specURI()(string)"</code></pre>
 
 <h2 id="adopt">Adopting it</h2>
 <p>
-  <code>IHookMetadata</code> is MIT licensed and has no dependency on anything else here. Copy the interface, return
+  <code>IHookMetadata</code> is Apache-2.0 licensed and has no dependency on anything else here. Copy the interface, return
   four constants, and point <code>specURI</code> anywhere you like. It costs nothing and it makes your hook legible to
   every tool that learns to ask.
 </p>

@@ -115,7 +115,7 @@ ${body}
       </div>
     </div>
     <p class="foot__legal">
-      MIT licensed. Not affiliated with Uniswap Labs. These contracts are unaudited: read the limitation on every hook
+      Apache-2.0 licensed. Not affiliated with Uniswap Labs. These contracts are unaudited: read the limitation on every hook
       page before putting money behind one.
     </p>
   </div>

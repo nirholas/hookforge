@@ -135,7 +135,7 @@ export function hookPage(hook, {assets, chains}) {
       about: {"@type": "SoftwareSourceCode", name: hook.contract, programmingLanguage: "Solidity", codeRepository: SITE.repo},
       keywords: hook.tags.join(", "),
       isPartOf: {"@type": "WebSite", name: SITE.name, url: SITE.url},
-      license: "https://opensource.org/licenses/MIT",
+      license: "https://www.apache.org/licenses/LICENSE-2.0",
     },
     {
       "@context": "https://schema.org",

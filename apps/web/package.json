@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "hookforge.pages.dev: the 3D catalogue and documentation for the HookForge Uniswap v4 hooks.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "build": "vite build && node build.mjs",

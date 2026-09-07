@@ -186,7 +186,7 @@ const llms = `# HookForge
 
 > ${SITE.description}
 
-${hooks.length} hooks are shipped: contract, tests, deploy script, manifest and documentation, MIT licensed, no admin
+${hooks.length} hooks are shipped: contract, tests, deploy script, manifest and documentation, Apache-2.0 licensed, no admin
 keys. Source: ${SITE.repo}
 
 Every hook also describes itself on-chain through IHookMetadata (hookName, hookVersion, specURI, hookTags), so a hook

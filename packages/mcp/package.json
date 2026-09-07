@@ -2,7 +2,7 @@
   "name": "@hookforge/mcp",
   "version": "1.0.0",
   "description": "MCP server for the HookForge Uniswap v4 hook catalogue: let a coding agent search hooks by problem, read a hook's parameters and prior art, and decode what any hook address will actually do.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "type": "module",
   "bin": { "hookforge-mcp": "./dist/server.js" },
   "main": "./dist/server.js",

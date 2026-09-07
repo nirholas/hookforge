@@ -17,7 +17,7 @@ export function chainsPage({chains, hooks, assets}) {
       description:
         "Chain id and PoolManager address for every chain HookForge targets, kept in the Solidity source the hooks deploy against.",
       url: `${SITE.url}/chains/`,
-      license: "https://opensource.org/licenses/MIT",
+      license: "https://www.apache.org/licenses/LICENSE-2.0",
       creator: {"@type": "Organization", name: SITE.name, url: SITE.url},
     },
   ];

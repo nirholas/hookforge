@@ -527,7 +527,7 @@ poolManager.initialize(key, startingSqrtPriceX96);`
     codeRepository: repoUrl,
     programmingLanguage: "Solidity",
     runtimePlatform: "Ethereum Virtual Machine",
-    license: "https://opensource.org/licenses/MIT",
+    license: "https://www.apache.org/licenses/LICENSE-2.0",
     keywords: hook.tags.join(", "),
     isPartOf: {"@type": "WebSite", name: "HookForge", url: catalogueUrl},
   };
@@ -601,7 +601,7 @@ poolManager.initialize(key, startingSqrtPriceX96);`
       <div class="stat"><dt>Callbacks</dt><dd>${claimed.length} of 14</dd></div>
       <div class="stat"><dt>Fee</dt><dd>${hook.properties?.dynamicFee ? "dynamic" : "static"}</dd></div>
       <div class="stat"><dt>Admin keys</dt><dd>none</dd></div>
-      <div class="stat"><dt>Licence</dt><dd>MIT</dd></div>
+      <div class="stat"><dt>Licence</dt><dd>Apache-2.0</dd></div>
     </dl>
   </section>
   </div>
@@ -693,7 +693,7 @@ forge script script/Deploy.s.sol --rpc-url $RPC_URL --broadcast --verify</code><
       <a href="/llms.txt">llms.txt</a> &middot;
       <a href="${esc(catalogueUrl)}" rel="noopener">The rest of the catalogue</a>
     </p>
-    <p>MIT licensed. Not affiliated with Uniswap Labs.</p>
+    <p>Apache-2.0 licensed. Not affiliated with Uniswap Labs.</p>
   </div>
 </footer>
 <script type="module" src="/assets/scene.js"></script>

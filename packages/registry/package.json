@@ -2,7 +2,7 @@
   "name": "@hookforge/registry",
   "version": "1.0.0",
   "description": "Machine-readable manifests for every HookForge Uniswap v4 hook: permissions, parameters, prior art, and deterministic addresses on every chain.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
