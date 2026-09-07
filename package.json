@@ -4,9 +4,17 @@
   "version": "1.0.0",
   "description": "50 production Uniswap v4 hooks: novel AMM mechanisms, a TypeScript SDK, an MCP server for agents, and a 3D catalogue.",
   "license": "Apache-2.0",
-  "repository": { "type": "git", "url": "https://github.com/nirholas/hookforge.git" },
-  "workspaces": ["packages/*", "apps/*"],
-  "engines": { "node": ">=20" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nirholas/hookforge.git"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "build:registry": "node packages/registry/scripts/build.mjs",
@@ -14,5 +22,9 @@
     "contracts:build": "forge build --root contracts",
     "contracts:test": "forge test --root contracts",
     "contracts:lint": "forge lint --root contracts"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "viem": "^2.56.3"
   }
 }

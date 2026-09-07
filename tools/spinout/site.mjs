@@ -9,11 +9,15 @@
  * The page itself is server-rendered HTML. The 3D scene is decoration over content that is already complete: with
  * JavaScript disabled, or WebGL unavailable, the page still says everything it has to say.
  */
-import {mkdirSync, writeFileSync} from "node:fs";
+import {existsSync, mkdirSync, readFileSync, writeFileSync} from "node:fs";
+import {execFileSync} from "node:child_process";
 import {dirname, join} from "node:path";
+import {fileURLToPath} from "node:url";
 
 import {claimedFlags, errorTable, flagMask, paragraphs, parameterTable} from "./templates.mjs";
 import {hookCard} from "../../apps/web/lib/og.mjs";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
 
 const THREE_VERSION = "0.170.0";
 const THREE_CDN = `https://cdn.jsdelivr.net/npm/three@${THREE_VERSION}/build/three.module.js`;
@@ -372,7 +376,124 @@ tr:last-child td { border-bottom: 0; }
 .foot { border-top: 1px solid var(--line); margin-top: 4rem; padding: 2rem 0 3rem; color: var(--text-faint); font-size: .9rem; }
 .foot a { color: var(--text-dim); text-decoration: none; }
 .foot a:hover { color: var(--forge); }
+
+/* ---------- the demo ---------- */
+.demo { margin: 1.5rem 0 2rem; }
+.panel { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--ink-raised); overflow: hidden; }
+.panel--empty { padding: 2rem 1.25rem; text-align: center; color: var(--text-dim); }
+.panel__wallet { display: flex; align-items: center; gap: .75rem; padding: .7rem 1.1rem; border-bottom: 1px solid var(--line); font-size: .88rem; flex-wrap: wrap; }
+.panel__chain { font-family: var(--mono); font-size: .78rem; color: var(--text-faint); border: 1px solid var(--line-bright); border-radius: 999px; padding: .15rem .6rem; }
+.panel__account { font-family: var(--mono); font-size: .82rem; color: var(--text-dim); }
+.panel__error { color: #ff8fa3; font-size: .82rem; }
+.panel__body { padding: 1.25rem; }
+.panel__head h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.panel__lede { margin: 0 0 1.1rem; color: var(--text-dim); font-size: .92rem; }
+.panel__actions { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin: 1.1rem 0 .4rem; }
+.panel__balance { font-family: var(--mono); font-size: .8rem; color: var(--text-faint); margin-left: auto; }
+.panel__hint { color: var(--text-faint); font-size: .86rem; }
+.btn--small { padding: .3rem .7rem; font-size: .82rem; }
+.kv { display: grid; gap: .35rem; margin: 0 0 1rem; }
+.kv__row { display: flex; justify-content: space-between; gap: 1rem; font-size: .88rem; border-bottom: 1px solid var(--line); padding-bottom: .35rem; }
+.kv__row:last-child { border-bottom: 0; }
+.kv__key { color: var(--text-faint); }
+.kv__value { text-align: right; word-break: break-word; }
+.kv__value--mono { font-family: var(--mono); font-size: .84rem; }
+.raw { margin: 1rem 0; }
+.raw summary { cursor: pointer; color: var(--text-dim); font-size: .88rem; }
+.raw summary:hover { color: var(--text); }
+.code { margin-top: .75rem; }
+.status { display: flex; align-items: center; gap: .5rem; font-size: .88rem; min-height: 1.6rem; margin: .6rem 0 0; color: var(--text-dim); }
+.status__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); flex: none; }
+.status--pending .status__dot { background: var(--forge); animation: pulse 1s ease-in-out infinite; }
+.status--ok .status__dot { background: #4ecdc4; }
+.status--error { color: #ff8fa3; }
+.status--error .status__dot { background: #ff6b8a; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+.compare { margin-top: 1.25rem; }
+.compare__hint { color: var(--text-faint); font-size: .86rem; margin: 0; }
+.compare__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.compare__cell { background: var(--ink-sunken); padding: .9rem 1rem; display: grid; gap: .2rem; }
+.compare__cell--win { background: var(--forge-glow); }
+.compare__label { font-size: .74rem; letter-spacing: .07em; text-transform: uppercase; color: var(--text-faint); }
+.compare__value { font-size: 1.4rem; font-weight: 640; font-variant-numeric: tabular-nums; }
+.field { display: grid; gap: .3rem; margin: 1rem 0; }
+.field__label { font-size: .8rem; color: var(--text-dim); }
+.field__hint { font-size: .78rem; color: var(--text-faint); }
+.input { background: var(--ink-sunken); border: 1px solid var(--line-bright); border-radius: var(--radius); padding: .55rem .75rem; color: var(--text); font: inherit; font-family: var(--mono); font-size: .9rem; }
+.input:focus { outline: 2px solid var(--forge); outline-offset: 1px; }
+.warn { color: #ffc44d; font-size: .85rem; border-left: 2px solid #ffc44d; padding-left: .7rem; }
+.modal { position: fixed; inset: 0; z-index: 100; background: rgba(3,4,6,.7); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 1rem; }
+.modal__panel { background: var(--ink-raised); border: 1px solid var(--line-bright); border-radius: var(--radius-lg); max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal__head { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.15rem; border-bottom: 1px solid var(--line); }
+.modal__head h3 { margin: 0; font-size: 1rem; }
+.modal__close { background: none; border: 0; color: var(--text-faint); font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 0 .25rem; }
+.modal__close:hover { color: var(--text); }
+.modal__body { padding: 1.15rem; }
+.modal__lede { color: var(--text-dim); font-size: .9rem; margin-top: 0; }
+.modal__actions { display: flex; gap: .6rem; justify-content: flex-end; padding: 1rem 1.15rem; border-top: 1px solid var(--line); }
 `;
+
+
+/** Hooks with a working demo panel. A hook without one gets no demo section rather than an empty promise of one. */
+const DEMO_PANELS = new Set(["x402-gate"]);
+
+/** Bundles the demo app once and returns the code, so every repository ships a build with no install step. */
+function demoBundle() {
+  const entry = join(HERE, "app", "main.js");
+  const out = join(HERE, "app", ".bundle.js");
+  execFileSync(
+    "npx",
+    ["esbuild", entry, "--bundle", "--format=esm", "--minify", "--target=es2022", `--outfile=${out}`],
+    {cwd: join(HERE, "..", ".."), stdio: "pipe"},
+  );
+  return readFileSync(out, "utf8");
+}
+
+/** The deployment config for a hook, or null when it has never been deployed anywhere. */
+function deploymentsFor(slug) {
+  const path = join(HERE, "deployments", `${slug}.json`);
+  return existsSync(path) ? readFileSync(path, "utf8") : null;
+}
+
+/**
+ * The demo section.
+ *
+ * Rendered server-side down to the explanation, so a visitor with no JavaScript still learns what the demo would do
+ * and how to run it locally. The interactive part replaces the placeholder once the bundle loads.
+ */
+function demoSection(hook, deployments, repoUrl) {
+  if (!DEMO_PANELS.has(hook.slug)) return "";
+
+  return `
+  <section class="shell">
+    <h2 id="try">Try it</h2>
+    <p>
+      This is the hook running, not a picture of it. Connect a wallet on a chain it is deployed to, or bring the whole
+      stack up locally in one command and use it with no funds and no wallet risk at all.
+    </p>
+    <div class="demo" data-demo="${esc(hook.slug)}">
+      <div class="panel panel--empty">
+        <p>Loading the demo\u2026 if this does not change, JavaScript is blocked and the demo cannot run.</p>
+      </div>
+    </div>
+    <details class="raw">
+      <summary>Run the whole thing locally</summary>
+      <pre><code>git clone --recurse-submodules ${esc(repoUrl)}
+cd ${esc(hook.slug)}
+
+anvil &amp;
+forge script script/DeployLocal.s.sol --rpc-url http://127.0.0.1:8545 --broadcast \\
+  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+node web/build.mjs &amp;&amp; npx serve web/dist</code></pre>
+      <p class="muted">
+        Anvil's first account is pre-funded and its key is public by design. Never use it anywhere real.
+      </p>
+    </details>
+  </section>
+${deployments ? `  <script type="application/json" id="deployments">${deployments.replace(/</g, "\\u003c")}</script>` : ""}
+  <script type="module" src="/assets/demo.js"></script>`;
+}
 
 const esc = (value) =>
   String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
@@ -386,7 +507,7 @@ function buildScript(hook, siteUrl, repoUrl, catalogueUrl) {
  * Everything on the page comes from \`hook.json\`, which is generated from the contract, so the page cannot describe
  * the hook as something it is not. No dependencies: run \`node web/build.mjs\` and publish \`web/dist\`.
  */
-import {cpSync, mkdirSync, readFileSync, writeFileSync} from "node:fs";
+import {cpSync, existsSync, mkdirSync, readFileSync, writeFileSync} from "node:fs";
 import {dirname, join} from "node:path";
 import {fileURLToPath} from "node:url";
 
@@ -404,6 +525,7 @@ mkdirSync(join(DIST, "assets"), {recursive: true});
 writeFileSync(join(DIST, "index.html"), page);
 cpSync(join(HERE, "src", "site.css"), join(DIST, "assets", "site.css"));
 cpSync(join(HERE, "src", "scene.js"), join(DIST, "assets", "scene.js"));
+if (existsSync(join(HERE, "src", "demo.js"))) cpSync(join(HERE, "src", "demo.js"), join(DIST, "assets", "demo.js"));
 cpSync(join(HERE, "src", "og.png"), join(DIST, "og.png"));
 cpSync(join(HERE, "..", "hook.json"), join(DIST, "hook.json"));
 
@@ -478,7 +600,7 @@ console.log("built " + hook.slug + " site into web/dist");
 `;
 }
 
-function indexHtml(hook, {siteUrl, repoUrl, catalogueUrl}) {
+function indexHtml(hook, {siteUrl, repoUrl, catalogueUrl, deployments}) {
   const claimed = claimedFlags(hook);
   const allFlags = [
     "beforeInitialize", "afterInitialize", "beforeAddLiquidity", "afterAddLiquidity",
@@ -683,6 +805,7 @@ forge script script/Deploy.s.sol --rpc-url $RPC_URL --broadcast --verify</code><
       </p>
     </div>
   </section>
+${demoSection(hook, deployments, repoUrl)}
 </main>
 
 <footer class="foot">
@@ -704,8 +827,11 @@ forge script script/Deploy.s.sol --rpc-url $RPC_URL --broadcast --verify</code><
 
 /** Writes the whole `web/` tree, including the rasterised social card. */
 export function emitSite(repo, hook, {siteUrl, repoUrl, catalogueUrl}) {
+  const deployments = deploymentsFor(hook.slug);
+
   write(repo, "web/build.mjs", buildScript(hook, siteUrl, repoUrl, catalogueUrl));
-  write(repo, "web/src/index.html", indexHtml(hook, {siteUrl, repoUrl, catalogueUrl}));
+  write(repo, "web/src/index.html", indexHtml(hook, {siteUrl, repoUrl, catalogueUrl, deployments}));
+  if (DEMO_PANELS.has(hook.slug)) write(repo, "web/src/demo.js", demoBundle());
   write(repo, "web/src/site.css", CSS);
   write(repo, "web/src/scene.js", SCENE);
   writeFileSync(join(repo, "web", "src", "og.png"), hookCard(hook));
