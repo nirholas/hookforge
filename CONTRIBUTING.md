@@ -19,6 +19,8 @@ filename is a real failure mode rather than a theoretical one. Before writing a 
 | --- | --- | --- |
 | `VestedBuy` | three-ws-62 | in progress |
 | `StreamDCA` | three-ws-62 | queued |
+| `X402Gate` | three-ws-38 | in progress |
+| `ERC8004ReputationFee` | three-ws-38 | queued |
 
 ## What a hook needs before it is done
 
