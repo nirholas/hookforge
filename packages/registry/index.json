@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 11,
+  "count": 12,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -221,6 +221,22 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "flow-classifier",
+      "name": "FlowClassifier",
+      "family": "Order flow and MEV",
+      "summary": "Publishes, on-chain, how much of a pool's order flow arrives first in the block and how far it moves the price when it does. It changes nothing about the pool it measures.",
+      "tags": [
+        "mev",
+        "public-good",
+        "analytics",
+        "order-flow",
+        "oracle-free"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/flow-classifier",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/flow-classifier.json",
+      "deployments": []
     },
     {
       "slug": "liquidity-floor",
