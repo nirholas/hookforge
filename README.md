@@ -84,7 +84,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | [`DepegShield`](contracts/src/hooks/DepegShieldHook.sol) | For pegged pairs: fees rise superlinearly with distance from the peg and fall for swaps that restore it. | shipped |
 | `ILInsurance` | Skims a slice of fees into a vault that pays impermanent-loss claims to the providers who funded it. | building |
 | `DrawdownCap` | Caps how much price impact one address may cause per epoch. | building |
-| `LiquidityFloor` | Enforces a minimum liquidity that cannot leave while a pool is young. | building |
+| [`LiquidityFloor`](contracts/src/hooks/LiquidityFloorHook.sol) | Holds each position to a fraction of its own additions until an unlock date, so commitments are fractional and race-free. | shipped |
 
 ### Liquidity provider economics
 
@@ -116,7 +116,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | `VestedBuy` | Vests purchases linearly and enforces the schedule at the pool rather than in a token contract. | building |
 | `EpochRebalance` | Rebalances the pool toward a target weight each epoch, making the pool itself an index. | building |
 | `StreamDCA` | Executes recurring dollar-cost-average streams block by block. | building |
-| `TradingCalendar` | Opens and closes the pool on a schedule, ramping fees at the edges instead of slamming shut. | building |
+| [`TradingCalendar`](contracts/src/hooks/TradingCalendarHook.sol) | Opens and closes the pool on a schedule, ramping fees at the edges instead of slamming shut. | shipped |
 
 ### Cross-domain and information
 
