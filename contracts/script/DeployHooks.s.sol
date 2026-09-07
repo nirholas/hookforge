@@ -19,9 +19,12 @@ import {AntiSnipeRampHook} from "src/hooks/AntiSnipeRampHook.sol";
  * @notice Deploys the HookForge catalogue deterministically to any chain with a Uniswap v4 `PoolManager`.
  *
  * @dev A v4 hook only works at an address whose low fourteen bits spell out the callbacks it implements, so every
- * deployment starts by mining a CREATE2 salt. Mining against `Chains.CREATE2_DEPLOYER` and broadcasting with a salt
- * means the same hook lands at the same address on every chain, which is what makes the published address book worth
- * anything: an integrator can hardcode one address for all eighteen chains.
+ * deployment starts by mining a CREATE2 salt. Mining against `Chains.CREATE2_DEPLOYER` makes the result reproducible:
+ * anyone can re-run this script against a chain and derive the same address without trusting the published one.
+ *
+ * The address is *not* the same on every chain. A hook takes its `PoolManager` as a constructor argument, so the init
+ * code differs per chain and so does the CREATE2 result. What is guaranteed is that the address is a pure function of
+ * (hook source, compiler settings, chain), which is the property that matters for verification.
  *
  * Usage:
  *

@@ -1,0 +1,180 @@
+{
+  "$schema": "https://hookforge.dev/schema/registry.json",
+  "name": "HookForge",
+  "description": "Production Uniswap v4 hooks with on-chain self-description.",
+  "homepage": "https://hookforge.dev",
+  "generated": "2026-09-07",
+  "count": 6,
+  "hooks": [
+    {
+      "slug": "anti-snipe-ramp",
+      "name": "AntiSnipeRamp",
+      "family": "Launch",
+      "summary": "Opens a pool at a punitive fee that decays to normal over a fixed window, and pays every cent of the difference to liquidity providers rather than to the deployer.",
+      "tags": [
+        "launch",
+        "anti-snipe",
+        "dynamic-fee",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.dev/hooks/anti-snipe-ramp",
+      "manifest": "https://hookforge.dev/schema/hooks/anti-snipe-ramp.json",
+      "deployments": [
+        {
+          "chain": "unichain",
+          "chainId": 130,
+          "address": "0xa712fa3ecD3a5260389a9115d09E7A8Ccf5e5080"
+        },
+        {
+          "chain": "base",
+          "chainId": 8453,
+          "address": "0x3C2ebA98374549AF1f7FC909265146E78C881080"
+        },
+        {
+          "chain": "arbitrum",
+          "chainId": 42161,
+          "address": "0xd0Debb7531F0960ccd0061306bDeC1FBF6Da5080"
+        }
+      ]
+    },
+    {
+      "slug": "arb-tax-decay",
+      "name": "ArbTaxDecay",
+      "family": "Order flow and MEV",
+      "summary": "Prices the staleness of a pool: the longer a pool goes untraded, the more the next swap pays.",
+      "tags": [
+        "mev",
+        "lvr",
+        "dynamic-fee",
+        "oracle-free"
+      ],
+      "docs": "https://hookforge.dev/hooks/arb-tax-decay",
+      "manifest": "https://hookforge.dev/schema/hooks/arb-tax-decay.json",
+      "deployments": [
+        {
+          "chain": "unichain",
+          "chainId": 130,
+          "address": "0xaD2e51cEB82F517C8e67559FfDc89B5F8C705080"
+        },
+        {
+          "chain": "base",
+          "chainId": 8453,
+          "address": "0x1A0e586A71F401c2E511c7e6fAf7197112915080"
+        },
+        {
+          "chain": "arbitrum",
+          "chainId": 42161,
+          "address": "0xE4014d2671834C7FdD6aA44A28AA217498359080"
+        }
+      ]
+    },
+    {
+      "slug": "circuit-breaker",
+      "name": "CircuitBreaker",
+      "family": "Risk",
+      "summary": "Halts swapping for a cooldown after the price moves further than a pool is willing to move in one window, and lets liquidity leave the whole time.",
+      "tags": [
+        "risk",
+        "circuit-breaker",
+        "oracle-free",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.dev/hooks/circuit-breaker",
+      "manifest": "https://hookforge.dev/schema/hooks/circuit-breaker.json",
+      "deployments": [
+        {
+          "chain": "unichain",
+          "chainId": 130,
+          "address": "0x0b2A21Bc92AFdFb9DABF19F0359A0c60701990c0"
+        },
+        {
+          "chain": "base",
+          "chainId": 8453,
+          "address": "0x4893e7438ee8d2Ee400b7c4d88493f0F51e650C0"
+        },
+        {
+          "chain": "arbitrum",
+          "chainId": 42161,
+          "address": "0xf4dC1c4587044572A61f42F046809681602190c0"
+        }
+      ]
+    },
+    {
+      "slug": "depeg-shield",
+      "name": "DepegShield",
+      "family": "Risk",
+      "summary": "Makes leaving a peg expensive and returning to it cheap, in proportion to how far the pool has already strayed.",
+      "tags": [
+        "risk",
+        "stablecoin",
+        "dynamic-fee",
+        "oracle-free"
+      ],
+      "docs": "https://hookforge.dev/hooks/depeg-shield",
+      "manifest": "https://hookforge.dev/schema/hooks/depeg-shield.json",
+      "deployments": [
+        {
+          "chain": "unichain",
+          "chainId": 130,
+          "address": "0xe0898d4881d0cdF143c4921e04fDa13908019080"
+        },
+        {
+          "chain": "base",
+          "chainId": 8453,
+          "address": "0x9Bc7695a864eDc8ecE0B4a315ceF612c7DbB1080"
+        },
+        {
+          "chain": "arbitrum",
+          "chainId": 42161,
+          "address": "0xf6DeaDf77EDDB78eCFea2FeAAD7bBbAB88511080"
+        }
+      ]
+    },
+    {
+      "slug": "priority-fee-tax",
+      "name": "PriorityFeeTax",
+      "family": "Order flow and MEV",
+      "summary": "Charges a swap in proportion to what it paid the block producer to get where it is in the block.",
+      "tags": [
+        "mev",
+        "dynamic-fee",
+        "order-flow",
+        "oracle-free"
+      ],
+      "docs": "https://hookforge.dev/hooks/priority-fee-tax",
+      "manifest": "https://hookforge.dev/schema/hooks/priority-fee-tax.json",
+      "deployments": [
+        {
+          "chain": "unichain",
+          "chainId": 130,
+          "address": "0x123A792F3B58367fFAE610Be8Fd69518b429D080"
+        },
+        {
+          "chain": "base",
+          "chainId": 8453,
+          "address": "0xb406d286F0A7E3fF88260674E66EeaA1A7b15080"
+        },
+        {
+          "chain": "arbitrum",
+          "chainId": 42161,
+          "address": "0x28991E242f5C69dF4f42dcFFc5B63BDABE025080"
+        }
+      ]
+    },
+    {
+      "slug": "tradingcalendarhook",
+      "name": "TradingCalendar",
+      "family": "Uncategorised",
+      "summary": "Gives a pool a trading session, and closes it by raising the price of immediacy rather than by reverting.",
+      "tags": [
+        "dynamic-fee",
+        "schedule",
+        "rwa",
+        "oracle-free"
+      ],
+      "docs": "https://hookforge.dev/hooks/tradingcalendarhook",
+      "manifest": "https://hookforge.dev/schema/hooks/tradingcalendarhook.json",
+      "deployments": []
+    }
+  ]
+}

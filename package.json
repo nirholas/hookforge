@@ -1,0 +1,18 @@
+{
+  "name": "hookforge",
+  "private": true,
+  "version": "1.0.0",
+  "description": "50 production Uniswap v4 hooks: novel AMM mechanisms, a TypeScript SDK, an MCP server for agents, and a 3D catalogue.",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/nirholas/hookforge.git" },
+  "workspaces": ["packages/*", "apps/*"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "build:registry": "node packages/registry/scripts/build.mjs",
+    "test": "npm run test --workspaces --if-present",
+    "contracts:build": "forge build --root contracts",
+    "contracts:test": "forge test --root contracts",
+    "contracts:lint": "forge lint --root contracts"
+  }
+}

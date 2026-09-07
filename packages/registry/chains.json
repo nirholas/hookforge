@@ -1,0 +1,94 @@
+{
+  "chains": [
+    {
+      "slug": "ethereum",
+      "chainId": 1,
+      "poolManager": "0x000000000004444c5dc75cB358380D2e3dE08A90"
+    },
+    {
+      "slug": "optimism",
+      "chainId": 10,
+      "poolManager": "0x9a13F98Cb987694C9F086b1F5eB990EeA8264Ec3"
+    },
+    {
+      "slug": "bnb",
+      "chainId": 56,
+      "poolManager": "0x28e2Ea090877bF75740558f6BFB36A5ffeE9e9dF"
+    },
+    {
+      "slug": "unichain",
+      "chainId": 130,
+      "poolManager": "0x1F98400000000000000000000000000000000004"
+    },
+    {
+      "slug": "polygon",
+      "chainId": 137,
+      "poolManager": "0x67366782805870060151383F4BbFF9daB53e5cD6"
+    },
+    {
+      "slug": "monad",
+      "chainId": 143,
+      "poolManager": "0x188d586Ddcf52439676Ca21A244753fA19F9Ea8e"
+    },
+    {
+      "slug": "xlayer",
+      "chainId": 196,
+      "poolManager": "0x360E68faCcca8cA495c1B759Fd9EEe466db9FB32"
+    },
+    {
+      "slug": "worldchain",
+      "chainId": 480,
+      "poolManager": "0xb1860D529182ac3BC1F51Fa2ABd56662b7D13f33"
+    },
+    {
+      "slug": "soneium",
+      "chainId": 1868,
+      "poolManager": "0x360E68faCcca8cA495c1B759Fd9EEe466db9FB32"
+    },
+    {
+      "slug": "tempo",
+      "chainId": 4217,
+      "poolManager": "0x33620f62C5b9B2086dD6b62F4A297A9f30347029"
+    },
+    {
+      "slug": "megaeth",
+      "chainId": 4326,
+      "poolManager": "0xaCB7e78fa05D562e0A5D3089ec896D57D057d38E"
+    },
+    {
+      "slug": "robinhood",
+      "chainId": 4663,
+      "poolManager": "0x8366a39CC670B4001A1121B8F6A443A643e40951"
+    },
+    {
+      "slug": "base",
+      "chainId": 8453,
+      "poolManager": "0x498581fF718922c3f8e6A244956aF099B2652b2b"
+    },
+    {
+      "slug": "arbitrum",
+      "chainId": 42161,
+      "poolManager": "0x360E68faCcca8cA495c1B759Fd9EEe466db9FB32"
+    },
+    {
+      "slug": "celo",
+      "chainId": 42220,
+      "poolManager": "0x288dc841A52FCA2707c6947B3A777c5E56cd87BC"
+    },
+    {
+      "slug": "avalanche",
+      "chainId": 43114,
+      "poolManager": "0x06380C0e0912312B5150364B9DC4542BA0DbBc85"
+    },
+    {
+      "slug": "ink",
+      "chainId": 57073,
+      "poolManager": "0x360E68faCcca8cA495c1B759Fd9EEe466db9FB32"
+    },
+    {
+      "slug": "zora",
+      "chainId": 7777777,
+      "poolManager": "0x0575338e4C17006aE181B47900A84404247CA30f"
+    }
+  ]
+}
