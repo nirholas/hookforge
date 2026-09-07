@@ -150,4 +150,12 @@ contract AntiSnipeRampHookTest is ForgeTest {
         out = uint256(uint128(swap(poolKey, true, -1e14, ZERO_BYTES).amount1()));
         vm.revertToState(snapshot);
     }
+
+    function test_theParameterisedPreviewAgreesWithTheLiveQuote() public {
+        uint256 opened = block.timestamp;
+        for (uint256 elapsed = 0; elapsed <= 2 hours; elapsed += 15 minutes) {
+            vm.warp(opened + elapsed);
+            assertEq(hook.feeAfter(poolId, elapsed), hook.quoteFee(poolId), "preview must match the live quote");
+        }
+    }
 }

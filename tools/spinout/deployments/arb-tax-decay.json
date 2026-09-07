@@ -1,0 +1,18 @@
+{
+  "chains": {
+    "31337": {
+      "rpcUrl": "http://127.0.0.1:8545",
+      "poolManager": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "router": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      "hook": "0x5522c0244E936aB6E4D06853F1678b2E6124d080",
+      "currency0": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+      "currency1": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+      "fee": 8388608,
+      "tickSpacing": 60,
+      "poolId": "0xd3b8b5e9f4c716e2c8a808c61796031c5c62c1dbdda451e5d59e3849d9438667",
+      "zeroForOne": true,
+      "faucet": true,
+      "demoSwapAmount": "10000000000000000"
+    }
+  }
+}

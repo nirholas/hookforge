@@ -97,6 +97,16 @@ contract PriorityFeeTaxHook is ForgeFeeHook, PoolConfigurable {
         return tx.gasprice > block.basefee ? tx.gasprice - block.basefee : 0;
     }
 
+    /**
+     * @notice The fee this pool would charge a swap bidding `priorityWei` per gas.
+     * @dev Parameterised so the curve can be quoted and plotted without constructing a transaction at each bid, and
+     * so a front end reads the schedule off the contract instead of reimplementing it.
+     */
+    function feeAtPriority(PoolId id, uint256 priorityWei) public view returns (uint24) {
+        Config memory cfg = configOf[id];
+        return FeeMath.addClamped(cfg.baseFee, FeeMath.saturating(cfg.maxSurcharge, priorityWei, cfg.halfPriorityWei));
+    }
+
     /// @notice The fee this pool would charge the current transaction, without changing any state.
     function quoteFee(PoolId id) public view returns (uint24) {
         Config memory cfg = configOf[id];

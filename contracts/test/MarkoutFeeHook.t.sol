@@ -234,4 +234,11 @@ contract MarkoutFeeHookTest is ForgeTest {
             assertLe(hook.quoteFee(poolId), BASE_FEE + MAX_SURCHARGE);
         }
     }
+
+    function test_theParameterisedPreviewSpansTheWholeRange() public view {
+        assertEq(hook.feeAtToxicity(poolId, 0), BASE_FEE, "no measured toxicity is the base fee");
+        assertEq(hook.feeAtToxicity(poolId, 1e18), BASE_FEE + MAX_SURCHARGE, "full toxicity is the cap");
+        assertEq(hook.feeAtToxicity(poolId, 0.5e18), BASE_FEE + MAX_SURCHARGE / 2, "and it interpolates between");
+        assertEq(hook.feeAtToxicity(poolId, 5e18), BASE_FEE + MAX_SURCHARGE, "a score above one is clamped, not wrapped");
+    }
 }

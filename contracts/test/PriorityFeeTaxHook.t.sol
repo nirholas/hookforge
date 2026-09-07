@@ -127,4 +127,11 @@ contract PriorityFeeTaxHookTest is ForgeTest {
         out = uint256(uint128(swap(poolKey, true, -1e15, ZERO_BYTES).amount1()));
         vm.revertToState(snapshot);
     }
+
+    function test_theParameterisedPreviewAgreesWithTheLiveQuote() public {
+        for (uint256 bid = 0; bid <= 40 gwei; bid += 5 gwei) {
+            vm.txGasPrice(BASE_FEE_WEI + bid);
+            assertEq(hook.feeAtPriority(poolId, bid), hook.quoteFee(poolId), "preview must match the live quote");
+        }
+    }
 }

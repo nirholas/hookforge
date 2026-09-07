@@ -94,6 +94,17 @@ contract ArbTaxDecayHook is ForgeFeeHook, PoolConfigurable {
         emit PoolConfigured(id, cfg.baseFee, cfg.maxSurcharge, cfg.halfLife);
     }
 
+    /**
+     * @notice The fee this pool would charge after `quietSeconds` without a trade.
+     * @dev Parameterised rather than only answerable for "now", so an integrator can quote the curve without
+     * simulating a chain forward, and a front end can plot it from the contract rather than reimplementing the
+     * formula in another language and letting the two drift.
+     */
+    function feeAfter(PoolId id, uint256 quietSeconds) public view returns (uint24) {
+        Config memory cfg = configOf[id];
+        return FeeMath.addClamped(cfg.baseFee, FeeMath.saturating(cfg.maxSurcharge, quietSeconds, cfg.halfLife));
+    }
+
     /// @notice The fee this pool would charge a swap landing right now, without changing any state.
     function quoteFee(PoolId id) public view returns (uint24) {
         Config memory cfg = configOf[id];

@@ -175,4 +175,14 @@ contract ArbTaxDecayHookTest is ForgeTest {
             if (logs[i].emitter == address(hook) && logs[i].topics[0] == topic) return (logs[i].data, true);
         }
     }
+
+    function test_theParameterisedPreviewAgreesWithTheLiveQuote() public {
+        // The preview exists so a client can plot the curve without simulating a chain forward. It is only useful
+        // if it is the same function the pool actually charges, so assert that at several points.
+        uint256 start = block.timestamp;
+        for (uint256 elapsed = 0; elapsed <= 4 * HALF_LIFE; elapsed += HALF_LIFE / 3) {
+            vm.warp(start + elapsed);
+            assertEq(hook.feeAfter(poolId, elapsed), hook.quoteFee(poolId), "preview must match the live quote");
+        }
+    }
 }

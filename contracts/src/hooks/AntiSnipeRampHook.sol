@@ -90,6 +90,14 @@ contract AntiSnipeRampHook is ForgeFeeHook, PoolConfigurable {
         emit PoolConfigured(id, cfg.startFee, cfg.endFee, cfg.rampSeconds, cfg.maxSwapDuringRamp);
     }
 
+    /**
+     * @notice The fee this pool charges `elapsedSeconds` after the pool opened.
+     * @dev Parameterised so the whole ramp can be read off the contract rather than reimplemented elsewhere.
+     */
+    function feeAfter(PoolId id, uint256 elapsedSeconds) public view returns (uint24) {
+        return _feeAt(configOf[id], elapsedSeconds);
+    }
+
     /// @notice The fee this pool charges right now.
     function quoteFee(PoolId id) public view returns (uint24) {
         return _feeAt(configOf[id], block.timestamp - openedAt[id]);

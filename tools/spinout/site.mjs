@@ -431,11 +431,19 @@ tr:last-child td { border-bottom: 0; }
 .modal__body { padding: 1.15rem; }
 .modal__lede { color: var(--text-dim); font-size: .9rem; margin-top: 0; }
 .modal__actions { display: flex; gap: .6rem; justify-content: flex-end; padding: 1rem 1.15rem; border-top: 1px solid var(--line); }
+
+.headline { display: grid; gap: .2rem; margin: 0 0 1.25rem; }
+.headline__value { font-size: clamp(2.4rem, 7vw, 3.6rem); font-weight: 660; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--forge); }
+.headline__label { color: var(--text-dim); font-size: .92rem; }
+.chart { margin: 0 0 1.25rem; }
+.chart__svg svg { width: 100%; height: auto; display: block; }
+.chart__caption { color: var(--text-faint); font-size: .8rem; margin-top: .4rem; }
 `;
 
 
-/** Hooks with a working demo panel. A hook without one gets no demo section rather than an empty promise of one. */
-const DEMO_PANELS = new Set(["x402-gate"]);
+/** Hooks with a working demo panel, and how each one wants to be presented. */
+const DEMOS = JSON.parse(readFileSync(join(HERE, "demos.json"), "utf8"));
+const DEMO_PANELS = new Set(Object.keys(DEMOS));
 
 /** Bundles the demo app once and returns the code, so every repository ships a build with no install step. */
 function demoBundle() {
@@ -449,10 +457,18 @@ function demoBundle() {
   return readFileSync(out, "utf8");
 }
 
-/** The deployment config for a hook, or null when it has never been deployed anywhere. */
+/**
+ * The config the page's demo reads: where the hook is deployed, and how this hook wants to be shown.
+ *
+ * Returns null when the hook has no demo at all, so a page never ships an interactive section that cannot work.
+ */
 function deploymentsFor(slug) {
+  const demo = DEMOS[slug];
+  if (!demo) return null;
+
   const path = join(HERE, "deployments", `${slug}.json`);
-  return existsSync(path) ? readFileSync(path, "utf8") : null;
+  const deployments = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {chains: {}};
+  return JSON.stringify({...deployments, demo});
 }
 
 /**

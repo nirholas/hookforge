@@ -135,6 +135,17 @@ contract MarkoutFeeHook is ForgeFeeHook, PoolConfigurable {
         emit PoolConfigured(id, cfg.baseFee, cfg.maxSurcharge, cfg.alphaWad, cfg.minHorizon);
     }
 
+    /**
+     * @notice The fee this pool would charge at a measured toxicity of `toxicityWad`.
+     * @dev Parameterised so the schedule can be plotted and quoted without waiting for the pool to reach a given
+     * score, and so nobody has to reimplement the interpolation to draw it.
+     */
+    function feeAtToxicity(PoolId id, uint256 toxicityWad) public view returns (uint24) {
+        Config memory cfg = configOf[id];
+        uint256 bounded = toxicityWad > WAD ? WAD : toxicityWad;
+        return FeeMath.addClamped(cfg.baseFee, FeeMath.mulDiv(cfg.maxSurcharge, bounded, WAD));
+    }
+
     /// @notice The fee this pool charges right now, given everything it has measured so far.
     function quoteFee(PoolId id) public view returns (uint24) {
         Config memory cfg = configOf[id];

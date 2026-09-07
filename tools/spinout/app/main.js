@@ -7,6 +7,7 @@
 import {chainName, connect, formatAmount, provider, publicClientFor, readableError, shortAddress, walletClientFor, watch} from "./wallet.js";
 import {clear, el} from "./ui.js";
 import {mountX402Gate} from "./panels/x402-gate.js";
+import {mountFeeHook} from "./panels/fee-hook.js";
 
 
 /** Whether a deployment points at an RPC only reachable from the machine running the chain. */
@@ -20,8 +21,10 @@ function walletIsOnChain(chainId) {
   return Boolean(provider()) && Number.isInteger(chainId);
 }
 
+/** Panels by kind. A hook names its kind in the demo config rather than the entry point knowing every slug. */
 const PANELS = {
   "x402-gate": mountX402Gate,
+  fee: mountFeeHook,
 };
 
 const root = document.querySelector("[data-demo]");
@@ -32,9 +35,9 @@ function fail(node, message) {
 }
 
 async function start(node) {
-  const slug = node.dataset.demo;
-  const mount = PANELS[slug];
   const config = JSON.parse(document.getElementById("deployments")?.textContent ?? "{}");
+  const mount = PANELS[config.demo?.panel ?? node.dataset.demo];
+  if (!mount) return fail(node, "No demo panel is configured for this hook yet.");
 
   const session = {
     account: null,
@@ -125,7 +128,11 @@ async function start(node) {
     const walletClient = session.account ? walletClientFor(session.chainId, session.account) : null;
 
     clear(body);
-    mount(body, {deployment: {...deployment, chainId: session.chainId}, clients: {publicClient, walletClient}, session});
+    mount(body, {
+      deployment: {...deployment, chainId: session.chainId, demo: config.demo},
+      clients: {publicClient, walletClient},
+      session,
+    });
   }
 
   function renderHeader() {
