@@ -91,7 +91,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | Hook | What it does | Status |
 | --- | --- | --- |
 | `TickHarberger` | Auctions the exclusive right to provide liquidity at the active tick under a Harberger tax, so it is always for sale. | building |
-| `TenureWeightedFees` | Weights fee share by continuous time in the pool, so capital that stays is paid more than capital that visits. | building |
+| [`TenureWeightedFees`](contracts/src/hooks/TenureWeightedFeesHook.sol) | Skims a slice of each swap into a pot shared by tenure, so staying is paid without arriving being taxed. | shipped |
 | `RangeRent` | Charges and pays rent for range occupancy based on how much of the range was actually used. | building |
 | `AutoCompoundDonate` | Donates accrued fees straight back to in-range liquidity, compounding without touching positions. | building |
 | `RetroRebate` | Pays volume rebates from on-chain epoch accounting, with no Merkle drop and no off-chain claim. | building |

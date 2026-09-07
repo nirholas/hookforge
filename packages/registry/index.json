@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 22,
+  "count": 23,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -560,6 +560,24 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/step-curve",
       "manifest": "https://hookforge.pages.dev/schema/hooks/step-curve.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
+    },
+    {
+      "slug": "tenure-weighted-fees",
+      "name": "TenureWeightedFees",
+      "family": "Liquidity provider economics",
+      "summary": "Pays liquidity that stays more than liquidity that visits, by skimming a slice of every swap into a pot and sharing it out in proportion to how long each position has been in the pool.",
+      "tags": [
+        "lp-economics",
+        "tenure",
+        "jit-defence",
+        "rewards",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/tenure-weighted-fees",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/tenure-weighted-fees.json",
       "repo": null,
       "site": null,
       "deployments": []
