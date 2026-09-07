@@ -60,9 +60,9 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | `YieldSpace` | A fixed-rate curve with a maturity, converging to par at expiry. Interest-rate markets as a native v4 pool. | building |
 | `LMSR` | A logarithmic market scoring rule curve, giving prediction markets bounded loss and always-available liquidity. | building |
 | `PowerPerp` | An `x^p` invariant, so an LP position has power-perpetual payoff instead of the usual square-root exposure. | building |
-| `RatchetFloor` | A protocol-owned bid that can only move up, giving a token a floor price that is enforced by the curve. | building |
+| [`RatchetFloor`](contracts/src/hooks/RatchetFloorHook.sol) | A protocol-owned bid that can only move up, giving a token a floor price that is enforced by the curve. | shipped |
 | `GridLadder` | Asymmetric bid and ask ladders in one position, so an LP can quote a spread rather than a symmetric range. | building |
-| `DutchClearingLaunch` | A descending-price launch that ends in a single clearing price, refunding everyone who bid above it. | building |
+| [`DutchClearingLaunch`](contracts/src/hooks/DutchClearingLaunchHook.sol) | A descending-price launch enforced as a floor on what the pool will sell at, so the opening price is discovered rather than declared. | shipped |
 | `StepCurve` | Piecewise-constant prices, for assets that should trade in discrete steps rather than on a continuum. | building |
 
 ### Token mechanics
@@ -80,10 +80,10 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | Hook | What it does | Status |
 | --- | --- | --- |
 | [`CircuitBreaker`](contracts/src/hooks/CircuitBreakerHook.sol) | Halts swaps after a move larger than a threshold and resumes automatically after a cooldown. Withdrawals stay open. | shipped |
-| `OracleBand` | Requires a swap to clear within a band around a signed reference price, so a thin pool cannot be walked away from reality. | building |
+| [`OracleBand`](contracts/src/hooks/OracleBandHook.sol) | Requires a swap to clear within a band around a signed reference price, so a thin pool cannot be walked away from reality. | shipped |
 | [`DepegShield`](contracts/src/hooks/DepegShieldHook.sol) | For pegged pairs: fees rise superlinearly with distance from the peg and fall for swaps that restore it. | shipped |
 | `ILInsurance` | Skims a slice of fees into a vault that pays impermanent-loss claims to the providers who funded it. | building |
-| `DrawdownCap` | Caps how much price impact one address may cause per epoch. | building |
+| [`DrawdownCap`](contracts/src/hooks/DrawdownCapHook.sol) | Caps how much price impact one address may cause per epoch. | shipped |
 | [`LiquidityFloor`](contracts/src/hooks/LiquidityFloorHook.sol) | Holds each position to a fraction of its own additions until an unlock date, so commitments are fractional and race-free. | shipped |
 
 ### Liquidity provider economics

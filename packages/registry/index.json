@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 15,
+  "count": 16,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -233,6 +233,24 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "dutch-clearing-launch",
+      "name": "DutchClearingLaunch",
+      "family": "Launch",
+      "summary": "A descending-price launch enforced as a floor on what the pool will sell at, so a token opens at the price the first real buyer is willing to pay rather than the price the deployer guessed.",
+      "tags": [
+        "launch",
+        "auction",
+        "price-discovery",
+        "anti-snipe",
+        "oracle-free"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/dutch-clearing-launch",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/dutch-clearing-launch.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
     },
     {
       "slug": "expiry-settle",
