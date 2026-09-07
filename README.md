@@ -103,7 +103,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | --- | --- | --- |
 | `X402Gate` | Meters pool access with x402 payment receipts, so an autonomous agent can pay per swap for a better fee tier. | building |
 | `ERC8004ReputationFee` | Sets the fee tier from the swapper's on-chain agent reputation. | building |
-| `AgentBudget` | Enforces per-agent rate limits and spend budgets in the pool itself, not in the agent's own code. | building |
+| [`AgentBudget`](contracts/src/hooks/AgentBudgetHook.sol) | Enforces a signed per-epoch spend budget in the pool itself, so a delegated agent key is bounded by the venue rather than by its own code. | shipped |
 | `IntentSettle` | Settles signed ERC-7683 intents against pool liquidity, with solvers competing on the fill. | building |
 | `HookMeter` | Instruments another hook: gas, revert rate and fee take, published on-chain for anyone to audit. | building |
 | `HookStack` | Runs an ordered stack of sub-hooks on one pool, each with its own gas budget. | building |
