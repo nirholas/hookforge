@@ -19,3 +19,6 @@
 [submodule "contracts/lib/uniswap-hooks"]
 	path = contracts/lib/uniswap-hooks
 	url = https://github.com/OpenZeppelin/uniswap-hooks
+[submodule "contracts/lib/prb-math"]
+	path = contracts/lib/prb-math
+	url = https://github.com/PaulRBerg/prb-math
