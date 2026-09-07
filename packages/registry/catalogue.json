@@ -1,0 +1,307 @@
+{
+  "$schema": "https://hookforge.dev/schema/catalogue.json",
+  "description": "The fifty hooks HookForge set out to build. Entries whose contract has shipped are described authoritatively by their generated manifest in hooks/; this file is the plan, and the source of the roadmap.",
+  "count": 50,
+  "hooks": [
+    {
+      "slug": "arb-tax-decay",
+      "name": "ArbTaxDecay",
+      "family": "Order flow and MEV",
+      "summary": "Prices staleness: the longer a pool sits untraded, the more the next swap pays. Recaptures loss-versus-rebalancing with no oracle."
+    },
+    {
+      "slug": "priority-fee-tax",
+      "name": "PriorityFeeTax",
+      "family": "Order flow and MEV",
+      "summary": "Charges in proportion to the priority fee a swap paid for its place in the block, on the theory that only racing flow bids."
+    },
+    {
+      "slug": "block-batch-clearing",
+      "name": "BlockBatchClearing",
+      "family": "Order flow and MEV",
+      "summary": "Queues every swap in a block and clears them at one uniform price, so position inside the block stops being worth anything."
+    },
+    {
+      "slug": "top-of-block-auction",
+      "name": "TopOfBlockAuction",
+      "family": "Order flow and MEV",
+      "summary": "An on-chain auction for the right to trade first in a block, with the winning bid paid to liquidity providers."
+    },
+    {
+      "slug": "flow-classifier",
+      "name": "FlowClassifier",
+      "family": "Order flow and MEV",
+      "summary": "Publishes a running toxic-versus-benign classification of a pool's order flow on-chain, as a public good other hooks can read."
+    },
+    {
+      "slug": "impact-split",
+      "name": "ImpactSplit",
+      "family": "Order flow and MEV",
+      "summary": "Splits a large swap into tranches across blocks and guarantees the result beats immediate execution."
+    },
+    {
+      "slug": "sandwich-bond",
+      "name": "SandwichBond",
+      "family": "Order flow and MEV",
+      "summary": "Lets a swapper post a bond returned unless a same-block backrun is detected, in which case it compensates them."
+    },
+    {
+      "slug": "yield-space",
+      "name": "YieldSpace",
+      "family": "Curves",
+      "summary": "A fixed-rate curve with a maturity, converging to par at expiry. Interest-rate markets as a native v4 pool."
+    },
+    {
+      "slug": "lmsr",
+      "name": "LMSR",
+      "family": "Curves",
+      "summary": "A logarithmic market scoring rule curve, giving prediction markets bounded loss and always-available liquidity."
+    },
+    {
+      "slug": "power-perp",
+      "name": "PowerPerp",
+      "family": "Curves",
+      "summary": "An x^p invariant, so a liquidity position has power-perpetual payoff instead of the usual square-root exposure."
+    },
+    {
+      "slug": "ratchet-floor",
+      "name": "RatchetFloor",
+      "family": "Curves",
+      "summary": "A protocol-owned bid that can only move up, giving a token a floor price enforced by the curve itself."
+    },
+    {
+      "slug": "grid-ladder",
+      "name": "GridLadder",
+      "family": "Curves",
+      "summary": "Asymmetric bid and ask ladders in one position, so a provider can quote a spread rather than a symmetric range."
+    },
+    {
+      "slug": "dutch-clearing-launch",
+      "name": "DutchClearingLaunch",
+      "family": "Curves",
+      "summary": "A descending-price launch that ends in a single clearing price, refunding everyone who bid above it."
+    },
+    {
+      "slug": "step-curve",
+      "name": "StepCurve",
+      "family": "Curves",
+      "summary": "Piecewise-constant prices, for assets that should trade in discrete steps rather than on a continuum."
+    },
+    {
+      "slug": "rebase-absorb",
+      "name": "RebaseAbsorb",
+      "family": "Token mechanics",
+      "summary": "Makes rebasing tokens safe in v4 by absorbing balance drift into the pool as a donation to liquidity providers."
+    },
+    {
+      "slug": "fee-on-transfer",
+      "name": "FeeOnTransfer",
+      "family": "Token mechanics",
+      "summary": "Makes fee-on-transfer tokens work by settling on measured balance deltas instead of requested amounts."
+    },
+    {
+      "slug": "yield-discount",
+      "name": "YieldDiscount",
+      "family": "Token mechanics",
+      "summary": "Parks idle reserves in an ERC-4626 vault and pays the yield out as fee discounts to swappers."
+    },
+    {
+      "slug": "dividend-passthrough",
+      "name": "DividendPassthrough",
+      "family": "Token mechanics",
+      "summary": "Routes dividends paid to pool-held tokens through to liquidity providers pro rata."
+    },
+    {
+      "slug": "native-yield",
+      "name": "NativeYield",
+      "family": "Token mechanics",
+      "summary": "On chains with native yield, donates the pool's accrued yield to in-range liquidity."
+    },
+    {
+      "slug": "circuit-breaker",
+      "name": "CircuitBreaker",
+      "family": "Risk",
+      "summary": "Halts swapping for a cooldown after a limit move, then clears itself. No admin key, and liquidity can always leave."
+    },
+    {
+      "slug": "oracle-band",
+      "name": "OracleBand",
+      "family": "Risk",
+      "summary": "Requires a swap to clear within a band around a signed reference price, so a thin pool cannot be walked away from reality."
+    },
+    {
+      "slug": "depeg-shield",
+      "name": "DepegShield",
+      "family": "Risk",
+      "summary": "Fees rise superlinearly with distance from a peg and fall for swaps that restore it."
+    },
+    {
+      "slug": "il-insurance",
+      "name": "ILInsurance",
+      "family": "Risk",
+      "summary": "Skims a slice of fees into a vault that pays impermanent-loss claims to the providers who funded it."
+    },
+    {
+      "slug": "drawdown-cap",
+      "name": "DrawdownCap",
+      "family": "Risk",
+      "summary": "Caps how much price impact one address may cause per epoch."
+    },
+    {
+      "slug": "liquidity-floor",
+      "name": "LiquidityFloor",
+      "family": "Risk",
+      "summary": "Enforces a minimum liquidity that cannot leave while a pool is young."
+    },
+    {
+      "slug": "tick-harberger",
+      "name": "TickHarberger",
+      "family": "Liquidity provider economics",
+      "summary": "Auctions the exclusive right to provide liquidity at the active tick under a Harberger tax, so it is always for sale."
+    },
+    {
+      "slug": "tenure-weighted-fees",
+      "name": "TenureWeightedFees",
+      "family": "Liquidity provider economics",
+      "summary": "Weights fee share by continuous time in the pool, so capital that stays is paid more than capital that visits."
+    },
+    {
+      "slug": "range-rent",
+      "name": "RangeRent",
+      "family": "Liquidity provider economics",
+      "summary": "Charges and pays rent for range occupancy based on how much of the range was actually used."
+    },
+    {
+      "slug": "autocompound-donate",
+      "name": "AutoCompoundDonate",
+      "family": "Liquidity provider economics",
+      "summary": "Donates accrued fees straight back to in-range liquidity, compounding without touching positions."
+    },
+    {
+      "slug": "retro-rebate",
+      "name": "RetroRebate",
+      "family": "Liquidity provider economics",
+      "summary": "Pays volume rebates from on-chain epoch accounting, with no Merkle drop and no off-chain claim."
+    },
+    {
+      "slug": "fungible-range",
+      "name": "FungibleRange",
+      "family": "Liquidity provider economics",
+      "summary": "Tokenises a range position as an ERC-20 so it can be traded, lent and used as collateral."
+    },
+    {
+      "slug": "x402-gate",
+      "name": "X402Gate",
+      "family": "Agent-native",
+      "summary": "Meters pool access with x402 payment receipts, so an autonomous agent can pay per swap for a better fee tier."
+    },
+    {
+      "slug": "agent-reputation-fee",
+      "name": "AgentReputationFee",
+      "family": "Agent-native",
+      "summary": "Sets the fee tier from the swapper's on-chain agent reputation."
+    },
+    {
+      "slug": "agent-budget",
+      "name": "AgentBudget",
+      "family": "Agent-native",
+      "summary": "Enforces per-agent rate limits and spend budgets in the pool itself, not in the agent's own code."
+    },
+    {
+      "slug": "intent-settle",
+      "name": "IntentSettle",
+      "family": "Agent-native",
+      "summary": "Settles signed ERC-7683 intents against pool liquidity, with solvers competing on the fill."
+    },
+    {
+      "slug": "hook-meter",
+      "name": "HookMeter",
+      "family": "Agent-native",
+      "summary": "Instruments another hook: gas, revert rate and fee take, published on-chain for anyone to audit."
+    },
+    {
+      "slug": "hook-stack",
+      "name": "HookStack",
+      "family": "Agent-native",
+      "summary": "Runs an ordered stack of sub-hooks on one pool, each with its own gas budget."
+    },
+    {
+      "slug": "expiry-settle",
+      "name": "ExpirySettle",
+      "family": "Time",
+      "summary": "Gives a pool a maturity date at which it settles, turning it into a dated instrument."
+    },
+    {
+      "slug": "vested-buy",
+      "name": "VestedBuy",
+      "family": "Time",
+      "summary": "Vests purchases linearly and enforces the schedule at the pool rather than in a token contract."
+    },
+    {
+      "slug": "epoch-rebalance",
+      "name": "EpochRebalance",
+      "family": "Time",
+      "summary": "Rebalances the pool toward a target weight each epoch, making the pool itself an index."
+    },
+    {
+      "slug": "stream-dca",
+      "name": "StreamDCA",
+      "family": "Time",
+      "summary": "Executes recurring dollar-cost-average streams block by block."
+    },
+    {
+      "slug": "trading-calendar",
+      "name": "TradingCalendar",
+      "family": "Time",
+      "summary": "Opens and closes the pool on a schedule, ramping fees at the edges instead of slamming shut."
+    },
+    {
+      "slug": "shared-liquidity",
+      "name": "SharedLiquidity",
+      "family": "Cross-domain and information",
+      "summary": "Mirrors one pool across chains and settles the net position, so liquidity is not fragmented per chain."
+    },
+    {
+      "slug": "l1-anchor",
+      "name": "L1Anchor",
+      "family": "Cross-domain and information",
+      "summary": "Anchors an L2 pool to a proven L1 price."
+    },
+    {
+      "slug": "variance-swap",
+      "name": "VarianceSwap",
+      "family": "Cross-domain and information",
+      "summary": "Pays realized variance, making liquidity providers short volatility and traders long it, explicitly."
+    },
+    {
+      "slug": "implied-vol-fee",
+      "name": "ImpliedVolFee",
+      "family": "Cross-domain and information",
+      "summary": "Prices swaps off an implied-volatility surface rather than a realized-volatility estimate."
+    },
+    {
+      "slug": "anti-snipe-ramp",
+      "name": "AntiSnipeRamp",
+      "family": "Launch",
+      "summary": "Opens at a punitive fee that decays to normal, paying the whole premium to liquidity rather than to the deployer."
+    },
+    {
+      "slug": "commit-reveal-dark",
+      "name": "CommitRevealDark",
+      "family": "Launch",
+      "summary": "Hides order size behind a hash commitment and clears the batch on reveal."
+    },
+    {
+      "slug": "lottery-fees",
+      "name": "LotteryFees",
+      "family": "Liquidity provider economics",
+      "summary": "Sends a slice of fees to a no-loss lottery among the pool's liquidity providers."
+    },
+    {
+      "slug": "reserve-stable",
+      "name": "ReserveStable",
+      "family": "Curves",
+      "summary": "Mints and burns against a reserve to hold a band, with the band enforced by the hook."
+    }
+  ]
+}
