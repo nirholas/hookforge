@@ -3,9 +3,10 @@ pragma solidity ^0.8.26;
 
 import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
 import {SwapParams} from "@uniswap/v4-core/src/types/PoolOperation.sol";
-import {UD60x18, ud, convert} from "@prb/math/UD60x18.sol";
+import {UD60x18, ud} from "@prb/math/UD60x18.sol";
 
 import {ForgeCurveHook} from "../base/ForgeCurveHook.sol";
+import {WeightedMath} from "../libraries/WeightedMath.sol";
 
 /**
  * @title PowerPerpHook
@@ -86,24 +87,18 @@ contract PowerPerpHook is ForgeCurveHook {
     /// @notice The invariant `x^w * y^(1-w)`, which every swap leaves unchanged before fees.
     function invariant() external view returns (uint256) {
         (uint256 reserve0, uint256 reserve1) = reserves();
-        if (reserve0 == 0 || reserve1 == 0) return 0;
-
-        UD60x18 w = ud((weight0Bps * 1e18) / BPS);
-        UD60x18 term0 = ud(reserve0).pow(w);
-        UD60x18 term1 = ud(reserve1).pow(ud(1e18).sub(w));
-        return term0.mul(term1).unwrap();
+        return WeightedMath.invariant(reserve0, reserve1, _weight0());
     }
 
     /// @notice The pool's marginal price of currency0 in currency1, in 18 decimals.
     function spotPrice() external view returns (uint256) {
         (uint256 reserve0, uint256 reserve1) = reserves();
-        if (reserve0 == 0 || reserve1 == 0) return 0;
+        return WeightedMath.spotPrice(reserve0, reserve1, _weight0());
+    }
 
-        // Marginal price of a weighted pool: (y / (1 - w)) / (x / w).
-        UD60x18 w = ud((weight0Bps * 1e18) / BPS);
-        UD60x18 numerator = ud(reserve1).div(ud(1e18).sub(w));
-        UD60x18 denominator = ud(reserve0).div(w);
-        return numerator.div(denominator).unwrap();
+    /// @dev The weight on currency0, in 18 decimals.
+    function _weight0() private view returns (UD60x18) {
+        return ud((weight0Bps * 1e18) / BPS);
     }
 
     /**
@@ -122,27 +117,14 @@ contract PowerPerpHook is ForgeCurveHook {
         (uint256 reserve0, uint256 reserve1) = reserves();
         if (reserve0 == 0 || reserve1 == 0) revert NoLiquidity();
 
-        // `wIn` weights the currency going in, `wOut` the one coming out.
-        UD60x18 w0 = ud((weight0Bps * 1e18) / BPS);
+        UD60x18 w0 = _weight0();
         UD60x18 w1 = ud(1e18).sub(w0);
         (UD60x18 wIn, UD60x18 wOut) = zeroForOne ? (w0, w1) : (w1, w0);
         (uint256 reserveIn, uint256 reserveOut) = zeroForOne ? (reserve0, reserve1) : (reserve1, reserve0);
 
-        if (exactInput) {
-            // out = reserveOut * (1 - (reserveIn / (reserveIn + in))^(wIn / wOut))
-            UD60x18 inputRatio = ud(reserveIn).div(ud(reserveIn + specifiedAmount));
-            UD60x18 inputFactor = inputRatio.pow(wIn.div(wOut));
-            return ud(reserveOut).mul(ud(1e18).sub(inputFactor)).unwrap();
-        }
-
-        // in = reserveIn * ((reserveOut / (reserveOut - out))^(wOut / wIn) - 1)
-        if (specifiedAmount >= reserveOut) revert InsufficientReserves();
-        UD60x18 ratio = ud(reserveOut).div(ud(reserveOut - specifiedAmount));
-        UD60x18 factor = ratio.pow(wOut.div(wIn));
-        // Rounded up by one wei. Every operation in that expression rounds down, and an exact-output quote that
-        // rounds down is a quote the pool cannot honour: it hands over the full output having been paid slightly
-        // less than the curve requires. One wei per swap, always in the pool's favour, closes it.
-        return ud(reserveIn).mul(factor.sub(ud(1e18))).unwrap() + 1;
+        return exactInput
+            ? WeightedMath.amountOut(reserveIn, reserveOut, wIn, wOut, specifiedAmount)
+            : WeightedMath.amountIn(reserveIn, reserveOut, wIn, wOut, specifiedAmount);
     }
 
     /// @notice The fee a swap would pay, in the unspecified currency.

@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 19,
+  "count": 20,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -248,6 +248,24 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/dutch-clearing-launch",
       "manifest": "https://hookforge.pages.dev/schema/hooks/dutch-clearing-launch.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
+    },
+    {
+      "slug": "epoch-rebalance",
+      "name": "EpochRebalance",
+      "family": "Time",
+      "summary": "An index whose whole future is fixed before anybody deposits: the pool's target allocation glides along a schedule written at deployment, and nobody, including the deployer, can change it afterwards.",
+      "tags": [
+        "curve",
+        "index",
+        "rebalancing",
+        "schedule",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/epoch-rebalance",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/epoch-rebalance.json",
       "repo": null,
       "site": null,
       "deployments": []

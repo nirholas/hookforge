@@ -1,20 +1,20 @@
 {
   "$schema": "https://hookforge.pages.dev/schema/hook-manifest.json",
-  "slug": "power-perp",
-  "name": "PowerPerp",
-  "contract": "PowerPerpHook",
+  "slug": "epoch-rebalance",
+  "name": "EpochRebalance",
+  "contract": "EpochRebalanceHook",
   "version": "1.0.0",
-  "family": "Curves",
-  "summary": "A pool with a weight, so a liquidity provider chooses how much of the move they want instead of always getting the square root of it.",
-  "description": "Providing to a constant-product pool is a position, and almost nobody picks it deliberately. Holding `x*y = k` against a price move gives a payoff proportional to the square root of the price, always, with no way to ask for more or less. A provider who is bullish and wants most of the upside, and a provider who wants to sit closer to stable, are handed the identical exposure and told it is a fee opportunity. The generalisation has been known since Balancer: hold the weighted geometric mean constant,   x^w * y^(1-w) = k and the position's value moves with `price^(1-w)`. At `w = 0.5` that is the square root every constant-product pool gives. At `w = 0.8` the pool holds mostly currency0 and the provider keeps most of its move. At `w = 0.2` the pool is mostly currency1 and the provider is nearly flat to currency0. One parameter, and the provider's exposure is something they chose. The swap maths follows from the invariant. Selling `dx` of currency0 into the pool leaves   dy = y * (1 - (x / (x + dx))^(w / (1 - w))) which is computed here in 60.18 fixed point. The exponent is a real number, not an integer, so this needs genuine `pow`; it uses PRB Math rather than an approximation, because a curve that is subtly wrong in the tail is a curve that pays somebody to find the tail. The reason this is worth having on v4 specifically: v4 pools are concentrated-liquidity pools, and concentration and weighting are different tools. Concentration says where you are willing to quote. Weighting says what exposure you want while you quote. Nothing in v4 offers the second, and a hook that replaces the curve is the only place it can live.",
-  "priorArt": "Weighted geometric-mean pools are Balancer's, and have been since 2020. The Squared and power-perpetual submissions for v4 build leveraged products on top of a pool rather than changing the pool's own curve. Bringing the weighted invariant to v4 as a custom curve, so a provider can pick their exposure to the pair they are quoting, is the contribution here; the maths is deliberately the well-understood one rather than something new.",
-  "limitation": "A weighted pool is more exposed to one side by construction, so a provider who picks a high weight and is wrong about direction loses more than a constant-product provider would. That is the point of the parameter, not a defect, but it does mean the weight is a directional view and should be chosen as one. Gas is also higher than a constant-product pool: every quote evaluates a real-exponent `pow`, which costs a few thousand gas more than a multiply.",
+  "family": "Time",
+  "summary": "An index whose whole future is fixed before anybody deposits: the pool's target allocation glides along a schedule written at deployment, and nobody, including the deployer, can change it afterwards.",
+  "description": "A weighted pool is already an index fund. Holding `x^w * y^(1-w)` constant keeps the value split at `w` to `1-w` without anybody trading, because arbitrageurs restore the ratio for free every time the price moves. That result is Balancer's and it is why weighted pools are described as self-rebalancing. What a real index also needs is reconstitution: the target itself changes. Balancer does this with an owner call that starts a gradual weight update, and that is the part worth improving on, for two reasons. The first is trust. A provider deposits into a 60/40 pool and the owner can make it 20/80 next week. Whatever the governance around that key, the provider's exposure is not theirs to control, and the pool's terms are a promise rather than a property. The second is the rebalance itself. A weight change is a trade the pool must do, and if it happens as one step the whole trade is available at one price in one block, which is the most arbitrageable shape a rebalance can have. Every index that reconstitutes on a known date pays for this, and it has a name: index front-running. This hook fixes both by fixing the schedule. Weight checkpoints are set at construction and interpolated linearly between, so the pool's allocation on any future date is computable by anyone from the moment it exists. A provider knows what they are joining for the whole life of the pool. And because the weight moves continuously rather than in a step, the rebalancing flow is spread across the glide instead of concentrated into one block: there is no single moment worth racing to, because at every moment only an instant's worth of the trade is available. The same mechanism is a liquidity bootstrapping pool when the schedule is two points and the first weight is lopsided, so this covers that case without a separate contract.",
+  "priorArt": "Weighted pools as self-rebalancing indices are Balancer's, as are gradual weight updates, which are triggered by an owner. Liquidity bootstrapping pools are the two-point case. Making the entire weight schedule immutable and set before the first deposit, so the pool's future allocation is a property a provider can verify rather than a promise a key holder can revise, is the contribution here, along with the observation that a continuous glide removes the single arbitrageable print a stepped reconstitution creates.",
+  "limitation": "The schedule cannot respond to anything. An index that needs to react to a delisting, a merger or a depeg cannot be expressed here, and pretending otherwise by picking a schedule that happens to look right is worse than using a pool with a keeper. The glide also does not eliminate rebalancing cost, it spreads it: the pool still trades into the new weight and still pays for that, it simply does not hand the whole trade to one participant in one block.",
   "tags": [
     "curve",
-    "custom-curve",
-    "weighted",
-    "lp-economics",
-    "exposure"
+    "index",
+    "rebalancing",
+    "schedule",
+    "no-admin"
   ],
   "recommendedChains": [
     "base",
@@ -26,8 +26,8 @@
     "polygon",
     "bnb"
   ],
-  "source": "contracts/src/hooks/PowerPerpHook.sol",
-  "docs": "https://hookforge.pages.dev/hooks/power-perp",
+  "source": "contracts/src/hooks/EpochRebalanceHook.sol",
+  "docs": "https://hookforge.pages.dev/hooks/epoch-rebalance",
   "repo": null,
   "site": null,
   "permissions": null,
@@ -106,8 +106,8 @@
       "notice": "The pool is not configured to use this hook."
     },
     {
-      "signature": "InvalidWeight()",
-      "notice": "The weight must leave both sides a real share; a pool weighted entirely to one side is not a pool."
+      "signature": "InvalidSchedule()",
+      "notice": "The schedule was empty, too long, out of order, or carried a weight outside the usable band."
     },
     {
       "signature": "LiquidityOnlyViaHook()",
@@ -141,9 +141,21 @@
           "internalType": "contract IPoolManager"
         },
         {
-          "name": "_weight0Bps",
-          "type": "uint256",
-          "internalType": "uint256"
+          "name": "schedule_",
+          "type": "tuple[]",
+          "internalType": "struct EpochRebalanceHook.Checkpoint[]",
+          "components": [
+            {
+              "name": "time",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "weight0Bps",
+              "type": "uint16",
+              "internalType": "uint16"
+            }
+          ]
         },
         {
           "name": "_swapFeeBps",
@@ -162,6 +174,19 @@
         }
       ],
       "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "MAX_CHECKPOINTS",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -1080,6 +1105,32 @@
     },
     {
       "type": "function",
+      "name": "checkpointCount",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "currentWeightBps",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "decimals",
       "inputs": [],
       "outputs": [
@@ -1476,6 +1527,31 @@
     },
     {
       "type": "function",
+      "name": "schedule",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "tuple[]",
+          "internalType": "struct EpochRebalanceHook.Checkpoint[]",
+          "components": [
+            {
+              "name": "time",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "weight0Bps",
+              "type": "uint16",
+              "internalType": "uint16"
+            }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "specURI",
       "inputs": [],
       "outputs": [
@@ -1632,8 +1708,14 @@
     },
     {
       "type": "function",
-      "name": "weight0Bps",
-      "inputs": [],
+      "name": "weightAtBps",
+      "inputs": [
+        {
+          "name": "timestamp",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
       "outputs": [
         {
           "name": "",
@@ -1972,7 +2054,7 @@
     },
     {
       "type": "error",
-      "name": "InvalidWeight",
+      "name": "InvalidSchedule",
       "inputs": []
     },
     {
