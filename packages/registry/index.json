@@ -23,22 +23,26 @@
         {
           "chain": "unichain",
           "chainId": 130,
-          "address": "0xa712fa3ecD3a5260389a9115d09E7A8Ccf5e5080"
+          "address": "0xa712fa3ecD3a5260389a9115d09E7A8Ccf5e5080",
+          "status": "deterministic"
         },
         {
           "chain": "robinhood",
           "chainId": 4663,
-          "address": "0x885B7D5F9C96B9434a14Cfd0BdC8D8c6aE5F5080"
+          "address": "0x885B7D5F9C96B9434a14Cfd0BdC8D8c6aE5F5080",
+          "status": "deterministic"
         },
         {
           "chain": "base",
           "chainId": 8453,
-          "address": "0x3C2ebA98374549AF1f7FC909265146E78C881080"
+          "address": "0x3C2ebA98374549AF1f7FC909265146E78C881080",
+          "status": "deterministic"
         },
         {
           "chain": "arbitrum",
           "chainId": 42161,
-          "address": "0xd0Debb7531F0960ccd0061306bDeC1FBF6Da5080"
+          "address": "0xd0Debb7531F0960ccd0061306bDeC1FBF6Da5080",
+          "status": "deterministic"
         }
       ]
     },
@@ -59,22 +63,26 @@
         {
           "chain": "unichain",
           "chainId": 130,
-          "address": "0xaD2e51cEB82F517C8e67559FfDc89B5F8C705080"
+          "address": "0xaD2e51cEB82F517C8e67559FfDc89B5F8C705080",
+          "status": "deterministic"
         },
         {
           "chain": "robinhood",
           "chainId": 4663,
-          "address": "0xB3eaD21616aAC0aBC83E8f4CE826242d5fEdD080"
+          "address": "0xB3eaD21616aAC0aBC83E8f4CE826242d5fEdD080",
+          "status": "deterministic"
         },
         {
           "chain": "base",
           "chainId": 8453,
-          "address": "0x1A0e586A71F401c2E511c7e6fAf7197112915080"
+          "address": "0x1A0e586A71F401c2E511c7e6fAf7197112915080",
+          "status": "deterministic"
         },
         {
           "chain": "arbitrum",
           "chainId": 42161,
-          "address": "0xE4014d2671834C7FdD6aA44A28AA217498359080"
+          "address": "0xE4014d2671834C7FdD6aA44A28AA217498359080",
+          "status": "deterministic"
         }
       ]
     },
@@ -95,22 +103,26 @@
         {
           "chain": "unichain",
           "chainId": 130,
-          "address": "0x0b2A21Bc92AFdFb9DABF19F0359A0c60701990c0"
+          "address": "0x0b2A21Bc92AFdFb9DABF19F0359A0c60701990c0",
+          "status": "deterministic"
         },
         {
           "chain": "robinhood",
           "chainId": 4663,
-          "address": "0x2f652188F365D255860CDA638bBafd6F91d1D0c0"
+          "address": "0x2f652188F365D255860CDA638bBafd6F91d1D0c0",
+          "status": "deterministic"
         },
         {
           "chain": "base",
           "chainId": 8453,
-          "address": "0x4893e7438ee8d2Ee400b7c4d88493f0F51e650C0"
+          "address": "0x4893e7438ee8d2Ee400b7c4d88493f0F51e650C0",
+          "status": "deterministic"
         },
         {
           "chain": "arbitrum",
           "chainId": 42161,
-          "address": "0xf4dC1c4587044572A61f42F046809681602190c0"
+          "address": "0xf4dC1c4587044572A61f42F046809681602190c0",
+          "status": "deterministic"
         }
       ]
     },
@@ -131,22 +143,26 @@
         {
           "chain": "unichain",
           "chainId": 130,
-          "address": "0xe0898d4881d0cdF143c4921e04fDa13908019080"
+          "address": "0xe0898d4881d0cdF143c4921e04fDa13908019080",
+          "status": "deterministic"
         },
         {
           "chain": "robinhood",
           "chainId": 4663,
-          "address": "0xf6e63D5e5F90127CE74949F6e207a05518c0D080"
+          "address": "0xf6e63D5e5F90127CE74949F6e207a05518c0D080",
+          "status": "deterministic"
         },
         {
           "chain": "base",
           "chainId": 8453,
-          "address": "0x9Bc7695a864eDc8ecE0B4a315ceF612c7DbB1080"
+          "address": "0x9Bc7695a864eDc8ecE0B4a315ceF612c7DbB1080",
+          "status": "deterministic"
         },
         {
           "chain": "arbitrum",
           "chainId": 42161,
-          "address": "0xf6DeaDf77EDDB78eCFea2FeAAD7bBbAB88511080"
+          "address": "0xf6DeaDf77EDDB78eCFea2FeAAD7bBbAB88511080",
+          "status": "deterministic"
         }
       ]
     },
@@ -182,22 +198,26 @@
         {
           "chain": "unichain",
           "chainId": 130,
-          "address": "0x123A792F3B58367fFAE610Be8Fd69518b429D080"
+          "address": "0x123A792F3B58367fFAE610Be8Fd69518b429D080",
+          "status": "deterministic"
         },
         {
           "chain": "robinhood",
           "chainId": 4663,
-          "address": "0xC9f88e5D2f4900240670a2fcB0fF077963961080"
+          "address": "0xC9f88e5D2f4900240670a2fcB0fF077963961080",
+          "status": "deterministic"
         },
         {
           "chain": "base",
           "chainId": 8453,
-          "address": "0xb406d286F0A7E3fF88260674E66EeaA1A7b15080"
+          "address": "0xb406d286F0A7E3fF88260674E66EeaA1A7b15080",
+          "status": "deterministic"
         },
         {
           "chain": "arbitrum",
           "chainId": 42161,
-          "address": "0x28991E242f5C69dF4f42dcFFc5B63BDABE025080"
+          "address": "0x28991E242f5C69dF4f42dcFFc5B63BDABE025080",
+          "status": "deterministic"
         }
       ]
     },

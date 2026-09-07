@@ -43,6 +43,7 @@
     "afterInitialize": true,
     "beforeInitialize": false
   },
+  "permissionsSource": "address",
   "properties": {
     "dynamicFee": false,
     "upgradeable": false,

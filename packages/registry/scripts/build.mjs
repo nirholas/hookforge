@@ -118,6 +118,27 @@ function readDeployments(chains) {
   return byHook;
 }
 
+/**
+ * Reads the permission flags a hook declares in `getHookPermissions()`.
+ *
+ * A deployed hook's flags are the low fourteen bits of its address, which is the only thing v4 itself consults. Before
+ * a hook is deployed there is no address to read, so the declaration in the source is the next best source of truth,
+ * and the deploy script mines an address to match it. Hooks that inherit their permissions from a base (a fee hook
+ * declares none of its own) fall back to that base's declaration.
+ */
+function permissionsFromSource(source) {
+  const declared = source.match(/function getHookPermissions\(\)[\s\S]*?Hooks\.Permissions\(\{([\s\S]*?)\}\)/);
+  const body = declared?.[1] ?? (source.includes("ForgeFeeHook") ? "afterInitialize: true, beforeSwap: true" : null);
+  if (body === null) return null;
+
+  const set = Object.fromEntries(
+    [...body.matchAll(/(\w+)\s*:\s*(true|false)/g)].map((m) => [m[1], m[2] === "true"]),
+  );
+  // The v4 struct spells the delta flags "ReturnDelta"; the address bits are named "ReturnsDelta". Normalise.
+  const alias = (name) => set[name] ?? set[name.replace("Returns", "Return")] ?? false;
+  return Object.fromEntries(FLAG_BITS.map((name) => [name, alias(name)]));
+}
+
 /** Describes the `configure` entry point so a client can build the call without the ABI in hand. */
 function describeConfigure(abi) {
   const fn = abi.find((entry) => entry.type === "function" && entry.name === "configure");
@@ -147,7 +168,10 @@ function buildHook(contractName, chains, deployments) {
   const name = hookName(source) ?? contractName;
 
   const addresses = deployments[name] ?? [];
-  const permissions = addresses.length ? permissionsFromAddress(addresses[0].address) : null;
+  // Prefer the deployed address, which is what v4 reads; fall back to the source declaration the deploy
+  // script mines that address to satisfy, so the registry is complete before a hook ships.
+  const permissions = addresses.length ? permissionsFromAddress(addresses[0].address) : permissionsFromSource(source);
+  const permissionsSource = addresses.length ? "address" : "declaration";
   const abi = artifact.abi ?? [];
 
   return {
@@ -166,6 +190,7 @@ function buildHook(contractName, chains, deployments) {
     source: `contracts/src/hooks/${contractName}.sol`,
     docs: `https://hookforge.dev/hooks/${tags.slug ?? contractName.toLowerCase()}`,
     permissions,
+    permissionsSource,
     properties: {
       dynamicFee: source.includes("ForgeFeeHook"),
       upgradeable: false,
@@ -214,7 +239,9 @@ function main() {
       tags: hook.tags,
       docs: hook.docs,
       manifest: `https://hookforge.dev/schema/hooks/${hook.slug}.json`,
-      deployments: hook.deployments.map((d) => ({chain: d.chain, chainId: d.chainId, address: d.address})),
+      // `status` rides along: a deterministic address is where the hook *will* be, and a consumer that cannot
+      // tell that from a live deployment would misreport an undeployed hook as live.
+      deployments: hook.deployments.map((d) => ({chain: d.chain, chainId: d.chainId, address: d.address, status: d.status})),
     });
     console.log(`generated ${hook.slug}.json`);
   }

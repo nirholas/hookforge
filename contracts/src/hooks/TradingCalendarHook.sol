@@ -43,6 +43,12 @@ import {FeeMath} from "../libraries/FeeMath.sol";
  * Prior art: "New York Trading Hours" and "Trading Hours" hooks revert outside a window. Continuous fee ramps around
  * scheduled events appear in the `UniCast` design for known catalysts. Expressing a *recurring weekly calendar* as a
  * continuous fee surface, with no revert path and no oracle, is the contribution here.
+ *
+ * @custom:slug trading-calendar
+ * @custom:family Time
+ * @custom:prior-art The published calendar hooks ("New York Trading Hours", "Trading Hours") revert outside a window. Continuous fee ramps around a single scheduled event appear in the UniCast design. Expressing a recurring weekly calendar as a continuous fee surface, with no revert path and no oracle, is the contribution here.
+ * @custom:limitation The calendar is a fixed weekly pattern in UTC. It does not know about holidays, half days, or daylight-saving shifts in the reference market, so a pool tracking an asset with an irregular schedule has to pick a session that is correct most weeks and accept that it is wrong on the exceptions.
+ * @custom:chains base,arbitrum,unichain,robinhood,ethereum,optimism,polygon,bnb
  */
 contract TradingCalendarHook is ForgeFeeHook, PoolConfigurable {
     /// @notice Seconds in a day.

@@ -2,13 +2,17 @@ import {test, before, after} from "node:test";
 import assert from "node:assert/strict";
 import {Client} from "@modelcontextprotocol/sdk/client/index.js";
 import {StdioClientTransport} from "@modelcontextprotocol/sdk/client/stdio.js";
+import {fileURLToPath} from "node:url";
 
 let client;
 
 /** Talks to the real server over a real stdio transport: nothing here is stubbed. */
 before(async () => {
   client = new Client({name: "hookforge-tests", version: "1.0.0"});
-  await client.connect(new StdioClientTransport({command: "node", args: ["packages/mcp/dist/server.js"]}));
+  // Resolve the server relative to this file, so the suite runs the same from the package directory (npm test
+  // inside the workspace) and from the repository root (npm test --workspaces).
+  const serverPath = fileURLToPath(new URL("../dist/server.js", import.meta.url));
+  await client.connect(new StdioClientTransport({command: "node", args: [serverPath]}));
 });
 
 after(async () => {

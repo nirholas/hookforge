@@ -45,6 +45,12 @@ import {PoolConfigurable} from "../base/PoolConfigurable.sol";
  *
  * Prior art: `LiquidityLock`, `Timelock Addition` and `LockingLiquidity` all lock positions wholesale for a term.
  * Fractional, per-position, top-up-safe commitments are the contribution here.
+ *
+ * @custom:slug liquidity-floor
+ * @custom:family Liquidity provider economics
+ * @custom:prior-art LiquidityLock, Timelock Addition and LockingLiquidity all lock positions wholesale for a term. Fractional, per-position, top-up-safe commitments are the contribution here, along with the observation that a pool-wide minimum is a bank run rather than a floor.
+ * @custom:limitation The commitment binds the v4 position key, which is the address that called modifyLiquidity. A provider who routes through a position manager that pools many users under one key would share a commitment with them; every mainstream position manager gives each position its own key, but a custom router need not.
+ * @custom:chains base,arbitrum,unichain,robinhood,ethereum,optimism,polygon,bnb
  */
 contract LiquidityFloorHook is ForgeHook, PoolConfigurable {
     /// @notice Basis-point denominator.
