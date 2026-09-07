@@ -227,5 +227,215 @@
         "format": "wad"
       }
     ]
+  },
+  "circuit-breaker": {
+    "panel": "guard",
+    "title": "A pool that stops rather than being drained",
+    "lede": "After a move larger than its threshold the pool halts swaps for a cooldown and resumes on its own. Withdrawals are never blocked.",
+    "tryLabel": "Try a small swap",
+    "tryOtherLabel": "Try the other direction",
+    "calls": [
+      {
+        "name": "isHalted",
+        "outputs": [
+          "bool"
+        ],
+        "reads": [
+          {
+            "label": "Halted right now",
+            "format": "bool"
+          }
+        ]
+      },
+      {
+        "name": "haltedUntil",
+        "outputs": [
+          "uint64"
+        ],
+        "reads": [
+          {
+            "label": "Halted until (unix)",
+            "format": "raw"
+          }
+        ]
+      }
+    ],
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG",
+      "config": "CircuitBreakerHook.Config({maxTickMove: 200, windowSeconds: 300, cooldownSeconds: 900})",
+      "dynamicFee": false
+    }
+  },
+  "oracle-band": {
+    "panel": "guard",
+    "title": "A pool that will not be walked away from reality",
+    "lede": "Swaps must clear inside a band around a signed reference price. Outside it the pool declines, and says by how much.",
+    "calls": [
+      {
+        "name": "deviation",
+        "outputs": [
+          "uint256",
+          "bool"
+        ],
+        "reads": [
+          {
+            "index": 0,
+            "label": "Deviation from the reference",
+            "format": "bps"
+          },
+          {
+            "index": 1,
+            "label": "Inside the band",
+            "format": "bool"
+          }
+        ]
+      }
+    ]
+  },
+  "drawdown-cap": {
+    "panel": "guard",
+    "title": "A cap on how far one address can move the price",
+    "lede": "Each address gets a price-impact budget per epoch. Spend it and the pool declines the rest until the epoch turns.",
+    "calls": [
+      {
+        "name": "headroom",
+        "outputs": [
+          "uint256",
+          "uint256"
+        ],
+        "reads": [
+          {
+            "index": 0,
+            "label": "Ticks of impact left this epoch",
+            "format": "raw"
+          },
+          {
+            "index": 1,
+            "label": "Epoch resets at (unix)",
+            "format": "raw"
+          }
+        ]
+      },
+      {
+        "name": "limitTick",
+        "outputs": [
+          "int24"
+        ],
+        "reads": [
+          {
+            "label": "Furthest tick allowed",
+            "format": "raw"
+          }
+        ]
+      }
+    ],
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG",
+      "config": "DrawdownCapHook.Config({maxFallTicks: 500, epochSeconds: 3600})",
+      "dynamicFee": false
+    }
+  },
+  "depeg-shield": {
+    "panel": "guard",
+    "title": "Fees that fight the depeg",
+    "lede": "The further the pool drifts from its peg, the more a swap that widens the gap pays, and the less one that closes it does.",
+    "tryLabel": "Push away from the peg",
+    "tryOtherLabel": "Push back toward it",
+    "calls": [
+      {
+        "name": "quoteFee",
+        "inputs": [
+          "bytes32",
+          "bool"
+        ],
+        "args": [
+          "poolId",
+          true
+        ],
+        "outputs": [
+          "uint24",
+          "uint256",
+          "bool"
+        ],
+        "reads": [
+          {
+            "index": 0,
+            "label": "Fee to push away from the peg",
+            "format": "pips"
+          },
+          {
+            "index": 1,
+            "label": "Ticks from the peg",
+            "format": "raw"
+          }
+        ]
+      },
+      {
+        "name": "quoteFee",
+        "inputs": [
+          "bytes32",
+          "bool"
+        ],
+        "args": [
+          "poolId",
+          false
+        ],
+        "outputs": [
+          "uint24",
+          "uint256",
+          "bool"
+        ],
+        "reads": [
+          {
+            "index": 0,
+            "label": "Fee to push back toward it",
+            "format": "pips"
+          }
+        ]
+      }
+    ],
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG",
+      "config": "DepegShieldHook.Config({pegTick: 0, baseFee: 500, minFee: 100, maxSurcharge: 20_000, halfDeviationTicks: 200})",
+      "dynamicFee": true
+    }
+  },
+  "dutch-clearing-launch": {
+    "panel": "guard",
+    "title": "The pool will not sell below its schedule",
+    "lede": "A descending floor. Buy below it and the pool refuses; wait and the floor comes to you. Selling is never restricted.",
+    "tryLabel": "Try to buy",
+    "tryOtherLabel": "Sell (never restricted)",
+    "calls": [
+      {
+        "name": "currentFloorX96",
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Floor right now",
+            "format": "q96"
+          }
+        ]
+      },
+      {
+        "name": "cleared",
+        "outputs": [
+          "bool"
+        ],
+        "reads": [
+          {
+            "label": "Has cleared",
+            "format": "bool"
+          }
+        ]
+      }
+    ],
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.AFTER_SWAP_FLAG",
+      "config": "DutchClearingLaunchHook.Config({startPriceX96: uint160(4 * Q96), floorPriceX96: uint160(Q96 / 2), startTime: uint64(block.timestamp), duration: 3600, buyIsZeroForOne: false})",
+      "dynamicFee": false
+    }
   }
 }

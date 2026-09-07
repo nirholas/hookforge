@@ -221,7 +221,7 @@ export function mountX402Gate(root, context) {
       await refresh();
       feed.set("ok", `Minted. You can pay the pool's price now.`);
     } catch (error) {
-      feed.set("error", readableError(error));
+      feed.set("error", readableError(error, deployment.errors ?? []));
     }
   }
 
@@ -303,7 +303,7 @@ export function mountX402Gate(root, context) {
         });
         await runSwap(hookData);
       } catch (error) {
-        feed.set("error", readableError(error));
+        feed.set("error", readableError(error, deployment.errors ?? []));
       }
     });
   }
@@ -359,6 +359,9 @@ export function mountX402Gate(root, context) {
       });
 
       const receipt = await publicClient.waitForTransactionReceipt({hash});
+      // A wallet client does not throw on a reverted transaction, so the status has to be read or a refusal is
+      // reported as a success.
+      if (receipt.status !== "success") throw new Error("The swap reverted on-chain.");
       const link = explorerFor(deployment.chainId, "tx", hash);
       feed.set("ok", paid ? "Paid and swapped." : "Swapped at the undiscounted fee.", link ? {href: link, text: "View"} : null);
 
@@ -366,7 +369,7 @@ export function mountX402Gate(root, context) {
       renderComparison();
       await refresh();
     } catch (error) {
-      feed.set("error", readableError(error));
+      feed.set("error", readableError(error, deployment.errors ?? []));
     }
   }
 
@@ -398,8 +401,8 @@ export function mountX402Gate(root, context) {
     );
   }
 
-  refresh().catch((error) => feed.set("error", readableError(error)));
-  session.onChange(() => refresh().catch((error) => feed.set("error", readableError(error))));
+  refresh().catch((error) => feed.set("error", readableError(error, deployment.errors ?? [])));
+  session.onChange(() => refresh().catch((error) => feed.set("error", readableError(error, deployment.errors ?? []))));
 
   return {refresh};
 }

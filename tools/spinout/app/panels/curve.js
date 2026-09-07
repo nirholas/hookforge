@@ -211,7 +211,7 @@ export function mountCurve(root, context) {
         const outDecimals = zeroForOne ? tokens.decimals1 : tokens.decimals0;
         result.textContent = `${formatAmount(out, outDecimals, 5)} ${outSymbol}`;
       } catch (error) {
-        result.textContent = readableError(error);
+        result.textContent = readableError(error, deployment.errors ?? []);
       }
     }
 
@@ -250,7 +250,7 @@ export function mountCurve(root, context) {
       await refresh();
       feed.set("ok", "Minted.");
     } catch (error) {
-      feed.set("error", readableError(error));
+      feed.set("error", readableError(error, deployment.errors ?? []));
     }
   }
 
@@ -305,11 +305,11 @@ export function mountCurve(root, context) {
       feed.set("ok", "Added. Your shares are a claim on both reserves.", link ? {href: link, text: "View"} : null);
       await refresh();
     } catch (error) {
-      feed.set("error", readableError(error));
+      feed.set("error", readableError(error, deployment.errors ?? []));
     }
   }
 
-  refresh().catch((error) => feed.set("error", readableError(error)));
-  session.onChange(() => refresh().catch((error) => feed.set("error", readableError(error))));
+  refresh().catch((error) => feed.set("error", readableError(error, deployment.errors ?? [])));
+  session.onChange(() => refresh().catch((error) => feed.set("error", readableError(error, deployment.errors ?? []))));
   return {refresh};
 }

@@ -264,7 +264,7 @@ export function mountFeeHook(root, context) {
       await refresh();
       feed.set("ok", "Minted. You can swap now.");
     } catch (error) {
-      feed.set("error", readableError(error));
+      feed.set("error", readableError(error, deployment.errors ?? []));
     }
   }
 
@@ -315,7 +315,8 @@ export function mountFeeHook(root, context) {
         ],
         account: session.account,
       });
-      await publicClient.waitForTransactionReceipt({hash});
+      const receipt = await publicClient.waitForTransactionReceipt({hash});
+      if (receipt.status !== "success") throw new Error("The swap reverted on-chain.");
 
       const link = explorerFor(deployment.chainId, "tx", hash);
       feed.set("ok", `Swapped at ${feeText(quoted)}.`, link ? {href: link, text: "View"} : null);
@@ -323,7 +324,7 @@ export function mountFeeHook(root, context) {
       renderComparison();
       await refresh();
     } catch (error) {
-      feed.set("error", readableError(error));
+      feed.set("error", readableError(error, deployment.errors ?? []));
     }
   }
 
@@ -354,7 +355,7 @@ export function mountFeeHook(root, context) {
     );
   }
 
-  refresh().catch((error) => feed.set("error", readableError(error)));
-  session.onChange(() => refresh().catch((error) => feed.set("error", readableError(error))));
+  refresh().catch((error) => feed.set("error", readableError(error, deployment.errors ?? [])));
+  session.onChange(() => refresh().catch((error) => feed.set("error", readableError(error, deployment.errors ?? []))));
   return {refresh};
 }

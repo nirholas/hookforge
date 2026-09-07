@@ -446,6 +446,13 @@ tr:last-child td { border-bottom: 0; }
 .quoter__label { font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); }
 .quoter__result { font-family: var(--mono); font-size: 1.35rem; font-weight: 600; color: var(--forge); word-break: break-all; }
 @media (max-width: 620px) { .quoter__row { grid-template-columns: 1fr; } }
+
+.attempts { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: .4rem; }
+.attempt { display: flex; align-items: baseline; gap: .6rem; font-size: .88rem; padding: .45rem .6rem; border-radius: var(--radius); background: var(--ink-sunken); border: 1px solid var(--line); }
+.attempt__badge { font-family: var(--mono); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; padding: .1rem .4rem; border-radius: 4px; flex: none; }
+.attempt--ok .attempt__badge { color: #4ecdc4; border: 1px solid rgba(78,205,196,.35); }
+.attempt--refused .attempt__badge { color: #ffc44d; border: 1px solid rgba(255,196,77,.35); }
+.attempt__detail { color: var(--text-dim); word-break: break-word; }
 `;
 
 
@@ -612,6 +619,7 @@ contract DeployLocal is Script {
     uint160 internal constant FLAGS = uint160(${recipe.flags});
     address internal constant CREATE2_DEPLOYER = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
     uint160 internal constant SQRT_PRICE_1_1 = 79228162514264337593543950336;
+    uint256 internal constant Q96 = 1 << 96;
 
     PoolManager internal manager;
     DemoToken internal weth;
@@ -710,13 +718,20 @@ function demoBundle() {
  *
  * Returns null when the hook has no demo at all, so a page never ships an interactive section that cannot work.
  */
-function deploymentsFor(slug) {
+function deploymentsFor(slug, hookAbi) {
   const demo = DEMOS[slug];
   if (!demo) return null;
 
   const path = join(HERE, "deployments", `${slug}.json`);
   const deployments = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {chains: {}};
-  return JSON.stringify({...deployments, demo});
+
+  // The hook's own error fragments travel with the config, so a refusal renders as the name the contract gave it
+  // rather than as a selector. Uniswap v4 wraps hook reverts, so without these every refusal is unreadable.
+  //
+  // Held at the top level rather than per chain: a local deploy merges its chain in afterwards, and anything
+  // attached to a chain that did not exist at generation time is simply lost.
+  const errors = (hookAbi ?? []).filter((entry) => entry.type === "error");
+  return JSON.stringify({...deployments, errors, demo});
 }
 
 /**
@@ -1116,7 +1131,7 @@ ${demoSection(hook, deployments, repoUrl)}
 
 /** Writes the whole `web/` tree, including the rasterised social card. */
 export function emitSite(repo, hook, {siteUrl, repoUrl, catalogueUrl}) {
-  const deployments = deploymentsFor(hook.slug);
+  const deployments = deploymentsFor(hook.slug, hook.abi);
 
   write(repo, "web/build.mjs", buildScript(hook, siteUrl, repoUrl, catalogueUrl));
   write(repo, "web/src/index.html", indexHtml(hook, {siteUrl, repoUrl, catalogueUrl, deployments}));

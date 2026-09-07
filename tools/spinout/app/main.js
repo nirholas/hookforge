@@ -9,6 +9,7 @@ import {clear, el} from "./ui.js";
 import {mountX402Gate} from "./panels/x402-gate.js";
 import {mountFeeHook} from "./panels/fee-hook.js";
 import {mountCurve} from "./panels/curve.js";
+import {mountGuard} from "./panels/guard.js";
 
 
 /** Whether a deployment points at an RPC only reachable from the machine running the chain. */
@@ -27,6 +28,7 @@ const PANELS = {
   "x402-gate": mountX402Gate,
   fee: mountFeeHook,
   curve: mountCurve,
+  guard: mountGuard,
 };
 
 const root = document.querySelector("[data-demo]");
@@ -131,7 +133,7 @@ async function start(node) {
 
     clear(body);
     mount(body, {
-      deployment: {...deployment, chainId: session.chainId, demo: config.demo},
+      deployment: {...deployment, chainId: session.chainId, demo: config.demo, errors: config.errors ?? []},
       clients: {publicClient, walletClient},
       session,
     });
