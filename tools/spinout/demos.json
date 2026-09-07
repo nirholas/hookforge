@@ -786,5 +786,38 @@
       "types": {}
     },
     "owedLabel": "unlocked and claimable"
+  },
+  "top-of-block-auction": {
+    "panel": "guard",
+    "title": "The first swap in a block is for sale",
+    "lede": "A searcher bids for the exclusive first slot in a future block and the pool keeps the money. Bid nothing and you simply cannot go first.",
+    "calls": [
+      {
+        "name": "earliestBiddableBlock",
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Earliest block you may bid on",
+            "format": "raw"
+          }
+        ]
+      },
+      {
+        "name": "proceeds",
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Proceeds accrued to the pool",
+            "format": "raw"
+          }
+        ]
+      }
+    ],
+    "tryLabel": "Try to swap first",
+    "tryOtherLabel": "Try the other direction"
   }
 }

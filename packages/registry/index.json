@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 26,
+  "count": 27,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -614,6 +614,24 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/tenure-weighted-fees",
       "manifest": "https://hookforge.pages.dev/schema/hooks/tenure-weighted-fees.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
+    },
+    {
+      "slug": "top-of-block-auction",
+      "name": "TopOfBlockAuction",
+      "family": "Order flow and MEV",
+      "summary": "Sells the right to trade first in a block, and gives the proceeds to the liquidity providers who are being traded against.",
+      "tags": [
+        "mev",
+        "auction",
+        "order-flow",
+        "lp-economics",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/top-of-block-auction",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/top-of-block-auction.json",
       "repo": null,
       "site": null,
       "deployments": []

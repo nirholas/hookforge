@@ -48,7 +48,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | [`ArbTaxDecay`](contracts/src/hooks/ArbTaxDecayHook.sol) | Prices staleness: the longer a pool sits untraded, the more the next swap pays, on a saturating curve. Recaptures loss-versus-rebalancing with no oracle. | shipped |
 | [`PriorityFeeTax`](contracts/src/hooks/PriorityFeeTaxHook.sol) | Charges a surcharge proportional to the swap's own priority fee, on the theory that toxic flow bids for position and benign flow does not. | shipped |
 | `BlockBatchClearing` | Queues every swap in a block and clears them at one uniform price, so ordering inside the block stops being worth anything. | building |
-| `TopOfBlockAuction` | An on-chain auction for the right to trade first in a block. The winning bid is paid to liquidity providers. | building |
+| [`TopOfBlockAuction`](contracts/src/hooks/TopOfBlockAuctionHook.sol) | Sells the right to trade first in a block and pays the proceeds to the providers whose stale quote created the value. | shipped |
 | [`FlowClassifier`](contracts/src/hooks/FlowClassifierHook.sol) | Publishes on-chain how much of a pool's flow arrives first in the block and how far it moves the price, as a public good other hooks can read. Changes nothing about the pool it measures. | shipped |
 | `ImpactSplit` | Splits a large swap into tranches across blocks and guarantees the result beats immediate execution or refunds the difference. | building |
 | `SandwichBond` | Lets a swapper post a bond that is returned unless a same-block backrun is detected, in which case it compensates them. | building |
