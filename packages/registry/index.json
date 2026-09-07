@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 21,
+  "count": 22,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -527,6 +527,24 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "reputation-fee",
+      "name": "ReputationFee",
+      "family": "Agent-native",
+      "summary": "Charges a counterparty according to how it has behaved, using an on-chain reputation registry, with no signature to present and nothing for a router to forward.",
+      "tags": [
+        "agent",
+        "reputation",
+        "dynamic-fee",
+        "erc8004",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/reputation-fee",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/reputation-fee.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
     },
     {
       "slug": "step-curve",
