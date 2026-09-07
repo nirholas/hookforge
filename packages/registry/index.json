@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 24,
+  "count": 25,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -320,6 +320,24 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/grid-ladder",
       "manifest": "https://hookforge.pages.dev/schema/hooks/grid-ladder.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
+    },
+    {
+      "slug": "il-insurance",
+      "name": "ILInsurance",
+      "family": "Risk",
+      "summary": "Pays liquidity providers back for divergence loss, out of a fund the pool's own trading fills.",
+      "tags": [
+        "risk",
+        "impermanent-loss",
+        "lp-economics",
+        "insurance",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/il-insurance",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/il-insurance.json",
       "repo": null,
       "site": null,
       "deployments": []

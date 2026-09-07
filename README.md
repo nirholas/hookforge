@@ -82,7 +82,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | [`CircuitBreaker`](contracts/src/hooks/CircuitBreakerHook.sol) | Halts swaps after a move larger than a threshold and resumes automatically after a cooldown. Withdrawals stay open. | shipped |
 | [`OracleBand`](contracts/src/hooks/OracleBandHook.sol) | Requires a swap to clear within a band around a signed reference price, so a thin pool cannot be walked away from reality. | shipped |
 | [`DepegShield`](contracts/src/hooks/DepegShieldHook.sol) | For pegged pairs: fees rise superlinearly with distance from the peg and fall for swaps that restore it. | shipped |
-| `ILInsurance` | Skims a slice of fees into a vault that pays impermanent-loss claims to the providers who funded it. | building |
+| [`ILInsurance`](contracts/src/hooks/ILInsuranceHook.sol) | Pays providers back for divergence loss out of a fund the pool's own trading fills, capped by what the fund actually holds. | shipped |
 | [`DrawdownCap`](contracts/src/hooks/DrawdownCapHook.sol) | Caps how much price impact one address may cause per epoch. | shipped |
 | [`LiquidityFloor`](contracts/src/hooks/LiquidityFloorHook.sol) | Holds each position to a fraction of its own additions until an unlock date, so commitments are fractional and race-free. | shipped |
 
