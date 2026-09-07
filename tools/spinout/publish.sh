@@ -25,8 +25,10 @@ declare -A PINS=(
 
 cd "$DIR"
 
-# The symlink used for local verification must never reach the repository.
-[ -L lib ] && rm -f lib
+# The lib directory used for local verification must never reach the repository, whether it is the symlink this
+# tooling makes or a real checkout left by `git clone --recurse-submodules`. Only the gitlinks below belong in the
+# tree; committing the dependency sources themselves would add hundreds of megabytes.
+if [ -L lib ]; then rm -f lib; elif [ -d lib ]; then mv lib "../.lib-stash-$SLUG"; fi
 
 rm -f .gitmodules
 for name in forge-std v4-core v4-periphery openzeppelin-contracts solmate uniswap-hooks prb-math; do

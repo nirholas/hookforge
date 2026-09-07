@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 25,
+  "count": 26,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -659,6 +659,24 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "vested-buy",
+      "name": "VestedBuy",
+      "family": "Time",
+      "summary": "Vests what a buyer receives, at the pool, so a launch can sell without handing every buyer a same-block exit.",
+      "tags": [
+        "launch",
+        "vesting",
+        "anti-flip",
+        "time",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/vested-buy",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/vested-buy.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
     },
     {
       "slug": "x402-gate",

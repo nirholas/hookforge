@@ -736,5 +736,55 @@
     "panel": "delegation",
     "title": "A spending limit the venue enforces",
     "lede": "A principal signs one budget for an agent; the agent signs each swap under it. The pool refuses anything past the cap, so the limit lives in the venue rather than in the agent's own code."
+  },
+  "il-insurance": {
+    "panel": "rewards",
+    "title": "Cover the pool pays for itself",
+    "lede": "A slice of every swap funds a cover fund. Withdraw for less than holding would have been worth and the fund pays the difference, up to what it actually holds.",
+    "calls": [
+      {
+        "name": "fund1",
+        "inputs": [],
+        "args": [],
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Cover fund",
+            "format": "token1"
+          }
+        ]
+      },
+      {
+        "name": "paidOut1",
+        "inputs": [],
+        "args": [],
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Paid in claims to date",
+            "format": "token1"
+          }
+        ]
+      }
+    ]
+  },
+  "vested-buy": {
+    "panel": "rewards",
+    "title": "Buy now, receive over time",
+    "lede": "Buying through this pool delivers part of the fill immediately and vests the rest. The token itself is untouched: no transfer hooks, no allowlist.",
+    "calls": [],
+    "owed": {
+      "name": "claimable",
+      "args": [
+        "poolId",
+        "account"
+      ],
+      "types": {}
+    },
+    "owedLabel": "unlocked and claimable"
   }
 }

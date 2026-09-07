@@ -45,8 +45,19 @@ if git ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
   git fetch -q origin main
   git rebase -q origin/main >/dev/null 2>&1 || { echo "  FAILED: could not rebase onto origin/main"; exit 1; }
 fi
-git push -q -u origin main 2>&1 | tail -1 || true
-echo "  pushed: $(git rev-parse --short HEAD)"
+if ! git push -q -u origin main 2>&1 | tail -2; then
+  echo "  FAILED: push rejected"; exit 1
+fi
+
+# Verify rather than assume. The previous version piped the push through `|| true` and then printed the local SHA,
+# so a failed authentication reported a successful push of a commit that never left the machine. Thirteen
+# repositories were silently behind before this was noticed.
+LOCAL=$(git rev-parse HEAD)
+REMOTE=$(git ls-remote origin main | cut -f1)
+if [ "$LOCAL" != "$REMOTE" ]; then
+  echo "  FAILED: push did not land (local ${LOCAL:0:7}, remote ${REMOTE:0:7})"; exit 1
+fi
+echo "  pushed: ${LOCAL:0:7}"
 
 node web/build.mjs >/dev/null
 URL=$(npx --yes wrangler@latest pages deploy web/dist --project-name "$SLUG" --branch main --commit-dirty=true 2>&1 \
