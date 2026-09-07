@@ -79,9 +79,9 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 
 | Hook | What it does | Status |
 | --- | --- | --- |
-| `CircuitBreaker` | Halts swaps after a move larger than a threshold and resumes automatically after a cooldown. Withdrawals stay open. | building |
+| [`CircuitBreaker`](contracts/src/hooks/CircuitBreakerHook.sol) | Halts swaps after a move larger than a threshold and resumes automatically after a cooldown. Withdrawals stay open. | shipped |
 | `OracleBand` | Requires a swap to clear within a band around a signed reference price, so a thin pool cannot be walked away from reality. | building |
-| `DepegShield` | For pegged pairs: fees rise superlinearly with distance from the peg and fall for swaps that restore it. | building |
+| [`DepegShield`](contracts/src/hooks/DepegShieldHook.sol) | For pegged pairs: fees rise superlinearly with distance from the peg and fall for swaps that restore it. | shipped |
 | `ILInsurance` | Skims a slice of fees into a vault that pays impermanent-loss claims to the providers who funded it. | building |
 | `DrawdownCap` | Caps how much price impact one address may cause per epoch. | building |
 | `LiquidityFloor` | Enforces a minimum liquidity that cannot leave while a pool is young. | building |
@@ -126,7 +126,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | `L1Anchor` | Anchors an L2 pool to a proven L1 price. | building |
 | `VarianceSwap` | Pays realized variance, making liquidity providers short volatility and traders long it, explicitly. | building |
 | `ImpliedVolFee` | Prices swaps off an implied-volatility surface rather than a realized-volatility estimate. | building |
-| `AntiSnipeRamp` | Starts a launch at a punitive fee that decays to normal, paying the difference to liquidity providers rather than the deployer. | building |
+| [`AntiSnipeRamp`](contracts/src/hooks/AntiSnipeRampHook.sol) | Starts a launch at a punitive fee that decays to normal, paying the difference to liquidity providers rather than the deployer. | shipped |
 | `CommitRevealDark` | Hides order size behind a hash commitment and clears the batch on reveal. | building |
 | `LotteryFees` | Sends a slice of fees to a no-loss lottery among the pool's liquidity providers. | building |
 | `ReserveStable` | Mints and burns against a reserve to hold a band, with the band enforced by the hook. | building |
