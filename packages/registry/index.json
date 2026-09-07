@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 12,
+  "count": 13,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -277,6 +277,22 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "markout-fee",
+      "name": "MarkoutFee",
+      "family": "Order flow and MEV",
+      "summary": "A fee that learns. The pool measures whether its own past trades turned out to be informed, and charges the next one accordingly.",
+      "tags": [
+        "mev",
+        "dynamic-fee",
+        "markout",
+        "adverse-selection",
+        "oracle-free"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/markout-fee",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/markout-fee.json",
+      "deployments": []
     },
     {
       "slug": "oracle-band",

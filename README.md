@@ -125,7 +125,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | `SharedLiquidity` | Mirrors one pool across chains and settles the net position, so liquidity is not fragmented per chain. | building |
 | `L1Anchor` | Anchors an L2 pool to a proven L1 price. | building |
 | `VarianceSwap` | Pays realized variance, making liquidity providers short volatility and traders long it, explicitly. | building |
-| `ImpliedVolFee` | Prices swaps off an implied-volatility surface rather than a realized-volatility estimate. | building |
+| [`MarkoutFee`](contracts/src/hooks/MarkoutFeeHook.sol) | Grades each swap after the fact by whether the price kept moving its way, and prices the next one from the running average. A fee that measures adverse selection instead of guessing at it. | shipped |
 | [`AntiSnipeRamp`](contracts/src/hooks/AntiSnipeRampHook.sol) | Starts a launch at a punitive fee that decays to normal, paying the difference to liquidity providers rather than the deployer. | shipped |
 | `CommitRevealDark` | Hides order size behind a hash commitment and clears the batch on reveal. | building |
 | `LotteryFees` | Sends a slice of fees to a no-loss lottery among the pool's liquidity providers. | building |
