@@ -9,3 +9,4 @@ v4-periphery/=lib/v4-periphery/src/
 uniswap-hooks/=lib/uniswap-hooks/src/
 solmate/=lib/solmate/
 permit2/=lib/permit2/
+@prb/math/=lib/prb-math/src/

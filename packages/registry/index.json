@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-07",
-  "count": 17,
+  "count": 18,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -389,6 +389,24 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "power-perp",
+      "name": "PowerPerp",
+      "family": "Curves",
+      "summary": "A pool with a weight, so a liquidity provider chooses how much of the move they want instead of always getting the square root of it.",
+      "tags": [
+        "curve",
+        "custom-curve",
+        "weighted",
+        "lp-economics",
+        "exposure"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/power-perp",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/power-perp.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
     },
     {
       "slug": "priority-fee-tax",

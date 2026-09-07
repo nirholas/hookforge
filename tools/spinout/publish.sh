@@ -20,6 +20,7 @@ declare -A PINS=(
   [openzeppelin-contracts]="bbf3600dc2fd09c7409c5e9d65e2faea36f35115 https://github.com/OpenZeppelin/openzeppelin-contracts"
   [solmate]="89365b880c4f3c786bdd453d4b8e8fe410344a69 https://github.com/transmissions11/solmate"
   [uniswap-hooks]="2ae32be4906d300fc49b4384842ef6bc3e902d73 https://github.com/OpenZeppelin/uniswap-hooks"
+  [prb-math]="5010593538ab97f92f96175daf5ab9337168964f https://github.com/PaulRBerg/prb-math"
 )
 
 cd "$DIR"
@@ -28,7 +29,7 @@ cd "$DIR"
 [ -L lib ] && rm -f lib
 
 rm -f .gitmodules
-for name in forge-std v4-core v4-periphery openzeppelin-contracts solmate uniswap-hooks; do
+for name in forge-std v4-core v4-periphery openzeppelin-contracts solmate uniswap-hooks prb-math; do
   read -r sha url <<<"${PINS[$name]}"
   printf '[submodule "lib/%s"]\n\tpath = lib/%s\n\turl = %s\n' "$name" "$name" "$url" >> .gitmodules
 done
@@ -39,7 +40,7 @@ git config user.email "claudescammer@outlook.com"
 git config commit.gpgsign false
 
 git add -A
-for name in forge-std v4-core v4-periphery openzeppelin-contracts solmate uniswap-hooks; do
+for name in forge-std v4-core v4-periphery openzeppelin-contracts solmate uniswap-hooks prb-math; do
   read -r sha url <<<"${PINS[$name]}"
   git update-index --add --cacheinfo "160000,$sha,lib/$name"
 done

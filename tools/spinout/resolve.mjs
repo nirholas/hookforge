@@ -55,6 +55,7 @@ export function externalPackages(root, files) {
       else if (specifier.startsWith("uniswap-hooks")) packages.add("uniswap-hooks");
       else if (specifier.startsWith("forge-std")) packages.add("forge-std");
       else if (specifier.startsWith("solmate")) packages.add("solmate");
+      else if (specifier.startsWith("@prb/math")) packages.add("prb-math");
     }
   }
   return packages;

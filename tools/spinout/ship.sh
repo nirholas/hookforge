@@ -37,7 +37,16 @@ bash "$ROOT/tools/spinout/publish.sh" "$SLUG" "$DIR" >/dev/null
 
 cd "$DIR"
 git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/nirholas/$SLUG.git"
+
+# Somebody else may have committed to the published repository since the last ship (the account owner runs
+# maintenance commits across every repo). Rebase onto whatever is there rather than failing the push or, worse,
+# forcing over it.
+if git ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
+  git fetch -q origin main
+  git rebase -q origin/main >/dev/null 2>&1 || { echo "  FAILED: could not rebase onto origin/main"; exit 1; }
+fi
 git push -q -u origin main 2>&1 | tail -1 || true
+echo "  pushed: $(git rev-parse --short HEAD)"
 
 node web/build.mjs >/dev/null
 URL=$(npx --yes wrangler@latest pages deploy web/dist --project-name "$SLUG" --branch main --commit-dirty=true 2>&1 \

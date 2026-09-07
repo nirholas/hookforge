@@ -59,7 +59,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | --- | --- | --- |
 | `YieldSpace` | A fixed-rate curve with a maturity, converging to par at expiry. Interest-rate markets as a native v4 pool. | building |
 | `LMSR` | A logarithmic market scoring rule curve, giving prediction markets bounded loss and always-available liquidity. | building |
-| `PowerPerp` | An `x^p` invariant, so an LP position has power-perpetual payoff instead of the usual square-root exposure. | building |
+| [`PowerPerp`](contracts/src/hooks/PowerPerpHook.sol) | A weighted geometric-mean curve, so a provider chooses how much of the price move they want instead of always getting the square root of it. | shipped |
 | [`RatchetFloor`](contracts/src/hooks/RatchetFloorHook.sol) | A protocol-owned bid that can only move up, giving a token a floor price that is enforced by the curve. | shipped |
 | `GridLadder` | Asymmetric bid and ask ladders in one position, so an LP can quote a spread rather than a symmetric range. | building |
 | [`DutchClearingLaunch`](contracts/src/hooks/DutchClearingLaunchHook.sol) | A descending-price launch enforced as a floor on what the pool will sell at, so the opening price is discovered rather than declared. | shipped |
