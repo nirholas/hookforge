@@ -10,7 +10,7 @@ pragma solidity ^0.8.26;
  * ERC-165 id, all answerable from constants, so implementing it costs no storage and ~200 gas to query.
  *
  * `specURI` should resolve to a machine-readable document following the HookForge hook manifest schema
- * (https://hookforge.dev/schema/hook-manifest.json), which carries the risk notes, parameters and audit status that do
+ * (https://hookforge.pages.dev/schema/hook-manifest.json), which carries the risk notes, parameters and audit status that do
  * not belong on-chain.
  */
 interface IHookMetadata {

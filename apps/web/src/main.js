@@ -1,5 +1,5 @@
 /**
- * Client entry for hookforge.dev.
+ * Client entry for hookforge.pages.dev.
  *
  * Every page is server-rendered HTML generated from the hook registry, so this file only adds behaviour that needs a
  * browser: the three.js lifecycle scenes, catalogue filtering, and copy buttons. If it fails to load, the catalogue is

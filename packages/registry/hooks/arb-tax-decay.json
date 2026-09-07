@@ -1,5 +1,5 @@
 {
-  "$schema": "https://hookforge.dev/schema/hook-manifest.json",
+  "$schema": "https://hookforge.pages.dev/schema/hook-manifest.json",
   "slug": "arb-tax-decay",
   "name": "ArbTaxDecay",
   "contract": "ArbTaxDecayHook",
@@ -26,7 +26,7 @@
     "bnb"
   ],
   "source": "contracts/src/hooks/ArbTaxDecayHook.sol",
-  "docs": "https://hookforge.dev/hooks/arb-tax-decay",
+  "docs": "https://hookforge.pages.dev/hooks/arb-tax-decay",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,
@@ -106,25 +106,25 @@
     {
       "chain": "unichain",
       "chainId": 130,
-      "address": "0xaD2e51cEB82F517C8e67559FfDc89B5F8C705080",
+      "address": "0x7C74267c059d1F073bE0D38ce2593a122e399080",
       "status": "deterministic"
     },
     {
       "chain": "robinhood",
       "chainId": 4663,
-      "address": "0xB3eaD21616aAC0aBC83E8f4CE826242d5fEdD080",
+      "address": "0x968b61840d695f6232004bdA038f28B9Af34D080",
       "status": "deterministic"
     },
     {
       "chain": "base",
       "chainId": 8453,
-      "address": "0x1A0e586A71F401c2E511c7e6fAf7197112915080",
+      "address": "0x497DF79D84864CF23B9e1fF5966f01dD03dF5080",
       "status": "deterministic"
     },
     {
       "chain": "arbitrum",
       "chainId": 42161,
-      "address": "0xE4014d2671834C7FdD6aA44A28AA217498359080",
+      "address": "0x06135B883a7220f1a4dE96dB557014C7d4009080",
       "status": "deterministic"
     }
   ],

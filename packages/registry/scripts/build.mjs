@@ -175,7 +175,7 @@ function buildHook(contractName, chains, deployments) {
   const abi = artifact.abi ?? [];
 
   return {
-    $schema: "https://hookforge.dev/schema/hook-manifest.json",
+    $schema: "https://hookforge.pages.dev/schema/hook-manifest.json",
     slug: tags.slug ?? contractName.toLowerCase(),
     name,
     contract: contractName,
@@ -188,7 +188,7 @@ function buildHook(contractName, chains, deployments) {
     tags: hookTags(source),
     recommendedChains: (tags.chains ?? "").split(",").filter(Boolean),
     source: `contracts/src/hooks/${contractName}.sol`,
-    docs: `https://hookforge.dev/hooks/${tags.slug ?? contractName.toLowerCase()}`,
+    docs: `https://hookforge.pages.dev/hooks/${tags.slug ?? contractName.toLowerCase()}`,
     permissions,
     permissionsSource,
     properties: {
@@ -238,7 +238,7 @@ function main() {
       summary: hook.summary,
       tags: hook.tags,
       docs: hook.docs,
-      manifest: `https://hookforge.dev/schema/hooks/${hook.slug}.json`,
+      manifest: `https://hookforge.pages.dev/schema/hooks/${hook.slug}.json`,
       // `status` rides along: a deterministic address is where the hook *will* be, and a consumer that cannot
       // tell that from a live deployment would misreport an undeployed hook as live.
       deployments: hook.deployments.map((d) => ({chain: d.chain, chainId: d.chainId, address: d.address, status: d.status})),
@@ -250,10 +250,10 @@ function main() {
     join(OUT, "index.json"),
     `${JSON.stringify(
       {
-        $schema: "https://hookforge.dev/schema/registry.json",
+        $schema: "https://hookforge.pages.dev/schema/registry.json",
         name: "HookForge",
         description: "Production Uniswap v4 hooks with on-chain self-description.",
-        homepage: "https://hookforge.dev",
+        homepage: "https://hookforge.pages.dev",
         generated: new Date().toISOString().slice(0, 10),
         count: index.length,
         hooks: index,

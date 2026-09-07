@@ -2,7 +2,7 @@ import {esc, h} from "./html.mjs";
 
 export const SITE = {
   name: "HookForge",
-  url: "https://hookforge.dev",
+  url: "https://hookforge.pages.dev",
   tagline: "50 production Uniswap v4 hooks that do not exist yet",
   repo: "https://github.com/nirholas/hookforge",
   description:

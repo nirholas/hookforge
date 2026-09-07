@@ -1,4 +1,4 @@
-# hookforge.dev
+# hookforge.pages.dev
 
 The catalogue and documentation site. Static HTML generated from the hook registry, with two three.js scenes.
 

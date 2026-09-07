@@ -2,7 +2,7 @@
   "name": "@hookforge/web",
   "version": "1.0.0",
   "private": true,
-  "description": "hookforge.dev: the 3D catalogue and documentation for the HookForge Uniswap v4 hooks.",
+  "description": "hookforge.pages.dev: the 3D catalogue and documentation for the HookForge Uniswap v4 hooks.",
   "license": "MIT",
   "type": "module",
   "scripts": {

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://hookforge.dev/schema/hook-manifest.json",
+  "$schema": "https://hookforge.pages.dev/schema/hook-manifest.json",
   "slug": "liquidity-floor",
   "name": "LiquidityFloor",
   "contract": "LiquidityFloorHook",
@@ -26,7 +26,7 @@
     "bnb"
   ],
   "source": "contracts/src/hooks/LiquidityFloorHook.sol",
-  "docs": "https://hookforge.dev/hooks/liquidity-floor",
+  "docs": "https://hookforge.pages.dev/hooks/liquidity-floor",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

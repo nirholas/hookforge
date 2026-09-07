@@ -29,7 +29,7 @@ const {poolId, hook, catalogue} = await describePool(client, {
 
 hook.name;                  // "CircuitBreaker"
 hook.permissions.afterSwap; // true, read from the address itself
-catalogue?.docs;            // https://hookforge.dev/hooks/circuit-breaker
+catalogue?.docs;            // https://hookforge.pages.dev/hooks/circuit-breaker
 ```
 
 ## Browse the catalogue

@@ -134,7 +134,7 @@ const {poolId, hook, catalogue} = await describePool(client, {
 
 hook.name;                  // "CircuitBreaker"
 hook.permissions.afterSwap; // true
-catalogue?.docs;            // https://hookforge.dev/hooks/circuit-breaker</code></pre>
+catalogue?.docs;            // https://hookforge.pages.dev/hooks/circuit-breaker</code></pre>
 
 <h2>Decode a hook with no network at all</h2>
 <p>

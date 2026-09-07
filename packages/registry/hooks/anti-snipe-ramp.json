@@ -1,5 +1,5 @@
 {
-  "$schema": "https://hookforge.dev/schema/hook-manifest.json",
+  "$schema": "https://hookforge.pages.dev/schema/hook-manifest.json",
   "slug": "anti-snipe-ramp",
   "name": "AntiSnipeRamp",
   "contract": "AntiSnipeRampHook",
@@ -26,7 +26,7 @@
     "bnb"
   ],
   "source": "contracts/src/hooks/AntiSnipeRampHook.sol",
-  "docs": "https://hookforge.dev/hooks/anti-snipe-ramp",
+  "docs": "https://hookforge.pages.dev/hooks/anti-snipe-ramp",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,
@@ -110,25 +110,25 @@
     {
       "chain": "unichain",
       "chainId": 130,
-      "address": "0xa712fa3ecD3a5260389a9115d09E7A8Ccf5e5080",
+      "address": "0x53D7d95607a608369cEF06018C0D7aE2505Dd080",
       "status": "deterministic"
     },
     {
       "chain": "robinhood",
       "chainId": 4663,
-      "address": "0x885B7D5F9C96B9434a14Cfd0BdC8D8c6aE5F5080",
+      "address": "0x20A9Ef8C1916c549eBa01Fe4e486be2adc0Bd080",
       "status": "deterministic"
     },
     {
       "chain": "base",
       "chainId": 8453,
-      "address": "0x3C2ebA98374549AF1f7FC909265146E78C881080",
+      "address": "0x6A35Ea8E3bCbCB45Ca764CD097F9495FB1709080",
       "status": "deterministic"
     },
     {
       "chain": "arbitrum",
       "chainId": 42161,
-      "address": "0xd0Debb7531F0960ccd0061306bDeC1FBF6Da5080",
+      "address": "0xdD3d11653d22120D31D3d0FbfA7c1A763BA71080",
       "status": "deterministic"
     }
   ],

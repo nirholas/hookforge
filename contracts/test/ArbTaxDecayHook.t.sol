@@ -53,7 +53,7 @@ contract ArbTaxDecayHookTest is ForgeTest {
 
     function test_metadata() public view {
         assertMetadata(address(hook), "ArbTaxDecay");
-        assertEq(hook.specURI(), "https://hookforge.dev/schema/hooks/arb-tax-decay.json");
+        assertEq(hook.specURI(), "https://hookforge.pages.dev/schema/hooks/arb-tax-decay.json");
     }
 
     function test_configure_storesParameters() public view {

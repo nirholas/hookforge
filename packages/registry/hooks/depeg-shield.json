@@ -1,5 +1,5 @@
 {
-  "$schema": "https://hookforge.dev/schema/hook-manifest.json",
+  "$schema": "https://hookforge.pages.dev/schema/hook-manifest.json",
   "slug": "depeg-shield",
   "name": "DepegShield",
   "contract": "DepegShieldHook",
@@ -26,7 +26,7 @@
     "bnb"
   ],
   "source": "contracts/src/hooks/DepegShieldHook.sol",
-  "docs": "https://hookforge.dev/hooks/depeg-shield",
+  "docs": "https://hookforge.pages.dev/hooks/depeg-shield",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,
@@ -114,25 +114,25 @@
     {
       "chain": "unichain",
       "chainId": 130,
-      "address": "0xe0898d4881d0cdF143c4921e04fDa13908019080",
+      "address": "0x6536608422113CFF4cbDb9c413E447EEd1fF1080",
       "status": "deterministic"
     },
     {
       "chain": "robinhood",
       "chainId": 4663,
-      "address": "0xf6e63D5e5F90127CE74949F6e207a05518c0D080",
+      "address": "0x6D7B49F497e6Dec999147dF461038AE312609080",
       "status": "deterministic"
     },
     {
       "chain": "base",
       "chainId": 8453,
-      "address": "0x9Bc7695a864eDc8ecE0B4a315ceF612c7DbB1080",
+      "address": "0xFe88b1eECB9AeFF393f4E7a7fFBB1f80392D9080",
       "status": "deterministic"
     },
     {
       "chain": "arbitrum",
       "chainId": 42161,
-      "address": "0xf6DeaDf77EDDB78eCFea2FeAAD7bBbAB88511080",
+      "address": "0xb888b2e1886d4C703c53C2a1650ced1262bCd080",
       "status": "deterministic"
     }
   ],

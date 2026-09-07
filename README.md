@@ -142,7 +142,7 @@ contracts/          Foundry project: hooks, shared bases, libraries, tests, depl
 packages/sdk/       TypeScript client: addresses, ABIs, quote helpers
 packages/registry/  Machine-readable hook manifests and the hooklist submissions
 packages/mcp/       MCP server so coding agents can query the catalogue
-apps/web/           hookforge.dev: 3D catalogue and documentation
+apps/web/           hookforge.pages.dev: 3D catalogue and documentation
 docs/               Long-form documentation, one page per hook
 ```
 
@@ -160,7 +160,7 @@ Foundry 1.7 or newer, Solidity 0.8.26, EVM version `cancun` (v4 requires transie
 ## Deployed addresses
 
 Deployment addresses are published in [`packages/registry`](packages/registry) and on
-[hookforge.dev](https://hookforge.dev) as each hook ships.
+[hookforge.dev](https://hookforge.pages.dev) as each hook ships.
 
 ## Contributing
 

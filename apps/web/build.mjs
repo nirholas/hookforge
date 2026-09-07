@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Generates hookforge.dev.
+ * Generates hookforge.pages.dev.
  *
  * Every page is static HTML rendered from the hook registry, which is itself generated from the Solidity. Vite has
  * already bundled the client modules into hashed assets by the time this runs; this script reads Vite's manifest so
@@ -132,19 +132,19 @@ write("og/hooks.png", siteCard({
   eyebrow: "Catalogue",
   title: `${hooks.length} shipped hooks`,
   summary: "Searchable by the problem: MEV and order flow, curves, risk, LP economics, launches, time, agents.",
-  footer: "hookforge.dev/hooks",
+  footer: "hookforge.pages.dev/hooks",
 }));
 write("og/chains.png", siteCard({
   eyebrow: "Deployment",
   title: "Chains and addresses",
   summary: "PoolManager addresses and deterministic hook addresses for Base, Arbitrum, Unichain and Robinhood Chain.",
-  footer: "hookforge.dev/chains",
+  footer: "hookforge.pages.dev/chains",
 }));
 write("og/docs.png", siteCard({
   eyebrow: "Documentation",
   title: "Build with HookForge",
   summary: "The SDK, the MCP server, on-chain hook metadata, and how to deploy a hook to a mined address.",
-  footer: "hookforge.dev/docs",
+  footer: "hookforge.pages.dev/docs",
 }));
 for (const hook of hooks) write(`og/hooks/${hook.slug}.png`, hookCard(hook));
 
@@ -166,7 +166,7 @@ ${pages
 
 write(
   "robots.txt",
-  `# hookforge.dev
+  `# hookforge.pages.dev
 # The catalogue is meant to be read by machines as well as people. Nothing here is rate limited or gated,
 # and the JSON endpoints below are cheaper for you than parsing the HTML.
 User-agent: *

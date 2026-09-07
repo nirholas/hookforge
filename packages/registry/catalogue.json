@@ -1,5 +1,5 @@
 {
-  "$schema": "https://hookforge.dev/schema/catalogue.json",
+  "$schema": "https://hookforge.pages.dev/schema/catalogue.json",
   "description": "The fifty hooks HookForge set out to build. Entries whose contract has shipped are described authoritatively by their generated manifest in hooks/; this file is the plan, and the source of the roadmap.",
   "count": 50,
   "hooks": [

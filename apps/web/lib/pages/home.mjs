@@ -4,7 +4,6 @@ import {hookCard} from "./catalogue.mjs";
 
 export function homePage({hooks, planned, chains, assets, testCount}) {
   const featured = hooks.slice(0, 6);
-  const lead = hooks[0];
 
   const jsonLd = [
     {
@@ -33,11 +32,12 @@ export function homePage({hooks, planned, chains, assets, testCount}) {
 
   const body = h`
 <section class="hero">
+  <canvas class="hero__canvas" data-hero aria-hidden="true"></canvas>
   <div class="shell hero__inner">
     <div class="prose">
       <p class="eyebrow">Uniswap v4 hooks</p>
       <h1>Mechanisms nobody built yet, written properly.</h1>
-      <p>
+      <p class="lede">
         Uniswap v4 turned the AMM into a platform, and most of what has been built on it re-implements something that
         already worked: limit orders, TWAMM, a KYC gate, another dynamic fee. HookForge is a catalogue of what is
         missing. Every hook is checked against the roughly 140 published hooks and hackathon submissions before it is
@@ -51,24 +51,17 @@ export function homePage({hooks, planned, chains, assets, testCount}) {
       </div>
     </div>
 
-    <div class="hero__canvas lifecycle">
-      <canvas data-permissions="${esc(JSON.stringify(lead?.permissions ?? {}))}" aria-hidden="true"></canvas>
-      <p class="lifecycle__fallback">
-        A Uniswap v4 pool offers fourteen points at which a hook may intervene. Which ones a hook claims is encoded in
-        the low fourteen bits of its own address.
-      </p>
-    </div>
   </div>
 </section>
 
 <section class="shell">
-  <ul class="stats">
-    <li class="stat"><strong>${hooks.length}</strong><span>hooks shipped</span></li>
-    <li class="stat"><strong>${hooks.length + planned.length}</strong><span>in the catalogue</span></li>
-    <li class="stat"><strong>${testCount}</strong><span>tests passing</span></li>
-    <li class="stat"><strong>${chains.length}</strong><span>chains in the address book</span></li>
-    <li class="stat"><strong>0</strong><span>admin keys</span></li>
-  </ul>
+  <dl class="stats">
+    <div class="stat"><dt>Hooks shipped</dt><dd>${hooks.length}</dd></div>
+    <div class="stat"><dt>In the catalogue</dt><dd>${hooks.length + planned.length}</dd></div>
+    <div class="stat"><dt>Tests passing</dt><dd>${testCount}</dd></div>
+    <div class="stat"><dt>Chains</dt><dd>${chains.length}</dd></div>
+    <div class="stat"><dt>Admin keys</dt><dd>0</dd></div>
+  </dl>
 </section>
 
 <section class="shell">

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://hookforge.dev/schema/hook-manifest.json",
+  "$schema": "https://hookforge.pages.dev/schema/hook-manifest.json",
   "slug": "circuit-breaker",
   "name": "CircuitBreaker",
   "contract": "CircuitBreakerHook",
@@ -26,7 +26,7 @@
     "bnb"
   ],
   "source": "contracts/src/hooks/CircuitBreakerHook.sol",
-  "docs": "https://hookforge.dev/hooks/circuit-breaker",
+  "docs": "https://hookforge.pages.dev/hooks/circuit-breaker",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,
@@ -98,25 +98,25 @@
     {
       "chain": "unichain",
       "chainId": 130,
-      "address": "0x0b2A21Bc92AFdFb9DABF19F0359A0c60701990c0",
+      "address": "0x0c21ED115396E51B78CD658DA833369AeE3750c0",
       "status": "deterministic"
     },
     {
       "chain": "robinhood",
       "chainId": 4663,
-      "address": "0x2f652188F365D255860CDA638bBafd6F91d1D0c0",
+      "address": "0xD80eef4823D8Fa3219604629703f96DaAa4090C0",
       "status": "deterministic"
     },
     {
       "chain": "base",
       "chainId": 8453,
-      "address": "0x4893e7438ee8d2Ee400b7c4d88493f0F51e650C0",
+      "address": "0x799a653385E6d50770b1e6E7bc1994674C7e10C0",
       "status": "deterministic"
     },
     {
       "chain": "arbitrum",
       "chainId": 42161,
-      "address": "0xf4dC1c4587044572A61f42F046809681602190c0",
+      "address": "0x7b353a0b80170F165dc07C9F9b8903Ce9b92d0C0",
       "status": "deterministic"
     }
   ],

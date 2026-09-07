@@ -1,5 +1,5 @@
 {
-  "$schema": "https://hookforge.dev/schema/hook-manifest.json",
+  "$schema": "https://hookforge.pages.dev/schema/hook-manifest.json",
   "slug": "trading-calendar",
   "name": "TradingCalendar",
   "contract": "TradingCalendarHook",
@@ -26,7 +26,7 @@
     "bnb"
   ],
   "source": "contracts/src/hooks/TradingCalendarHook.sol",
-  "docs": "https://hookforge.dev/hooks/trading-calendar",
+  "docs": "https://hookforge.pages.dev/hooks/trading-calendar",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,

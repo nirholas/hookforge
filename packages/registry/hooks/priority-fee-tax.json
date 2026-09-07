@@ -1,5 +1,5 @@
 {
-  "$schema": "https://hookforge.dev/schema/hook-manifest.json",
+  "$schema": "https://hookforge.pages.dev/schema/hook-manifest.json",
   "slug": "priority-fee-tax",
   "name": "PriorityFeeTax",
   "contract": "PriorityFeeTaxHook",
@@ -23,7 +23,7 @@
     "robinhood"
   ],
   "source": "contracts/src/hooks/PriorityFeeTaxHook.sol",
-  "docs": "https://hookforge.dev/hooks/priority-fee-tax",
+  "docs": "https://hookforge.pages.dev/hooks/priority-fee-tax",
   "permissions": {
     "afterRemoveLiquidityReturnsDelta": false,
     "afterAddLiquidityReturnsDelta": false,
@@ -103,25 +103,25 @@
     {
       "chain": "unichain",
       "chainId": 130,
-      "address": "0x123A792F3B58367fFAE610Be8Fd69518b429D080",
+      "address": "0xE1cbeD2C3A27dE98202ac5EA439fc8Cb06a71080",
       "status": "deterministic"
     },
     {
       "chain": "robinhood",
       "chainId": 4663,
-      "address": "0xC9f88e5D2f4900240670a2fcB0fF077963961080",
+      "address": "0x9ae664D21C02e33658A608AF6A5fE8cC1fDE9080",
       "status": "deterministic"
     },
     {
       "chain": "base",
       "chainId": 8453,
-      "address": "0xb406d286F0A7E3fF88260674E66EeaA1A7b15080",
+      "address": "0x782f29DCa46C5b5d6D9321A824aAf901e18B5080",
       "status": "deterministic"
     },
     {
       "chain": "arbitrum",
       "chainId": 42161,
-      "address": "0x28991E242f5C69dF4f42dcFFc5B63BDABE025080",
+      "address": "0x8092f20876753cb41A4CCEA20665288C58af1080",
       "status": "deterministic"
     }
   ],

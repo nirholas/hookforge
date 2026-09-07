@@ -16,7 +16,7 @@ abstract contract ForgeMetadata is IHookMetadata, IERC165 {
     string internal constant FORGE_VERSION = "1.0.0";
 
     /// @dev Base URI for hook manifests: a hook's manifest lives at `SPEC_BASE + slug + ".json"`.
-    string internal constant SPEC_BASE = "https://hookforge.dev/schema/hooks/";
+    string internal constant SPEC_BASE = "https://hookforge.pages.dev/schema/hooks/";
 
     /// @inheritdoc IHookMetadata
     function hookName() external view virtual returns (string memory);
