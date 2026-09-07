@@ -130,9 +130,9 @@ contract PowerPerpHook is ForgeCurveHook {
 
         if (exactInput) {
             // out = reserveOut * (1 - (reserveIn / (reserveIn + in))^(wIn / wOut))
-            UD60x18 ratio = ud(reserveIn).div(ud(reserveIn + specifiedAmount));
-            UD60x18 factor = ratio.pow(wIn.div(wOut));
-            return ud(reserveOut).mul(ud(1e18).sub(factor)).unwrap();
+            UD60x18 inputRatio = ud(reserveIn).div(ud(reserveIn + specifiedAmount));
+            UD60x18 inputFactor = inputRatio.pow(wIn.div(wOut));
+            return ud(reserveOut).mul(ud(1e18).sub(inputFactor)).unwrap();
         }
 
         // in = reserveIn * ((reserveOut / (reserveOut - out))^(wOut / wIn) - 1)
