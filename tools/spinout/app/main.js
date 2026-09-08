@@ -16,6 +16,7 @@ import {mountCommit} from "./panels/commit.js";
 import {mountLease} from "./panels/lease.js";
 import {mountStream} from "./panels/stream.js";
 import {mountVault} from "./panels/vault.js";
+import {mountBatch} from "./panels/batch.js";
 
 
 /** Whether a deployment points at an RPC only reachable from the machine running the chain. */
@@ -41,6 +42,7 @@ const PANELS = {
   lease: mountLease,
   stream: mountStream,
   vault: mountVault,
+  batch: mountBatch,
 };
 
 const root = document.querySelector("[data-demo]");

@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-08",
-  "count": 37,
+  "count": 38,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -107,6 +107,24 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "block-batch-clearing",
+      "name": "BlockBatchClearing",
+      "family": "Order flow and MEV",
+      "summary": "Every swap in a block clears at one price, and orders that want opposite sides fill against each other for free.",
+      "tags": [
+        "mev",
+        "batch-auction",
+        "uniform-price",
+        "order-flow",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/block-batch-clearing",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/block-batch-clearing.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
     },
     {
       "slug": "block-reversal",

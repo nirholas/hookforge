@@ -1227,5 +1227,19 @@
       "constructorArgs": "IPoolManager(address(manager)), 50e18, 30, \"LMSR LP\", \"LMSR-LP\"",
       "dynamicFee": false
     }
+  },
+  "block-batch-clearing": {
+    "panel": "batch",
+    "title": "One price for the whole block",
+    "lede": "Almost all of what is called MEV is the value of being first. This pool collects every order in a block and clears them all at one price, solved in closed form on-chain with no auction and no solver, so arriving earlier is worth nothing. Orders in opposite directions fill against each other before the curve is touched, which means matched flow pays no slippage at all. Place two opposing orders and compare.",
+    "defaultAmount": "1",
+    "zeroForOneLabel": "Sell currency0",
+    "oneForZeroLabel": "Sell currency1",
+    "localDeploy": {
+      "flags": "Hooks.BEFORE_INITIALIZE_FLAG | Hooks.BEFORE_ADD_LIQUIDITY_FLAG | Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG | Hooks.BEFORE_SWAP_FLAG | Hooks.BEFORE_SWAP_RETURNS_DELTA_FLAG",
+      "constructorArgs": "IPoolManager(address(manager)), 30, \"Batch LP\", \"BATCH-LP\"",
+      "dynamicFee": false,
+      "seed": "IERC20(Currency.unwrap(currency0)).approve(address(hook), type(uint256).max);\nIERC20(Currency.unwrap(currency1)).approve(address(hook), type(uint256).max);\nhook.deposit(1_000e18, 1_000e18);"
+    }
   }
 }
