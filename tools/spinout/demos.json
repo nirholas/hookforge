@@ -1241,5 +1241,51 @@
       "dynamicFee": false,
       "seed": "IERC20(Currency.unwrap(currency0)).approve(address(hook), type(uint256).max);\nIERC20(Currency.unwrap(currency1)).approve(address(hook), type(uint256).max);\nhook.deposit(1_000e18, 1_000e18);"
     }
+  },
+  "range-rent": {
+    "panel": "guard",
+    "title": "Rent a tick range and nobody else may provide there",
+    "lede": "Concentrated liquidity is a commons, which is what makes just-in-time liquidity work: add at exactly the right ticks for one block, take a share of the fee, withdraw. Every defence so far taxes the symptom. This removes the commons for ranges worth defending: while a range is leased, nobody but the lessee may add liquidity to it, and the rent goes to the providers sharing the rest of the pool.",
+    "calls": [
+      {
+        "name": "rentFor",
+        "inputs": [
+          "poolKey",
+          "uint32"
+        ],
+        "args": [
+          "poolKey",
+          3600
+        ],
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Rent for a one hour lease",
+            "format": "raw"
+          }
+        ]
+      },
+      {
+        "name": "pendingRent",
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Rent waiting for providers",
+            "format": "raw"
+          }
+        ]
+      }
+    ],
+    "tryLabel": "Try a swap",
+    "tryOtherLabel": "Try the other direction",
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_ADD_LIQUIDITY_FLAG",
+      "config": "RangeRentHook.Config({rangeWidth: 600, rentPerSecond: 1e12, minTerm: 1 hours, maxTerm: 7 days})",
+      "dynamicFee": false
+    }
   }
 }

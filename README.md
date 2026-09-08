@@ -92,7 +92,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | --- | --- | --- |
 | [`TickHarberger`](contracts/src/hooks/TickHarbergerHook.sol) | Leases the right to set the fee one tick range at a time under a continuous self-assessed tax, so price levels are priced separately and the rent goes to the providers being priced. | shipped |
 | [`TenureWeightedFees`](contracts/src/hooks/TenureWeightedFeesHook.sol) | Skims a slice of each swap into a pot shared by tenure, so staying is paid without arriving being taxed. | shipped |
-| `RangeRent` | Charges and pays rent for range occupancy based on how much of the range was actually used. | building |
+| [`RangeRent`](contracts/src/hooks/RangeRentHook.sol) | Rents a tick range exclusively, so nobody but the lessee may add liquidity there. Just-in-time liquidity is not made expensive, it is made impossible, and the rent goes to the providers sharing the rest of the pool. | shipped |
 | `AutoCompoundDonate` | Donates accrued fees straight back to in-range liquidity, compounding without touching positions. | building |
 | [`RetroRebate`](contracts/src/hooks/RetroRebateHook.sol) | Pays volume rebates from closed on-chain epochs, so there is no Merkle root, no off-chain script and nobody who can decline to publish it. | shipped |
 | [`FungibleRange`](contracts/src/hooks/FungibleRangeHook.sol) | A concentrated position with fungible shares whose band widens every time it is forced to move and narrows again while quiet, so attacking the rebalance damps itself. No keeper, no manager. | shipped |
