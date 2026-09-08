@@ -1,0 +1,26 @@
+{
+  "lib/forge-std": {
+    "rev": "886b4f8b63409ef474542de6394d25a9b5908ed3"
+  },
+  "lib/openzeppelin-contracts": {
+    "rev": "bbf3600dc2fd09c7409c5e9d65e2faea36f35115"
+  },
+  "lib/permit2": {
+    "rev": "cc56ad0f3439c502c246fc5cfcc3db92bb8b7219"
+  },
+  "lib/prb-math": {
+    "rev": "5010593538ab97f92f96175daf5ab9337168964f"
+  },
+  "lib/solmate": {
+    "rev": "89365b880c4f3c786bdd453d4b8e8fe410344a69"
+  },
+  "lib/uniswap-hooks": {
+    "rev": "2ae32be4906d300fc49b4384842ef6bc3e902d73"
+  },
+  "lib/v4-core": {
+    "rev": "46c6834698c48bc4a463a86d8420f4eb1d7f3b75"
+  },
+  "lib/v4-periphery": {
+    "rev": "dce236d4e2057422d0791d9a973a58765eb46f65"
+  }
+}
