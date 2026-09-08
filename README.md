@@ -129,7 +129,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | [`AntiSnipeRamp`](contracts/src/hooks/AntiSnipeRampHook.sol) | Starts a launch at a punitive fee that decays to normal, paying the difference to liquidity providers rather than the deployer. | shipped |
 | [`CommitRevealDark`](contracts/src/hooks/CommitRevealDarkHook.sol) | Accepts only swaps that were committed to in an earlier block, so seeing an order stops being useful and nobody has to be trusted to hide it. | shipped |
 | `LotteryFees` | Sends a slice of fees to a no-loss lottery among the pool's liquidity providers. | building |
-| `ReserveStable` | Mints and burns against a reserve to hold a band, with the band enforced by the hook. | building |
+| [`ReserveStable`](contracts/src/hooks/ReserveStableHook.sol) | Pays a bounded rebate to whoever restores a pegged pool's balance, funded solely by the surcharge it collected while losing it, and provably unable to pay out more than it took in. | shipped |
 
 ## Repository layout
 

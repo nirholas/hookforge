@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-08",
-  "count": 28,
+  "count": 29,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -578,6 +578,24 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/reputation-fee",
       "manifest": "https://hookforge.pages.dev/schema/hooks/reputation-fee.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
+    },
+    {
+      "slug": "reserve-stable",
+      "name": "ReserveStable",
+      "family": "Curves",
+      "summary": "A pegged-pair pool that pays arbitrageurs to rebalance it, out of a fund it filled while going wrong.",
+      "tags": [
+        "curve",
+        "stablecoin",
+        "custom-curve",
+        "rebalancing",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/reserve-stable",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/reserve-stable.json",
       "repo": null,
       "site": null,
       "deployments": []

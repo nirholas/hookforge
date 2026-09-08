@@ -74,9 +74,25 @@ const CURVE_ABI = [
   },
 ];
 
-/** Extra read-only figures a given curve publishes about itself, named in the demo config. */
-function statAbi(name) {
-  return {type: "function", name, stateMutability: "view", inputs: [], outputs: [{type: "uint256"}]};
+/**
+ * Extra read-only figures a given curve publishes about itself, named in the demo config.
+ *
+ * A stat may take arguments and may return something other than an unsigned integer, because a curve that quotes a
+ * spread has to be able to say the spread is negative, and one that prices two directions has to be asked which.
+ */
+function statAbi(stat) {
+  return {
+    type: "function",
+    name: stat.name,
+    stateMutability: "view",
+    inputs: (stat.inputs ?? []).map((type) => ({type})),
+    outputs: (stat.outputs ?? ["uint256"]).map((type) => ({type})),
+  };
+}
+
+/** A stable key per configured stat, so the same view read with different arguments does not collide. */
+function statKey(stat) {
+  return `${stat.name}(${(stat.args ?? []).join(",")})`;
 }
 
 export function mountCurve(root, context) {
@@ -100,7 +116,7 @@ export function mountCurve(root, context) {
     feed.node,
   );
 
-  const abi = [...CURVE_ABI, ...(demo.stats ?? []).map((s) => statAbi(s.name))];
+  const abi = [...CURVE_ABI, ...(demo.stats ?? []).map(statAbi)];
 
   async function refresh() {
     const {publicClient} = clients;
@@ -131,13 +147,15 @@ export function mountCurve(root, context) {
 
     for (const stat of demo.stats ?? []) {
       try {
-        state.stats[stat.name] = await publicClient.readContract({
+        state.stats[statKey(stat)] = await publicClient.readContract({
           address: deployment.hook,
           abi,
           functionName: stat.name,
+          args: stat.args ?? [],
         });
       } catch {
-        state.stats[stat.name] = null; // A curve with no liquidity cannot answer some of these, which is fine.
+        // A curve with no liquidity cannot answer some of these, which is fine.
+        state.stats[statKey(stat)] = null;
       }
     }
 
@@ -150,6 +168,13 @@ export function mountCurve(root, context) {
     if (stat.format === "percent") return `${((Number(value) / 1e18) * 100).toFixed(2)}%`;
     if (stat.format === "q96") return (Number(value) / 2 ** 96).toFixed(4);
     if (stat.format === "bps") return `${(Number(value) / 100).toFixed(2)}%`;
+    // A signed spread: negative means the pool is paying the trader to make this trade, which is the whole point of
+    // publishing it, so the sign is spelled out rather than left to a minus sign the eye slides over.
+    if (stat.format === "sbps") {
+      const bps = Number(value);
+      const magnitude = `${(Math.abs(bps) / 100).toFixed(2)}%`;
+      return bps < 0 ? `${magnitude} rebate` : `${magnitude} spread`;
+    }
     if (stat.format === "token") return formatAmount(value, 18, 3);
     return value.toString();
   }
@@ -161,7 +186,7 @@ export function mountCurve(root, context) {
       row(`${tokens.symbol1} reserve`, formatAmount(state.reserves[1], tokens.decimals1, 3)),
       row("Total shares", formatAmount(state.supply ?? 0n, 18, 3)),
       session.account ? row("Your shares", formatAmount(state.shares, 18, 3)) : null,
-      ...(demo.stats ?? []).map((stat) => row(stat.label, formatStat(stat, state.stats[stat.name]))),
+      ...(demo.stats ?? []).map((stat) => row(stat.label, formatStat(stat, state.stats[statKey(stat)]))),
     );
 
     renderQuoter();
