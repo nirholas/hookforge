@@ -962,5 +962,63 @@
       "config": "BlockReversalHook.Config({baseFee: 500, maxSurcharge: 9_500, thresholdTicks: 20, halfPointTicks: 60})",
       "dynamicFee": true
     }
+  },
+  "fungible-range": {
+    "panel": "vault",
+    "title": "A band that widens every time it is forced to move",
+    "lede": "A concentrated position with fungible shares and no keeper. A predictable rebalancer is a standing invitation, so this one is not predictable: every forced move widens the band, and quiet time narrows it back. Push the price out of band and watch the width climb.",
+    "defaultAmount": "10",
+    "pushLabel": "Push the price out of band",
+    "pushHint": "Swap hard enough to move the position, which widens the band it moves into.",
+    "pushAmount": "60000000000000000000",
+    "pushResult": "Pushed. If the band moved, the width above went up and the count went with it.",
+    "stats": [
+      {
+        "name": "currentHalfWidth",
+        "label": "Band half-width",
+        "outputs": [
+          "int24"
+        ],
+        "format": "ticks"
+      },
+      {
+        "name": "tickLower",
+        "label": "Lower tick",
+        "outputs": [
+          "int24"
+        ],
+        "format": "raw"
+      },
+      {
+        "name": "tickUpper",
+        "label": "Upper tick",
+        "outputs": [
+          "int24"
+        ],
+        "format": "raw"
+      },
+      {
+        "name": "rebalances",
+        "label": "Times it has been forced to move",
+        "outputs": [
+          "uint64"
+        ],
+        "format": "raw"
+      },
+      {
+        "name": "rebalanceDue",
+        "label": "Would the next swap move it",
+        "outputs": [
+          "bool"
+        ],
+        "format": "bool"
+      }
+    ],
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.AFTER_SWAP_FLAG",
+      "constructorArgs": "IPoolManager(address(manager)), int24(600), int24(6000), 5_000, 13_000, 1 days, \"Fungible Range LP\", \"FR-LP\"",
+      "dynamicFee": false,
+      "seed": "IERC20(Currency.unwrap(currency0)).approve(address(hook), type(uint256).max);\nIERC20(Currency.unwrap(currency1)).approve(address(hook), type(uint256).max);\nhook.deposit(200e18, 200e18);"
+    }
   }
 }

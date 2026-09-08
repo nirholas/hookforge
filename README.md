@@ -95,7 +95,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | `RangeRent` | Charges and pays rent for range occupancy based on how much of the range was actually used. | building |
 | `AutoCompoundDonate` | Donates accrued fees straight back to in-range liquidity, compounding without touching positions. | building |
 | [`RetroRebate`](contracts/src/hooks/RetroRebateHook.sol) | Pays volume rebates from closed on-chain epochs, so there is no Merkle root, no off-chain script and nobody who can decline to publish it. | shipped |
-| `FungibleRange` | Tokenises a range position as an ERC-20 so it can be traded, lent and used as collateral. | building |
+| [`FungibleRange`](contracts/src/hooks/FungibleRangeHook.sol) | A concentrated position with fungible shares whose band widens every time it is forced to move and narrows again while quiet, so attacking the rebalance damps itself. No keeper, no manager. | shipped |
 
 ### Agent-native
 

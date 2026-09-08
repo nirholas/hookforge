@@ -18,6 +18,12 @@ import {IHookMetadata} from "src/interfaces/IHookMetadata.sol";
  * @title ForgeTest
  * @notice Shared harness for HookForge hook tests: a fresh `PoolManager`, two funded ERC-20s, routers, and helpers for
  * placing a hook at an address whose low bits encode its permission flags.
+ *
+ * @dev One trap is worth naming here, because it has cost this suite real time twice. `vm.prank` and
+ * `vm.expectRevert` apply to the NEXT external call, and an argument that is itself an external call is evaluated
+ * first. So `vm.prank(alice); target.act(target.read())` sends `read` as alice and `act` as the test contract, and
+ * whatever the test asserts afterwards is about something nobody meant to write. Hoist every `target.read()` into a
+ * local before the cheatcode.
  */
 abstract contract ForgeTest is Test, Deployers {
     using StateLibrary for IPoolManager;

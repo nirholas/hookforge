@@ -586,6 +586,21 @@ contract DeployLocal is Script {
  * that drifts from the contract it deploys is worse than no script.
  */
 function localDeployScript(hook, recipe) {
+  // A hook that manages its own liquidity has no `configure` and cannot be seeded through the router, so both are
+  // optional. Defaulting the constructor to the pool manager alone keeps every existing recipe unchanged.
+  const constructorArgs = recipe.constructorArgs ?? "IPoolManager(address(manager))";
+  const configureCall = recipe.config ? `        hook.configure(key, ${recipe.config});\n` : "";
+  const seedCall = recipe.seed
+    ? recipe.seed
+        .split("\n")
+        .map((line) => (line ? `        ${line}` : ""))
+        .join("\n") + "\n"
+    : `        router.modifyLiquidity(
+            key,
+            ModifyLiquidityParams({tickLower: -60000, tickUpper: 60000, liquidityDelta: 5e18, salt: bytes32(0)}),
+            ""
+        );\n`;
+
   return `// SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.26;
 
@@ -643,9 +658,9 @@ contract DeployLocal is Script {
         router = new DemoRouter(IPoolManager(address(manager)));
 
         (address predicted, bytes32 salt) = HookMiner.find(
-            CREATE2_DEPLOYER, FLAGS, type(${hook.contract}).creationCode, abi.encode(IPoolManager(address(manager)))
+            CREATE2_DEPLOYER, FLAGS, type(${hook.contract}).creationCode, abi.encode(${constructorArgs})
         );
-        hook = new ${hook.contract}{salt: salt}(IPoolManager(address(manager)));
+        hook = new ${hook.contract}{salt: salt}(${constructorArgs});
         require(address(hook) == predicted, "hook landed at an unexpected address");
 
         _openPool();
@@ -685,19 +700,13 @@ contract DeployLocal is Script {
             hooks: IHooks(address(hook))
         });
 
-        hook.configure(key, ${recipe.config});
-        router.initialize(key, SQRT_PRICE_1_1);
+${configureCall}        router.initialize(key, SQRT_PRICE_1_1);
 
         weth.claim();
         dai.claim();
         IERC20(Currency.unwrap(currency0)).approve(address(router), type(uint256).max);
         IERC20(Currency.unwrap(currency1)).approve(address(router), type(uint256).max);
-        router.modifyLiquidity(
-            key,
-            ModifyLiquidityParams({tickLower: -60000, tickUpper: 60000, liquidityDelta: 5e18, salt: bytes32(0)}),
-            ""
-        );
-    }
+${seedCall}    }
 }
 `;
 }

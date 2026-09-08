@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-08",
-  "count": 32,
+  "count": 33,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -340,6 +340,24 @@
       "manifest": "https://hookforge.pages.dev/schema/hooks/flow-classifier.json",
       "repo": "https://github.com/nirholas/flow-classifier",
       "site": "https://flow-classifier.pages.dev",
+      "deployments": []
+    },
+    {
+      "slug": "fungible-range",
+      "name": "FungibleRange",
+      "family": "Liquidity management",
+      "summary": "A concentrated position with fungible shares, whose band widens every time it is forced to move.",
+      "tags": [
+        "liquidity",
+        "concentrated",
+        "rebalancing",
+        "keeper-free",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/fungible-range",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/fungible-range.json",
+      "repo": null,
+      "site": null,
       "deployments": []
     },
     {
