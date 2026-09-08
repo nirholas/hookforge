@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-08",
-  "count": 35,
+  "count": 36,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -617,6 +617,24 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "rebase-absorb",
+      "name": "RebaseAbsorb",
+      "family": "Curves",
+      "summary": "A pool whose reserves are real tokens it holds itself, so anything that happens to those tokens happens to the people who supplied them.",
+      "tags": [
+        "curve",
+        "rebasing",
+        "fee-on-transfer",
+        "custom-curve",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/rebase-absorb",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/rebase-absorb.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
     },
     {
       "slug": "reputation-fee",

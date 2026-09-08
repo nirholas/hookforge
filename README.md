@@ -69,10 +69,10 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 
 | Hook | What it does | Status |
 | --- | --- | --- |
-| `RebaseAbsorb` | Makes rebasing tokens safe in v4 by absorbing balance drift into the pool as a donation to liquidity providers. | building |
-| `FeeOnTransfer` | Makes fee-on-transfer tokens work by settling on measured balance deltas instead of requested amounts. | building |
+| [`RebaseAbsorb`](contracts/src/hooks/RebaseAbsorbHook.sol) | Holds its reserves as real tokens at its own address rather than as claims in the singleton, so a rebase, dividend or airdrop of the pool's tokens is attributable to one pool and already belongs to its share holders. Covers `DividendPassthrough` too. | shipped |
+| `FeeOnTransfer` | Partly covered by [`RebaseAbsorb`](contracts/src/hooks/RebaseAbsorbHook.sol), which settles a taxed payout exactly. A taxed *input* cannot be balanced by a hook at all: whatever the swapper sends is taxed before the manager counts it, so only a router that over-sends can cover the shortfall. Stated rather than faked. | shipped |
 | `YieldDiscount` | Parks idle reserves in an ERC-4626 vault and pays the yield out as fee discounts to swappers. | building |
-| `DividendPassthrough` | Routes dividends paid to pool-held tokens through to liquidity providers pro rata. | building |
+| `DividendPassthrough` | Folded into [`RebaseAbsorb`](contracts/src/hooks/RebaseAbsorbHook.sol): from the pool's point of view a dividend paid to holders and a rebase are the same event, and the same reserve-as-balance mechanism absorbs both. | shipped |
 | `WrappedNativeYield` | On chains with native yield, donates the pool's accrued yield to in-range liquidity. | building |
 
 ### Risk

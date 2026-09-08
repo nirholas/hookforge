@@ -1171,5 +1171,28 @@
       "dynamicFee": false,
       "seed": "IERC20(Currency.unwrap(currency1)).approve(address(hook), type(uint256).max);\nhook.deposit(1_000e18);\nrouter.modifyLiquidity(\n    key,\n    ModifyLiquidityParams({tickLower: -60000, tickUpper: 60000, liquidityDelta: 5e18, salt: bytes32(0)}),\n    \"\"\n);"
     }
+  },
+  "rebase-absorb": {
+    "panel": "vault",
+    "title": "A pool that feels what happens to its own tokens",
+    "lede": "Uniswap v4 keeps every pool's tokens in one singleton, and a rebase landing there belongs to no pool in particular. This hook holds its reserves at its own address instead, so a rebase, a dividend or an airdrop of the pool's own tokens is unambiguous and already belongs to the share holders. The reserve is read as the balance, so nothing has to notice.",
+    "defaultAmount": "100",
+    "pushLabel": "Swap against it",
+    "pushHint": "Trade the pool and watch the reserves move as real token balances.",
+    "pushAmount": "5000000000000000000",
+    "pushResult": "Swapped. The reserves above are the hook's own balances, not a stored number.",
+    "stats": [
+      {
+        "name": "swapFeeBps",
+        "label": "Swap fee",
+        "format": "bps"
+      }
+    ],
+    "localDeploy": {
+      "flags": "Hooks.BEFORE_INITIALIZE_FLAG | Hooks.BEFORE_ADD_LIQUIDITY_FLAG | Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG | Hooks.BEFORE_SWAP_FLAG | Hooks.BEFORE_SWAP_RETURNS_DELTA_FLAG",
+      "constructorArgs": "IPoolManager(address(manager)), 30, \"Rebase Absorb LP\", \"RA-LP\"",
+      "dynamicFee": false,
+      "seed": "IERC20(Currency.unwrap(currency0)).approve(address(hook), type(uint256).max);\nIERC20(Currency.unwrap(currency1)).approve(address(hook), type(uint256).max);\nhook.deposit(200e18, 200e18);"
+    }
   }
 }
