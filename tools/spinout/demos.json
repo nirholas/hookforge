@@ -1128,5 +1128,48 @@
       "config": "ImpactSplitHook.Config({maxImpactFee: 50_000, halfPointTicks: 200, windowSeconds: 1 hours, minTicks: 5})",
       "dynamicFee": false
     }
+  },
+  "variance-swap": {
+    "panel": "vault",
+    "title": "Sell the volatility exposure you already have",
+    "lede": "Every liquidity provider is short volatility whether they chose it or not. This measures the pool's realised variance from its own ticks and lets anybody take either side: deposit collateral to be short and collect premiums, or pay a premium to be long and get paid if the pool turns out wilder than the strike. Every note is fully collateralised when written.",
+    "defaultAmount": "500",
+    "pushLabel": "Shake the pool",
+    "pushHint": "Swap hard, which is what produces realised variance.",
+    "pushAmount": "20000000000000000000",
+    "pushResult": "Shaken. Realised variance above went up, and every open note is worth more.",
+    "stats": [
+      {
+        "name": "cumulativeVariance",
+        "label": "Realised variance (squared ticks)",
+        "format": "raw"
+      },
+      {
+        "name": "totalCollateral",
+        "label": "Collateral in the vault",
+        "format": "token"
+      },
+      {
+        "name": "totalLocked",
+        "label": "Locked against live notes",
+        "format": "token"
+      },
+      {
+        "name": "freeCollateral",
+        "label": "Free to back a new note",
+        "format": "token"
+      },
+      {
+        "name": "noteCount",
+        "label": "Notes written",
+        "format": "raw"
+      }
+    ],
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG",
+      "constructorArgs": "IPoolManager(address(manager)), 20, 200, 1 hours, 30 days, \"Variance Vault\", \"VVAULT\"",
+      "dynamicFee": false,
+      "seed": "IERC20(Currency.unwrap(currency1)).approve(address(hook), type(uint256).max);\nhook.deposit(1_000e18);\nrouter.modifyLiquidity(\n    key,\n    ModifyLiquidityParams({tickLower: -60000, tickUpper: 60000, liquidityDelta: 5e18, salt: bytes32(0)}),\n    \"\"\n);"
+    }
   }
 }
