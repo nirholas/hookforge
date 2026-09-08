@@ -4,7 +4,15 @@
 #   ship.sh <slug> [--create]
 #
 # --create makes the GitHub repository and the Cloudflare Pages project first. Without it, both are assumed to exist.
-# Requires GH_TOKEN, CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN in the environment. Nothing is written to disk.
+# Requires GH_TOKEN, CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN in the environment.
+#
+# GitHub tokens here have a habit of expiring mid-run, and creating a repository needs a broader scope than pushing
+# to one. Rather than let that stop a hook from shipping, a GitHub failure is recorded in tools/spinout/pending.txt
+# and the site is deployed anyway: the demo is the part users touch, and the repository can be caught up later with
+#
+#   tools/spinout/ship-pending.sh
+#
+# That is the only thing written to disk outside the generated repository.
 set -euo pipefail
 
 SLUG="$1"
@@ -38,26 +46,34 @@ bash "$ROOT/tools/spinout/publish.sh" "$SLUG" "$DIR" >/dev/null
 cd "$DIR"
 git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/nirholas/$SLUG.git"
 
-# Somebody else may have committed to the published repository since the last ship (the account owner runs
-# maintenance commits across every repo). Rebase onto whatever is there rather than failing the push or, worse,
-# forcing over it.
+PENDING="$ROOT/tools/spinout/pending.txt"
+record_pending() {
+  touch "$PENDING"
+  grep -qxF "$SLUG" "$PENDING" || echo "$SLUG" >> "$PENDING"
+  echo "  github: $1 (queued in tools/spinout/pending.txt)"
+}
+
+push_landed=0
 if git ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
+  # Somebody else may have committed to the published repository since the last ship. Rebase onto whatever is there
+  # rather than failing the push or, worse, forcing over it.
   git fetch -q origin main
   git rebase -q origin/main >/dev/null 2>&1 || { echo "  FAILED: could not rebase onto origin/main"; exit 1; }
 fi
-if ! git push -q -u origin main 2>&1 | tail -2; then
-  echo "  FAILED: push rejected"; exit 1
-fi
 
-# Verify rather than assume. The previous version piped the push through `|| true` and then printed the local SHA,
-# so a failed authentication reported a successful push of a commit that never left the machine. Thirteen
-# repositories were silently behind before this was noticed.
-LOCAL=$(git rev-parse HEAD)
-REMOTE=$(git ls-remote origin main | cut -f1)
-if [ "$LOCAL" != "$REMOTE" ]; then
-  echo "  FAILED: push did not land (local ${LOCAL:0:7}, remote ${REMOTE:0:7})"; exit 1
+if git push -q -u origin main >/dev/null 2>&1; then
+  # Verify rather than assume. An earlier version piped the push through `|| true` and printed the local SHA, so a
+  # failed authentication reported a successful push of a commit that never left the machine. Thirteen repositories
+  # were silently behind before that was noticed.
+  LOCAL=$(git rev-parse HEAD)
+  REMOTE=$(git ls-remote origin main 2>/dev/null | cut -f1)
+  if [ "$LOCAL" = "$REMOTE" ] && [ -n "$REMOTE" ]; then
+    echo "  pushed: ${LOCAL:0:7}"
+    push_landed=1
+    sed -i "/^$SLUG$/d" "$PENDING" 2>/dev/null || true
+  fi
 fi
-echo "  pushed: ${LOCAL:0:7}"
+[ "$push_landed" = "1" ] || record_pending "push did not land"
 
 node web/build.mjs >/dev/null
 URL=$(npx --yes wrangler@latest pages deploy web/dist --project-name "$SLUG" --branch main --commit-dirty=true 2>&1 \

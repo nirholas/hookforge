@@ -28,3 +28,6 @@ build/
 coverage/
 lcov.info
 *.log
+
+# Spin-outs whose GitHub side has not landed yet. Local queue state, not a fact about the repository.
+tools/spinout/pending.txt
