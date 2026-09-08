@@ -14,8 +14,21 @@ import {dirname, join, normalize, relative} from "node:path";
 
 /** Every relative import in `source`, resolved against the file it appeared in. */
 function relativeImports(source, fromFile) {
-  const matches = source.matchAll(/from\s+"(\.[^"]+\.sol)"/g);
-  return [...matches].map((match) => normalize(join(dirname(fromFile), match[1])));
+  const found = [];
+
+  // Neighbours, written the way source files in `src` refer to each other.
+  for (const match of source.matchAll(/from\s+"(\.[^"]+\.sol)"/g)) {
+    found.push(normalize(join(dirname(fromFile), match[1])));
+  }
+
+  // Project-root paths, which is how every test file names what it is testing. Missing these meant a test could
+  // reference a fixture that the generated repository never received, and the failure only showed up as a compile
+  // error in a repository that had already been created.
+  for (const match of source.matchAll(/from\s+"((?:src|test)\/[^"]+\.sol)"/g)) {
+    found.push(normalize(match[1]));
+  }
+
+  return found;
 }
 
 /**
