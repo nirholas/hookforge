@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-08",
-  "count": 31,
+  "count": 32,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -107,6 +107,24 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "block-reversal",
+      "name": "BlockReversal",
+      "family": "Order flow and MEV",
+      "summary": "Charges the swap that unwinds a block's own price move, which is the only leg of a sandwich that can be identified without knowing who anybody is.",
+      "tags": [
+        "mev",
+        "anti-sandwich",
+        "dynamic-fee",
+        "oracle-free",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/block-reversal",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/block-reversal.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
     },
     {
       "slug": "circuit-breaker",

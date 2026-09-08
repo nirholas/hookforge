@@ -7,7 +7,7 @@
  * hiding the exact thing it exists to show.
  */
 import {explorerFor, readableError, shortAddress} from "../wallet.js";
-import {claimBoth, formatToken, readPair, swap} from "../pool.js";
+import {claimBoth, formatToken, poolKeyOf, readPair, swap} from "../pool.js";
 import {clear, el, row, status} from "../ui.js";
 
 /**
@@ -17,12 +17,28 @@ import {clear, el, row, status} from "../ui.js";
  * displayed row says which one it wants. Flattening that to one output per function would mean either calling the
  * same view three times or quietly showing only its first return value.
  */
+const POOL_KEY_TUPLE = {
+  type: "tuple",
+  components: [
+    {name: "currency0", type: "address"},
+    {name: "currency1", type: "address"},
+    {name: "fee", type: "uint24"},
+    {name: "tickSpacing", type: "int24"},
+    {name: "hooks", type: "address"},
+  ],
+};
+
+/** Expands the shorthand a demo config uses for an input type into a real ABI input. */
+function inputFor(type) {
+  return type === "poolKey" ? POOL_KEY_TUPLE : {type};
+}
+
 function callsAbi(calls) {
   return calls.map((call) => ({
     type: "function",
     name: call.name,
     stateMutability: "view",
-    inputs: (call.inputs ?? ["bytes32"]).map((type) => ({type})),
+    inputs: (call.inputs ?? ["bytes32"]).map(inputFor),
     outputs: (call.outputs ?? ["uint256"]).map((type) => ({type})),
   }));
 }
@@ -61,7 +77,13 @@ export function mountGuard(root, context) {
     for (const call of calls) {
       try {
         // `args` defaults to the pool id, which is what almost every one of these takes.
-        const args = (call.args ?? ["poolId"]).map((arg) => (arg === "poolId" ? deployment.poolId : arg));
+        // Two shorthands, because almost every one of these views takes one or the other and spelling out a pool
+        // key in JSON per call would be five lines of duplicated deployment data each time.
+        const args = (call.args ?? ["poolId"]).map((arg) => {
+          if (arg === "poolId") return deployment.poolId;
+          if (arg === "poolKey") return poolKeyOf(deployment);
+          return arg;
+        });
         const result = await publicClient.readContract({
           address: deployment.hook,
           abi,

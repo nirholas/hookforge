@@ -906,5 +906,61 @@
       "flags": "Hooks.BEFORE_SWAP_FLAG",
       "dynamicFee": false
     }
+  },
+  "block-reversal": {
+    "panel": "guard",
+    "title": "The leg that closes a sandwich is the one that pays",
+    "lede": "This pool never asks who is trading. It records where the price stood when the block opened and charges any swap that moves it back, in proportion to how much of the block's move it is unwinding. Push the price one way, then try to come back and watch the quote change.",
+    "calls": [
+      {
+        "name": "quoteFee",
+        "inputs": [
+          "poolKey",
+          "bool"
+        ],
+        "args": [
+          "poolKey",
+          true
+        ],
+        "outputs": [
+          "uint24"
+        ],
+        "reads": [
+          {
+            "label": "Fee to sell currency0",
+            "format": "pips"
+          }
+        ]
+      },
+      {
+        "name": "quoteFee",
+        "inputs": [
+          "poolKey",
+          "bool"
+        ],
+        "args": [
+          "poolKey",
+          false
+        ],
+        "outputs": [
+          "uint24"
+        ],
+        "reads": [
+          {
+            "label": "Fee to buy currency0",
+            "format": "pips"
+          }
+        ]
+      }
+    ],
+    "tryLabel": "Sell currency0",
+    "tryOtherLabel": "Buy currency0",
+    "zeroForOneLabel": "sold currency0",
+    "oneForZeroLabel": "bought currency0",
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG",
+      "config": "BlockReversalHook.Config({baseFee: 500, maxSurcharge: 9_500, thresholdTicks: 20, halfPointTicks: 60})",
+      "dynamicFee": true
+    }
   }
 }
