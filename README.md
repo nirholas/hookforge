@@ -50,7 +50,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | `BlockBatchClearing` | Queues every swap in a block and clears them at one uniform price, so ordering inside the block stops being worth anything. | building |
 | [`TopOfBlockAuction`](contracts/src/hooks/TopOfBlockAuctionHook.sol) | Sells the right to trade first in a block and pays the proceeds to the providers whose stale quote created the value. | shipped |
 | [`FlowClassifier`](contracts/src/hooks/FlowClassifierHook.sol) | Publishes on-chain how much of a pool's flow arrives first in the block and how far it moves the price, as a public good other hooks can read. Changes nothing about the pool it measures. | shipped |
-| `ImpactSplit` | Splits a large swap into tranches across blocks and guarantees the result beats immediate execution or refunds the difference. | building |
+| [`ImpactSplit`](contracts/src/hooks/ImpactSplitHook.sol) | Charges each swap for its price impact, holds the charge, then splits it: the share of the move that survived a settlement window goes to providers, the share that decayed goes back to the trader. Permanent versus temporary impact, decided by the price rather than guessed at. | shipped |
 | [`BlockReversal`](contracts/src/hooks/BlockReversalHook.sol) | Charges the swap that unwinds the current block's own price move, which is the only leg of a sandwich identifiable without knowing who is trading. Replaces the address-based `SandwichBond` sketch, which a second EOA defeats. | shipped |
 
 ### Curves

@@ -1020,5 +1020,113 @@
       "dynamicFee": false,
       "seed": "IERC20(Currency.unwrap(currency0)).approve(address(hook), type(uint256).max);\nIERC20(Currency.unwrap(currency1)).approve(address(hook), type(uint256).max);\nhook.deposit(200e18, 200e18);"
     }
+  },
+  "impact-split": {
+    "panel": "guard",
+    "title": "Pay for the impact that lasts, get back the impact that does not",
+    "lede": "Every swap here is charged for how far it moved the price, and the charge is held rather than kept. After the settlement window the pool looks again: whatever share of the move survived goes to the providers who wore it, and whatever decayed comes back to you. Move the price, then move it back, and watch the surviving share fall.",
+    "calls": [
+      {
+        "name": "impactFeeFor",
+        "inputs": [
+          "poolKey",
+          "uint256"
+        ],
+        "args": [
+          "poolKey",
+          50
+        ],
+        "outputs": [
+          "uint24"
+        ],
+        "reads": [
+          {
+            "label": "Charge for a 50 tick move",
+            "format": "pips"
+          }
+        ]
+      },
+      {
+        "name": "impactFeeFor",
+        "inputs": [
+          "poolKey",
+          "uint256"
+        ],
+        "args": [
+          "poolKey",
+          200
+        ],
+        "outputs": [
+          "uint24"
+        ],
+        "reads": [
+          {
+            "label": "Charge for a 200 tick move",
+            "format": "pips"
+          }
+        ]
+      },
+      {
+        "name": "impactFeeFor",
+        "inputs": [
+          "poolKey",
+          "uint256"
+        ],
+        "args": [
+          "poolKey",
+          1000
+        ],
+        "outputs": [
+          "uint24"
+        ],
+        "reads": [
+          {
+            "label": "Charge for a 1000 tick move",
+            "format": "pips"
+          }
+        ]
+      },
+      {
+        "name": "escrowCount",
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Charges awaiting their verdict",
+            "format": "raw"
+          }
+        ]
+      },
+      {
+        "name": "survivedBps",
+        "inputs": [
+          "poolKey",
+          "uint256"
+        ],
+        "args": [
+          "poolKey",
+          0
+        ],
+        "outputs": [
+          "uint256"
+        ],
+        "reads": [
+          {
+            "label": "Share of the first move still standing",
+            "format": "bps"
+          }
+        ]
+      }
+    ],
+    "tryLabel": "Move the price down",
+    "tryOtherLabel": "Move it back up",
+    "zeroForOneLabel": "moved the price down",
+    "oneForZeroLabel": "moved the price up",
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG | Hooks.AFTER_SWAP_RETURNS_DELTA_FLAG",
+      "config": "ImpactSplitHook.Config({maxImpactFee: 50_000, halfPointTicks: 200, windowSeconds: 1 hours, minTicks: 5})",
+      "dynamicFee": false
+    }
   }
 }

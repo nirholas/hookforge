@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-08",
-  "count": 33,
+  "count": 34,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -392,6 +392,24 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/il-insurance",
       "manifest": "https://hookforge.pages.dev/schema/hooks/il-insurance.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
+    },
+    {
+      "slug": "impact-split",
+      "name": "ImpactSplit",
+      "family": "Fees and MEV",
+      "summary": "Charges a swap for the price impact that lasts, and gives back the impact that does not.",
+      "tags": [
+        "fees",
+        "price-impact",
+        "microstructure",
+        "rebate",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/impact-split",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/impact-split.json",
       "repo": null,
       "site": null,
       "deployments": []
