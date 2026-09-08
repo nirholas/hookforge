@@ -14,6 +14,7 @@ import {mountRewards} from "./panels/rewards.js";
 import {mountDelegation} from "./panels/delegation.js";
 import {mountCommit} from "./panels/commit.js";
 import {mountLease} from "./panels/lease.js";
+import {mountStream} from "./panels/stream.js";
 
 
 /** Whether a deployment points at an RPC only reachable from the machine running the chain. */
@@ -37,6 +38,7 @@ const PANELS = {
   delegation: mountDelegation,
   commit: mountCommit,
   lease: mountLease,
+  stream: mountStream,
 };
 
 const root = document.querySelector("[data-demo]");

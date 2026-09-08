@@ -891,5 +891,20 @@
       "config": "TickHarbergerHook.Config({rangeWidth: 600, rentRateBps: 500, maxFeePips: 50_000, minDeposit: 1e15})",
       "dynamicFee": false
     }
+  },
+  "stream-dca": {
+    "panel": "stream",
+    "title": "A standing order that buys more when the price falls",
+    "lede": "Dollar-cost averaging spends the same money whether the asset halved or doubled. This commits to growing the position by a fixed amount each period instead, so a cheaper price means a larger buy and a dearer one means a smaller buy or none. Open a stream, move the pool, and watch the next buy resize itself.",
+    "defaultBudget": "10",
+    "defaultPerPeriod": "1",
+    "defaultPeriodMinutes": "1",
+    "defaultPeriods": "10",
+    "zeroForOneLabel": "Spend currency0, buy currency1",
+    "oneForZeroLabel": "Spend currency1, buy currency0",
+    "localDeploy": {
+      "flags": "Hooks.BEFORE_SWAP_FLAG",
+      "dynamicFee": false
+    }
   }
 }

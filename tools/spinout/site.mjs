@@ -458,6 +458,7 @@ tr:last-child td { border-bottom: 0; }
 .attempt .btn--small { margin-left: auto; flex: none; }
 .panel__form { display: grid; gap: .4rem 1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 .panel__subhead { margin: 1.6rem 0 0; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); }
+.attempt__muted { color: var(--text-faint); font-size: .82rem; }
 `;
 
 

@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-08",
-  "count": 30,
+  "count": 31,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -632,6 +632,24 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/step-curve",
       "manifest": "https://hookforge.pages.dev/schema/hooks/step-curve.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
+    },
+    {
+      "slug": "stream-dca",
+      "name": "StreamDCA",
+      "family": "Order types",
+      "summary": "A standing order that buys more when the price falls, settled inside other people's swaps.",
+      "tags": [
+        "order-types",
+        "dca",
+        "value-averaging",
+        "keeper-free",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/stream-dca",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/stream-dca.json",
       "repo": null,
       "site": null,
       "deployments": []
