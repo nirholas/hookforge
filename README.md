@@ -127,7 +127,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | `VarianceSwap` | Pays realized variance, making liquidity providers short volatility and traders long it, explicitly. | building |
 | [`MarkoutFee`](contracts/src/hooks/MarkoutFeeHook.sol) | Grades each swap after the fact by whether the price kept moving its way, and prices the next one from the running average. A fee that measures adverse selection instead of guessing at it. | shipped |
 | [`AntiSnipeRamp`](contracts/src/hooks/AntiSnipeRampHook.sol) | Starts a launch at a punitive fee that decays to normal, paying the difference to liquidity providers rather than the deployer. | shipped |
-| `CommitRevealDark` | Hides order size behind a hash commitment and clears the batch on reveal. | building |
+| [`CommitRevealDark`](contracts/src/hooks/CommitRevealDarkHook.sol) | Accepts only swaps that were committed to in an earlier block, so seeing an order stops being useful and nobody has to be trusted to hide it. | shipped |
 | `LotteryFees` | Sends a slice of fees to a no-loss lottery among the pool's liquidity providers. | building |
 | `ReserveStable` | Mints and burns against a reserve to hold a band, with the band enforced by the hook. | building |
 

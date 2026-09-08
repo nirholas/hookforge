@@ -819,5 +819,18 @@
     ],
     "tryLabel": "Try to swap first",
     "tryOtherLabel": "Try the other direction"
+  },
+  "commit-reveal-dark": {
+    "panel": "commit",
+    "title": "Commit now, trade one block later",
+    "lede": "Every swap on this pool must have been committed to in an earlier block. Seeing an order stops being useful, because reacting to it would need a commitment made before you knew it existed. Commit below, watch the blocks count down, then reveal.",
+    "defaultAmount": "0.01",
+    "zeroForOneLabel": "Sell currency0",
+    "oneForZeroLabel": "Buy currency0",
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG",
+      "config": "CommitRevealDarkHook.Config({delayBlocks: 1, ttlBlocks: 200, bond: 0.001 ether})",
+      "dynamicFee": false
+    }
   }
 }

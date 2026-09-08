@@ -3,8 +3,8 @@
   "name": "HookForge",
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
-  "generated": "2026-09-07",
-  "count": 27,
+  "generated": "2026-09-08",
+  "count": 28,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -149,6 +149,24 @@
           "status": "deterministic"
         }
       ]
+    },
+    {
+      "slug": "commit-reveal-dark",
+      "name": "CommitRevealDark",
+      "family": "Order flow and MEV",
+      "summary": "Every swap must have been committed to in an earlier block, so nobody can react to an order they can see.",
+      "tags": [
+        "mev",
+        "anti-sandwich",
+        "commit-reveal",
+        "order-flow",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/commit-reveal-dark",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/commit-reveal-dark.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
     },
     {
       "slug": "depeg-shield",

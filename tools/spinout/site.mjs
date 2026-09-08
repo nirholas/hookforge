@@ -453,6 +453,11 @@ tr:last-child td { border-bottom: 0; }
 .attempt--ok .attempt__badge { color: #4ecdc4; border: 1px solid rgba(78,205,196,.35); }
 .attempt--refused .attempt__badge { color: #ffc44d; border: 1px solid rgba(255,196,77,.35); }
 .attempt__detail { color: var(--text-dim); word-break: break-word; }
+.attempt--idle .attempt__badge { color: var(--text-faint); border: 1px solid var(--line-bright); }
+.attempt__detail { display: flex; flex-wrap: wrap; align-items: baseline; gap: .45rem; flex: 1 1 auto; }
+.attempt .btn--small { margin-left: auto; flex: none; }
+.panel__form { display: grid; gap: .4rem 1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.panel__subhead { margin: 1.6rem 0 0; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); }
 `;
 
 
