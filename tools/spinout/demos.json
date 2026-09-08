@@ -878,5 +878,18 @@
       "constructorArgs": "IPoolManager(address(manager)), 1e18, 1e18, 4, 200, 196, 0.25e18, 500, \"Reserve Stable LP\", \"RSTBL-LP\"",
       "dynamicFee": false
     }
+  },
+  "tick-harberger": {
+    "panel": "lease",
+    "title": "Buy the right to price this range",
+    "lede": "Every price level is worth something different to trade at, and one pool-wide fee says otherwise. Name what the range holding the price is worth, pay rent on your own number, and set the fee inside it. Anybody can take it off you at the number you named, which is what keeps the number honest.",
+    "defaultValuation": "1",
+    "defaultFee": "1.00",
+    "defaultDeposit": "0.1",
+    "localDeploy": {
+      "flags": "Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG | Hooks.AFTER_SWAP_RETURNS_DELTA_FLAG",
+      "config": "TickHarbergerHook.Config({rangeWidth: 600, rentRateBps: 500, maxFeePips: 50_000, minDeposit: 1e15})",
+      "dynamicFee": false
+    }
   }
 }

@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-08",
-  "count": 29,
+  "count": 30,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -650,6 +650,24 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/tenure-weighted-fees",
       "manifest": "https://hookforge.pages.dev/schema/hooks/tenure-weighted-fees.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
+    },
+    {
+      "slug": "tick-harberger",
+      "name": "TickHarberger",
+      "family": "Fees and MEV",
+      "summary": "Leases the right to price a pool's flow, one tick range at a time, under a Harberger tax.",
+      "tags": [
+        "fees",
+        "harberger",
+        "auction",
+        "mev",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/tick-harberger",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/tick-harberger.json",
       "repo": null,
       "site": null,
       "deployments": []

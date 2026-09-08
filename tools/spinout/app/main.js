@@ -13,6 +13,7 @@ import {mountGuard} from "./panels/guard.js";
 import {mountRewards} from "./panels/rewards.js";
 import {mountDelegation} from "./panels/delegation.js";
 import {mountCommit} from "./panels/commit.js";
+import {mountLease} from "./panels/lease.js";
 
 
 /** Whether a deployment points at an RPC only reachable from the machine running the chain. */
@@ -35,6 +36,7 @@ const PANELS = {
   rewards: mountRewards,
   delegation: mountDelegation,
   commit: mountCommit,
+  lease: mountLease,
 };
 
 const root = document.querySelector("[data-demo]");
