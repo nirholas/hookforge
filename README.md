@@ -58,7 +58,7 @@ Status is honest: **shipped** means the contract, its tests and its documentatio
 | Hook | What it does | Status |
 | --- | --- | --- |
 | [`YieldSpace`](contracts/src/hooks/YieldSpaceHook.sol) | A fixed-rate curve with a maturity that converges to par on its own, so a rates market is an ordinary v4 pool. | shipped |
-| `LMSR` | A logarithmic market scoring rule curve, giving prediction markets bounded loss and always-available liquidity. | building |
+| [`LMSR`](contracts/src/hooks/LMSRHook.sol) | Hanson's bounded-loss scoring rule as a two-sided pool curve, with the bound published as an on-chain view a provider reads before depositing. A trade a thousand times the pool's size settles and leaves it standing. | shipped |
 | [`PowerPerp`](contracts/src/hooks/PowerPerpHook.sol) | A weighted geometric-mean curve, so a provider chooses how much of the price move they want instead of always getting the square root of it. | shipped |
 | [`RatchetFloor`](contracts/src/hooks/RatchetFloorHook.sol) | A protocol-owned bid that can only move up, giving a token a floor price that is enforced by the curve. | shipped |
 | [`GridLadder`](contracts/src/hooks/GridLadderHook.sol) | Quotes an independent bid and ask, so a pool can hold a market maker's position rather than a fee schedule. | shipped |

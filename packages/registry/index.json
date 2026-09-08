@@ -4,7 +4,7 @@
   "description": "Production Uniswap v4 hooks with on-chain self-description.",
   "homepage": "https://hookforge.pages.dev",
   "generated": "2026-09-08",
-  "count": 36,
+  "count": 37,
   "hooks": [
     {
       "slug": "agent-budget",
@@ -410,6 +410,24 @@
       ],
       "docs": "https://hookforge.pages.dev/hooks/impact-split",
       "manifest": "https://hookforge.pages.dev/schema/hooks/impact-split.json",
+      "repo": null,
+      "site": null,
+      "deployments": []
+    },
+    {
+      "slug": "lmsr",
+      "name": "LMSR",
+      "family": "Curves",
+      "summary": "A pool whose worst case a provider can read before they deposit.",
+      "tags": [
+        "curve",
+        "custom-curve",
+        "bounded-loss",
+        "scoring-rule",
+        "no-admin"
+      ],
+      "docs": "https://hookforge.pages.dev/hooks/lmsr",
+      "manifest": "https://hookforge.pages.dev/schema/hooks/lmsr.json",
       "repo": null,
       "site": null,
       "deployments": []
