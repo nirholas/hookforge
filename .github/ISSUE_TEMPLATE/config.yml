@@ -7,5 +7,5 @@ contact_links:
     url: https://three.ws
     about: Questions about the hosted platform rather than this repository.
   - name: Security report
-    url: https://github.com/nirholas/hookforge/security/advisories/new
+    url: https://github.com/nirholas/hookforge/blob/main/SECURITY.md
     about: Report a vulnerability privately.
