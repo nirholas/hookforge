@@ -1,0 +1,22 @@
+{
+  "name": "hookforge",
+  "owner": {
+    "name": "nirholas"
+  },
+  "description": "Search and decode the HookForge catalogue of Uniswap v4 hooks via its MCP server and TypeScript SDK.",
+  "plugins": [
+    {
+      "name": "hookforge",
+      "source": "./plugins/hookforge",
+      "description": "Search and decode the HookForge catalogue of Uniswap v4 hooks via its MCP server and TypeScript SDK.",
+      "category": "development",
+      "tags": [
+        "uniswap-v4",
+        "hooks",
+        "solidity",
+        "mcp",
+        "defi"
+      ]
+    }
+  ]
+}
